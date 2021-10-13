@@ -48,8 +48,8 @@ def login():
     global userCheck
     global passCheck
 
-    screen2 = Toplevel((screen))
-    screen2.title = "Login"
+    screen2 = Toplevel(screen)
+    screen2.title("Login")
     screen2.geometry("500x500")
 
     userCheck = StringVar()
@@ -82,10 +82,45 @@ def login_user():
         verify = file1.read().splitlines()
         if password_info in verify:
             print("Login Success")
+            login_success()
         else:
             print("Password not Recognized")
+            password_not_recognized()
     else:
         print("User not found!")
+        user_not_found()
+
+def login_success():
+    global screen3
+    screen3 = Toplevel(screen)
+    screen3.title("DCM")
+    screen3.geometry("1000x1000")
+
+def password_not_recognized():
+    global screen4
+    screen4 = Toplevel(screen)
+    screen4.title("Error")
+    screen4.geometry("200x100")
+    Label(screen4, text = "Password not recognized").pack()
+    Label(screen4, text = "").pack()
+    Button(screen4, text = "OK",  width = "20", height = "2", command = delete4).pack()
+
+
+def user_not_found():
+    global screen5
+    screen5 = Toplevel(screen)
+    screen5.title("Error")
+    screen5.geometry("200x100")
+    Label(screen5, text = "User not found").pack()
+    Label(screen5, text = "").pack()
+    Button(screen5, text = "OK",  width = "20", height = "2", command = delete5).pack()
+
+def delete4():
+    screen4.destroy()
+
+def delete5():
+    screen5.destroy()
+
 
 
 def main_screen():
