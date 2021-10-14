@@ -2,44 +2,60 @@ from tkinter import *
 import os
 
 def register():
+    # set up registration window
     global screen1
     screen1 = Toplevel(screen)
     screen1.title("Register")
-    screen1.geometry("500x500")
+    screen1.geometry("500x250")
 
+    # variables to store user info
     global username
     global password
     global user_Entry
     global pass_Entry
+    global user_Count
     
     username = StringVar()
     password = StringVar()
     
     Label(screen1, text = "Please enter details below").pack()
     Label(screen1,text = "").pack()
+
+    # enter username
     Label(screen1, text = "Username").pack()
     user_Entry = Entry(screen1, textvariable = username)
     user_Entry.pack()
+
+    # enter password
     Label(screen1, text = "Password").pack()
     pass_Entry = Entry(screen1, textvariable = password)
     pass_Entry.pack()
+
+    # register new user
     Label(screen1,text = "").pack()
     Button(screen1, text = "Register",  width = "20", height = "2", command = register_user).pack()
 
 def register_user():
-    username_info = username.get()
-    password_info = password.get()
 
-    file = open(username_info, "w")
-    file.write(username_info+"\n")
-    file.write(password_info)
-    file.close
+    if user_Count == 10:
+        Label(screen1, text="Registration Failed", width="200", height="3", font=("Calibri", 24), fg="green").pack()
 
-    user_Entry.delete(0, END)
-    pass_Entry.delete(0, END)
+    else:
+        # get username and password entered from register
+        username_info = username.get()
+        password_info = password.get()
 
-    Label(screen1, text = "Registration Success", width = "200", height = "3", font = ("Calibri", 24), fg = "green").pack()
+        # write info to a new file
+        file = open(username_info, "w")
+        file.write(username_info+"\n")
+        file.write(password_info)
+        file.close
 
+        #delete previous entries
+        user_Entry.delete(0, END)
+        pass_Entry.delete(0, END)
+
+        Label(screen1, text = "Registration Success", width = "200", height = "3", font = ("Calibri", 24), fg = "green").pack()
 
 def login():
     global screen2
@@ -50,32 +66,34 @@ def login():
 
     screen2 = Toplevel(screen)
     screen2.title("Login")
-    screen2.geometry("500x500")
+    screen2.geometry("500x250")
 
     userCheck = StringVar()
     passCheck = StringVar()
 
     Label(screen2, text = "Please enter details below").pack()
     Label(screen2, text = "").pack()
+
     Label(screen2, text = "Username").pack()
     user_Entry2 = Entry(screen2, textvariable = userCheck)
     user_Entry2.pack()
-    Label(screen2, text = "").pack()
+
     Label(screen2, text = "Password").pack()
     pass_Entry2 = Entry(screen2, textvariable = passCheck)
     pass_Entry2.pack()
-    Label(screen2, text = "").pack()
 
+    Label(screen2, text = "").pack()
     Button(screen2, text = "Login",  width = "20", height = "2", command = login_user).pack()
 
 def login_user():
-
+    # get username and password entered from login
     username_info = userCheck.get()
     password_info = passCheck.get()
 
     user_Entry2.delete(0, END)
     pass_Entry2.delete(0, END)
 
+    # read through all files in directory and compare against login (NOT THE MOST EFFICIENT METHOD...)
     list_of_files = os.listdir()
     if username_info in list_of_files:
         file1 = open(username_info, "r")
@@ -121,8 +139,6 @@ def delete4():
 def delete5():
     screen5.destroy()
 
-
-
 def main_screen():
     global screen
     screen = Tk()
@@ -135,7 +151,6 @@ def main_screen():
     Button(text = "Register",  width = "30", height = "2", command = register).pack()
 
     screen.mainloop()
-
 
 main_screen()
 
