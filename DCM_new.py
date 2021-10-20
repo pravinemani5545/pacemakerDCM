@@ -1,9 +1,13 @@
 from tkinter import *
+from Pacemaker_Modes import *
 import os
 
-# GONNA COPY THIS OVER ONCE LOGIN PART IS DONE AS WELL
+# IMPORTANT VARIABLES
 user_data_file = "user_data.txt"
 user_count = 0
+
+# pacemaker programmable parameters
+lrl_value, url_value, aa_value, apw_value, va_value, vpw_value, vrp_value, arp_value = 0, 0, 0, 0, 0, 0, 0, 0
 
 # ONLY FOR INITIALIZING DCM, USED FOR TESTING
 def erase_user_data():
@@ -11,7 +15,7 @@ def erase_user_data():
     file.write("0\n")
     file.close()
 
-# SET UP REGISTRATION PAGE
+# REGISTRATION PAGE ====================================================================================================
 def register_page():
     global register
     register = Toplevel(welcome)
@@ -24,26 +28,29 @@ def register_page():
     user = StringVar()
     password = StringVar()
 
-    Label(register, text = "Create New Account", font=("Calibri", 24)).grid(row = 0, column = 0, padx = 120, pady = 10, columnspan = 2)
+    Label(register, text="Create New Account", font=("Calibri", 24)).grid(row=0, column=0, padx=120, pady=10,
+                                                                          columnspan=2)
 
-    Label(register, text = "Username:").grid(row = 1, column = 0, pady = 10)
-    enter_user = Entry(register, textvariable = user)
-    enter_user.grid(row = 1, column = 1)
+    Label(register, text="Username:").grid(row=1, column=0, pady=10)
+    enter_user = Entry(register, textvariable=user)
+    enter_user.grid(row=1, column=1)
 
-    Label(register, text = "Password:").grid(row = 2, column = 0, pady = 10)
-    enter_pass = Entry(register, textvariable = password)
-    enter_pass.grid(row = 2, column = 1)
+    Label(register, text="Password:").grid(row=2, column=0, pady=10)
+    enter_pass = Entry(register, textvariable=password)
+    enter_pass.grid(row=2, column=1)
 
-    Button(register, text = "Register", padx = 20, pady = 10, command = register_new_user).grid(row = 3, column = 0, pady = 20, columnspan = 2)
-    Button(register, text = "Return to Menu", padx = 20, pady = 10, command = register.destroy).grid(row = 5, column = 0, pady = 20, columnspan = 2)
+    Button(register, text="Register", padx=20, pady=10, command=register_new_user).grid(row=3, column=0, pady=20,
+                                                                                        columnspan=2)
+    Button(register, text="Return to Menu", padx=20, pady=10, command=register.destroy).grid(row=5, column=0, pady=20,
+                                                                                             columnspan=2)
 
-# add new info to login data file
+# ADD REGISTRATION INFO TO DATA FILE
 def register_new_user():
     verify = check_user_limit()
 
     # write data to file
     if verify:
-        # update user_count and restore rest of data to file
+        # update user_count and restore previous data to file
         file = open(user_data_file, "r")
         data = file.readlines()
         data[0] = str(user_count) + "\n"
@@ -57,13 +64,15 @@ def register_new_user():
         file = open(user_data_file, "a")
         file.write(user.get() + "," + password.get() + "\n")
         file.close()
-		
-        Label(register, text="Registration Success", font=("Calibri", 24), fg="green").grid(row=4, column=0, columnspan=2)
 
+        Label(register, text="Registration Success", font=("Calibri", 24), fg="green").grid(row=4, column=0,
+                                                                                            columnspan=2)
     else:
-        Label(register, text="Registration Failed: Number of Users Exceeded Limit", font=("Calibri", 24), fg="red").grid(row=4, column=0, columnspan=2)
+        Label(register, text="Registration Failed: Number of Users Exceeded Limit", font=("Calibri", 24),
+              fg="red").grid(row=4, column=0, columnspan=2)
 
-# checks to see if amount of users logged !> maximum
+
+# CHECK TO SEE IF CURRENT USERS > USER LIMIT (10)
 def check_user_limit():
     global user_count
 
@@ -78,7 +87,7 @@ def check_user_limit():
         user_count = user_count + 1
         return True
 
-# SET UP LOGIN PAGE ====================================================================================================
+# LOGIN PAGE ===========================================================================================================
 def login_page():
     global login
     login = Toplevel(welcome)
@@ -101,28 +110,29 @@ def login_page():
     enter_pass.grid(row=2, column=1)
 
     Button(login, text="Login", padx=20, pady=10, command=login_check).grid(row=3, column=0, pady=20, columnspan=2)
-    Button(login, text="Return to Menu", padx=20, pady=10, command = login.destroy).grid(row=5, column=0, pady=20, columnspan=2)
+    Button(login, text="Return to Menu", padx=20, pady=10, command=login.destroy).grid(row=5, column=0, pady=20,
+                                                                                       columnspan=2)
 
-# check to see if login details are correct
+# CHECK TO SEE IF LOGIN DETAILS CORRECT
 def login_check():
     # import data from user_data_file
     file = open(user_data_file, "r")
     data = file.readlines()
     file.close()
 
-    flag = 1 # to track if user was found or not
-    verify = check_user_limit() # get latest user_count
+    flag = 1  # to track if user was found or not
+    verify = check_user_limit()  # get latest user_count
 
     message = Label(login, text="", font=("Calibri", 24), fg="green")
-    message.grid(row=4, column=0, columnspan=2) # initialize label
+    message.grid(row=4, column=0, columnspan=2)  # initialize label
 
     for i in range(1, user_count):
         user_data = data[i].split(",")
-        if (user.get() == user_data[0]):    # check to see if user is in list
-            if(password.get() == user_data[1].strip("\n")): # check to see if password is correct
+        if (user.get() == user_data[0]):  # check to see if user is in list
+            if (password.get() == user_data[1].strip("\n")):  # check to see if password is correct
                 message.config(text="                        Login Success                        ")
                 flag = 0
-                login_success() # WELCOME PAGE
+                DCM_login()  # go to main DCM page
             else:
                 message.config(text="Login Failed: Password Not Recognized", fg="red")
                 flag = 0
@@ -131,29 +141,175 @@ def login_check():
     if (flag):
         message.config(text="Login Failed: Username Not Recognized", fg="red")
 
-# TRANSFER FROM LOGIN PAGE TO ACTUAL DCM PAGE (in progress...)
-def login_success():
-    global screen3
-    welcome.destroy()
-    screen3 = Tk()
-    screen3.geometry("1000x1000")
-    screen3.title("DCM")
-
-# MAIN PAGE ============================================================================================================
+# WELCOME PAGE ============================================================================================================
 def welcome_page():
     global welcome
-    welcome =  Tk()
+    welcome = Tk()
     welcome.geometry("500x500")
-    welcome.title("Welcome to DCM")
+    welcome.title("Login to DCM")
 
-    Label(text="Pacemaker DCM", font=("Calibri", 24), justify = CENTER).grid(row = 0, column = 0, padx = 140)
-    Label(text="").grid(row = 1, column = 0)
-    Button(text="Login", padx = 20, pady = 10, command = login_page).grid(row = 2, column = 0)
-    Label(text="").grid(row = 3, column = 0)
-    Label(text = "Not a registered user?").grid(row = 4, column = 0)
-    Button(text = "Register", padx = 20, pady = 10, command = register_page).grid(row = 5, column = 0)
+    Label(text="Pacemaker DCM", font=("Calibri", 24), justify=CENTER).grid(row=0, column=0, padx=140)
+    Label(text="").grid(row=1, column=0)
+    Button(text="Login", padx=20, pady=10, command=login_page).grid(row=2, column=0)
+    Label(text="").grid(row=3, column=0)
+    Label(text="Not a registered user?").grid(row=4, column=0)
+    Button(text="Register", padx=20, pady=10, command=register_page).grid(row=5, column=0)
+    Label(text="", pady=100).grid(row=6, column=0)
+    Button(text="Quit", padx=20, pady=10, command=welcome.destroy).grid(row=6, column=0)
 
     welcome.mainloop()
 
-erase_user_data()
+# ACTUAL DCM ===========================================================================================================
+# NAVIGATION BAR AT TOP OF WINDOW
+def nav_bar():
+    global nav
+    nav = Frame(DCM)
+
+    Label(text="Welcome to DCM, " + user.get()).grid(row=0, column=0)
+    Label(text="ICON1", padx = 50).grid(row=0, column=1)
+    Label(text="ICON2", padx = 50).grid(row=0, column=2)
+    Label(text="OTHER STUFF", padx = 50).grid(row=0, column=3)
+    Button(text="Log Out", padx=10, pady=5, command=back_to_welcome).grid(row=0, column=4)
+
+def back_to_welcome():
+    DCM.destroy()
+    welcome_page()
+
+# AOO MODE PARAMETERS
+def set_mode_AOO():
+    # set up AOO frame inside of pm_params frame
+    print("AOO")
+    global AOO_mode
+    AOO_mode = Frame(pm_params)
+
+    # forget previous mode frame and set this as new one
+    global mode_frame
+    mode_frame.grid_forget()
+    mode_frame = AOO_mode
+    mode_frame.grid(row=1, column=0)
+
+    # parameters for this mode to be modified
+    global lrl_value, url_value, aa_value, apw_value
+    lrl_value = StringVar()
+    url_value = StringVar()
+    aa_value = StringVar()
+    apw_value = StringVar()
+
+    Label(AOO_mode, text="Lower Rate Limit: ").grid(row=1, column=0)
+    enter_lrl = Entry(AOO_mode, textvariable = lrl_value).grid(row=1, column=1)
+
+    Label(AOO_mode, text="Upper Rate Limit: ").grid(row=2, column=0)
+    enter_url = Entry(AOO_mode, textvariable=url_value).grid(row=2, column=1)
+
+    Label(AOO_mode, text="Atrial Amplitude: ").grid(row=3, column=0)
+    enter_aa = Entry(AOO_mode, textvariable=aa_value).grid(row=3, column=1)
+
+    Label(AOO_mode, text="Atrial Pulse Width: ").grid(row=4, column=0)
+    enter_apw = Entry(AOO_mode, textvariable=apw_value).grid(row=4, column=1)
+
+    Button(AOO_mode, text="Update", padx=20, pady=10, command=send_AOO).grid(row=5, columnspan=2)
+
+def send_AOO():
+    mode = AOO()
+
+    message = Label(AOO_mode, text="", font=("Calibri", 24), fg="green")
+    message.grid(row=6, column=0, columnspan=2)
+
+    # make sure values entered are valid
+    try:
+        int(lrl_value.get())
+        int(url_value.get())
+        int(aa_value.get())
+        int(apw_value.get())
+
+        mode.set_LRL(int(lrl_value.get()))
+        mode.set_URL(int(url_value.get()))
+        mode.set_AA(int(aa_value.get()))
+        mode.set_APW(int(apw_value.get()))
+        message.config(text="                     Update Success!                     ", fg="green")
+
+    except:
+        message.config(text="Update Failed: please use integers", fg="red")
+
+    # for testing values are correct
+    print(mode.get_LRL())
+    print(mode.get_URL())
+    print(mode.get_AA())
+    print(mode.get_APW())
+
+def set_mode_VOO():
+    print("VOO")
+    global VOO_mode
+    VOO_mode = Frame(pm_params)
+
+    # forget previous mode frame and set this as new one
+    global mode_frame
+    mode_frame.forget()
+    mode_frame = VOO_mode
+    mode_frame.grid(row=1, column=0)
+
+def set_mode_AAI():
+    print("AAI")
+    global AAI_mode
+    AAI_mode = Frame(pm_params)
+
+    # forget previous mode frame and set this as new one
+    global mode_frame
+    mode_frame.grid_forget()
+    mode_frame = AAI_mode
+    mode_frame.grid(row=1, column=0)
+
+def set_mode_VVI():
+    print("VVI")
+    global VVI_mode
+    VVI_mode = Frame(pm_params)
+
+    # forget previous mode frame and set this as new one
+    global mode_frame
+    mode_frame.grid_forget()
+    mode_frame = VVI_mode
+    mode_frame.grid(row=1, column=0)
+
+# PACEMAKER PARAMETERS WINDOW
+def pacemaker_parameters():
+    global pm_params
+    pm_params = Frame(DCM)
+
+    # initialize pacemaker mode windows
+    global mode_frame
+    mode_frame = Frame(pm_params)
+    mode_frame.grid(row=1, column=0)
+
+    set_mode_AOO()
+    set_mode_VOO()
+    set_mode_AAI()
+    set_mode_VVI()
+
+    mode_frame.grid_forget()
+
+    # set up menu to choose different pacemaker modes
+    pm_modes = Menubutton(pm_params, text="Choose Pacing Mode", relief = GROOVE)
+    pm_modes.menu = Menu(pm_modes, tearoff=0)
+    pm_modes["menu"] = pm_modes.menu
+
+    pm_modes.menu.add_command(label="AOO", command=set_mode_AOO)
+    pm_modes.menu.add_command(label="VOO", command=set_mode_VOO)
+    pm_modes.menu.add_command(label="AAI", command=set_mode_AAI)
+    pm_modes.menu.add_command(label="VVI", command=set_mode_VVI)
+
+    pm_modes.grid(row=0, column=0)
+
+def DCM_login():
+    global DCM
+    welcome.destroy()
+    DCM = Tk()
+    DCM.geometry("1280x720")
+    DCM.title("Welcome to DCM")
+
+    nav_bar()
+    nav.grid(row=0, column=0)
+
+    pacemaker_parameters()
+    pm_params.grid(row=1, column=0)
+
 welcome_page()
