@@ -29,7 +29,7 @@ def register_page():
     user = StringVar()
     password = StringVar()
 
-    Label(register, text="Create New Account", font=header).grid(row=0, column=0, padx=120, pady=10,
+    Label(register, text="Create New Account", font=("Calibri", 24)).grid(row=0, column=0, padx=120, pady=10,
                                                                           columnspan=2)
 
     Label(register, text="Username:").grid(row=1, column=0, pady=10)
