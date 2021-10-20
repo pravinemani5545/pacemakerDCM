@@ -178,7 +178,7 @@ def back_to_welcome():
 # AOO MODE PARAMETERS
 def set_mode_AOO():
     # set up AOO frame inside of pm_params frame
-    print("AOO")
+    mode_name.config(text="AOO")
     global AOO_mode
     AOO_mode = Frame(pm_params)
 
@@ -186,7 +186,7 @@ def set_mode_AOO():
     global mode_frame
     mode_frame.grid_forget()
     mode_frame = AOO_mode
-    mode_frame.grid(row=1, column=0)
+    mode_frame.grid(row=1, column=0, columnspan=2)
 
     # parameters for this mode to be modified
     global lrl_value, url_value, aa_value, apw_value
@@ -212,7 +212,7 @@ def set_mode_AOO():
 def send_AOO():
     mode = AOO()
 
-    message = Label(AOO_mode, text="", font=("Calibri", 24), fg="green")
+    message = Label(AOO_mode, text="                                                         ", font=("Calibri", 24), fg="green")
     message.grid(row=6, column=0, columnspan=2)
 
     # make sure values entered are valid
@@ -238,18 +238,67 @@ def send_AOO():
     print(mode.get_APW())
 
 def set_mode_VOO():
-    print("VOO")
+    mode_name.config(text="VOO")
     global VOO_mode
     VOO_mode = Frame(pm_params)
 
     # forget previous mode frame and set this as new one
     global mode_frame
-    mode_frame.forget()
+    mode_frame.grid_forget()
     mode_frame = VOO_mode
-    mode_frame.grid(row=1, column=0)
+    mode_frame.grid(row=1, column=0, columnspan=2)
+
+    # parameters for this mode to be modified
+    global lrl_value, url_value, va_value, vpw_value
+    lrl_value = StringVar()
+    url_value = StringVar()
+    va_value = StringVar()
+    vpw_value = StringVar()
+
+    Label(VOO_mode, text="Lower Rate Limit: ").grid(row=1, column=0)
+    enter_lrl = Entry(VOO_mode, textvariable=lrl_value).grid(row=1, column=1)
+
+    Label(VOO_mode, text="Upper Rate Limit: ").grid(row=2, column=0)
+    enter_url = Entry(VOO_mode, textvariable=url_value).grid(row=2, column=1)
+
+    Label(VOO_mode, text="Atrial Amplitude: ").grid(row=3, column=0)
+    enter_va = Entry(VOO_mode, textvariable=va_value).grid(row=3, column=1)
+
+    Label(VOO_mode, text="Atrial Pulse Width: ").grid(row=4, column=0)
+    enter_vpw = Entry(VOO_mode, textvariable=vpw_value).grid(row=4, column=1)
+
+    Button(VOO_mode, text="Update", padx=20, pady=10, command=send_VOO).grid(row=5, columnspan=2)
+
+def send_VOO():
+    mode = VOO()
+
+    message = Label(VOO_mode, text="                                                         ", font=("Calibri", 24), fg="green")
+    message.grid(row=6, column=0, columnspan=2)
+
+    # make sure values entered are valid
+    try:
+        int(lrl_value.get())
+        int(url_value.get())
+        int(va_value.get())
+        int(vpw_value.get())
+
+        mode.set_LRL(int(lrl_value.get()))
+        mode.set_URL(int(url_value.get()))
+        mode.set_VA(int(va_value.get()))
+        mode.set_VPW(int(vpw_value.get()))
+        message.config(text="                     Update Success!                     ", fg="green")
+
+    except:
+        message.config(text="Update Failed: please use integers", fg="red")
+
+    # for testing values are correct
+    print(mode.get_LRL())
+    print(mode.get_URL())
+    print(mode.get_VA())
+    print(mode.get_VPW())
 
 def set_mode_AAI():
-    print("AAI")
+    mode_name.config(text="AAI")
     global AAI_mode
     AAI_mode = Frame(pm_params)
 
@@ -257,10 +306,67 @@ def set_mode_AAI():
     global mode_frame
     mode_frame.grid_forget()
     mode_frame = AAI_mode
-    mode_frame.grid(row=1, column=0)
+    mode_frame.grid(row=1, column=0, columnspan=2)
+
+    # parameters for this mode to be modified
+    global lrl_value, url_value, aa_value, apw_value, arp_value
+    lrl_value = StringVar()
+    url_value = StringVar()
+    aa_value = StringVar()
+    apw_value = StringVar()
+    arp_value = StringVar()
+
+    Label(AAI_mode, text="Lower Rate Limit: ").grid(row=1, column=0)
+    enter_lrl = Entry(AAI_mode, textvariable=lrl_value).grid(row=1, column=1)
+
+    Label(AAI_mode, text="Upper Rate Limit: ").grid(row=2, column=0)
+    enter_url = Entry(AAI_mode, textvariable=url_value).grid(row=2, column=1)
+
+    Label(AAI_mode, text="Atrial Amplitude: ").grid(row=3, column=0)
+    enter_aa = Entry(AAI_mode, textvariable=aa_value).grid(row=3, column=1)
+
+    Label(AAI_mode, text="Atrial Pulse Width: ").grid(row=4, column=0)
+    enter_apw = Entry(AAI_mode, textvariable=apw_value).grid(row=4, column=1)
+
+    Label(AAI_mode, text="ARP: ").grid(row=5, column=0)
+    enter_arp = Entry(AAI_mode, textvariable=arp_value).grid(row=5, column=1)
+
+    Button(AAI_mode, text="Update", padx=20, pady=10, command=send_AAI).grid(row=6, columnspan=2)
+
+def send_AAI():
+    mode = AAI()
+
+    message = Label(AAI_mode, text="                                                         ", font=("Calibri", 24), fg="green")
+    message.grid(row=7, column=0, columnspan=2)
+
+    # make sure values entered are valid
+    try:
+        int(lrl_value.get())
+        int(url_value.get())
+        int(aa_value.get())
+        int(apw_value.get())
+        int(arp_value.get())
+
+        mode.set_LRL(int(lrl_value.get()))
+        mode.set_URL(int(url_value.get()))
+        mode.set_AA(int(aa_value.get()))
+        mode.set_APW(int(apw_value.get()))
+        mode.set_ARP(int(arp_value.get()))
+        message.config(text="                     Update Success!                     ", fg="green")
+
+    except:
+        message.config(text="Update Failed: please use integers", fg="red")
+
+    # for testing values are correct
+    print(mode.get_LRL())
+    print(mode.get_URL())
+    print(mode.get_AA())
+    print(mode.get_APW())
+    print(mode.get_ARP())
 
 def set_mode_VVI():
-    print("VVI")
+    mode_name.config(text="VVI")
+
     global VVI_mode
     VVI_mode = Frame(pm_params)
 
@@ -268,24 +374,82 @@ def set_mode_VVI():
     global mode_frame
     mode_frame.grid_forget()
     mode_frame = VVI_mode
-    mode_frame.grid(row=1, column=0)
+    mode_frame.grid(row=1, column=0, columnspan=2)
+
+    # parameters for this mode to be modified
+    global lrl_value, url_value, aa_value, apw_value, vrp_value
+    lrl_value = StringVar()
+    url_value = StringVar()
+    va_value = StringVar()
+    vpw_value = StringVar()
+    vrp_value = StringVar()
+
+    Label(VVI_mode, text="Lower Rate Limit: ").grid(row=1, column=0)
+    enter_lrl = Entry(VVI_mode, textvariable=lrl_value).grid(row=1, column=1)
+
+    Label(VVI_mode, text="Upper Rate Limit: ").grid(row=2, column=0)
+    enter_url = Entry(VVI_mode, textvariable=url_value).grid(row=2, column=1)
+
+    Label(VVI_mode, text="Atrial Amplitude: ").grid(row=3, column=0)
+    enter_va = Entry(VVI_mode, textvariable=va_value).grid(row=3, column=1)
+
+    Label(VVI_mode, text="Atrial Pulse Width: ").grid(row=4, column=0)
+    enter_vpw = Entry(VVI_mode, textvariable=vpw_value).grid(row=4, column=1)
+
+    Label(VVI_mode, text="VRP: ").grid(row=5, column=0)
+    enter_vrp = Entry(VVI_mode, textvariable=vrp_value).grid(row=5, column=1)
+
+    Button(VVI_mode, text="Update", padx=20, pady=10, command=send_VVI).grid(row=6, columnspan=2)
+
+def send_VVI():
+    mode = VVI()
+
+    message = Label(VVI_mode, text="                                                         ", font=("Calibri", 24), fg="green")
+    message.grid(row=7, column=0, columnspan=2)
+
+    # make sure values entered are valid
+    try:
+        int(lrl_value.get())
+        int(url_value.get())
+        int(va_value.get())
+        int(vpw_value.get())
+        int(vrp_value.get())
+
+        mode.set_LRL(int(lrl_value.get()))
+        mode.set_URL(int(url_value.get()))
+        mode.set_VA(int(va_value.get()))
+        mode.set_VPW(int(vpw_value.get()))
+        mode.set_VRP(int(vrp_value.get()))
+        message.config(text="                     Update Success!                     ", fg="green")
+
+    except:
+        message.config(text="Update Failed: please use integers", fg="red")
+
+    # for testing values are correct
+    print(mode.get_LRL())
+    print(mode.get_URL())
+    print(mode.get_VA())
+    print(mode.get_VPW())
+    print(mode.get_VRP())
 
 # PACEMAKER PARAMETERS WINDOW
 def pacemaker_parameters():
     global pm_params
     pm_params = Frame(DCM)
 
+    # displays current mode
+    global mode_name
+    mode_name = Label(pm_params, text="")
+    mode_name.grid(row=0, column=1)
+
     # initialize pacemaker mode windows
     global mode_frame
     mode_frame = Frame(pm_params)
-    mode_frame.grid(row=1, column=0)
 
     set_mode_AOO()
     set_mode_VOO()
     set_mode_AAI()
     set_mode_VVI()
-
-    mode_frame.grid_forget()
 
     # set up menu to choose different pacemaker modes
     pm_modes = Menubutton(pm_params, text="Choose Pacing Mode", relief = GROOVE)

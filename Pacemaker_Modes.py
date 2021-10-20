@@ -89,6 +89,12 @@ class AAI:
     def get_AA(self):
         return self.AA
 
+    def set_APW(self, value):
+        self.APW = value
+
+    def get_APW(self):
+        return self.APW
+
     def set_ARP(self, value):
         self.ARP = value
 
