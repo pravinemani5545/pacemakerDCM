@@ -1,4 +1,5 @@
 from tkinter import *
+import tkinter.font as tkFont
 from Pacemaker_Modes import *
 import os
 
@@ -28,7 +29,7 @@ def register_page():
     user = StringVar()
     password = StringVar()
 
-    Label(register, text="Create New Account", font=("Calibri", 24)).grid(row=0, column=0, padx=120, pady=10,
+    Label(register, text="Create New Account", font=header).grid(row=0, column=0, padx=120, pady=10,
                                                                           columnspan=2)
 
     Label(register, text="Username:").grid(row=1, column=0, pady=10)
@@ -148,7 +149,11 @@ def welcome_page():
     welcome.geometry("500x500")
     welcome.title("Login to DCM")
 
-    Label(text="Pacemaker DCM", font=("Calibri", 24), justify=CENTER).grid(row=0, column=0, padx=140)
+    # fonts
+    header = tkFont.Font(welcome, family="Roman", size=24, weight="bold")
+    print(tkFont.families())
+
+    Label(text="Pacemaker DCM", font=header, justify=CENTER).grid(row=0, column=0, padx=140)
     Label(text="").grid(row=1, column=0)
     Button(text="Login", padx=20, pady=10, command=login_page).grid(row=2, column=0)
     Label(text="").grid(row=3, column=0)
@@ -165,11 +170,11 @@ def nav_bar():
     global nav
     nav = Frame(DCM)
 
-    Label(text="Welcome to DCM, " + user.get()).grid(row=0, column=0)
-    Label(text="ICON1", padx = 50).grid(row=0, column=1)
-    Label(text="ICON2", padx = 50).grid(row=0, column=2)
-    Label(text="OTHER STUFF", padx = 50).grid(row=0, column=3)
-    Button(text="Log Out", padx=10, pady=5, command=back_to_welcome).grid(row=0, column=4)
+    Label(nav, text="Welcome to DCM, " + user.get()).grid(row=0, column=0)
+    Label(nav, text="ICON1", padx=50 ).grid(row=0, column=1)
+    Label(nav, text="ICON2", padx=50).grid(row=0, column=2)
+    Label(nav, text="", padx=400).grid(row=0, column=3)
+    Button(nav, text="Log Out", padx=10, pady=5, command=back_to_welcome).grid(row=0, column=4)
 
 def back_to_welcome():
     DCM.destroy()
@@ -195,7 +200,7 @@ def set_mode_AOO():
     aa_value = StringVar()
     apw_value = StringVar()
 
-    Label(AOO_mode, text="Lower Rate Limit: ").grid(row=1, column=0)
+    Label(AOO_mode, text="Lower Rate Limit: ").grid(row=1, column=0, padx=100)
     enter_lrl = Entry(AOO_mode, textvariable = lrl_value).grid(row=1, column=1)
 
     Label(AOO_mode, text="Upper Rate Limit: ").grid(row=2, column=0)
@@ -255,7 +260,7 @@ def set_mode_VOO():
     va_value = StringVar()
     vpw_value = StringVar()
 
-    Label(VOO_mode, text="Lower Rate Limit: ").grid(row=1, column=0)
+    Label(VOO_mode, text="Lower Rate Limit: ").grid(row=1, column=0, padx=100)
     enter_lrl = Entry(VOO_mode, textvariable=lrl_value).grid(row=1, column=1)
 
     Label(VOO_mode, text="Upper Rate Limit: ").grid(row=2, column=0)
@@ -316,7 +321,7 @@ def set_mode_AAI():
     apw_value = StringVar()
     arp_value = StringVar()
 
-    Label(AAI_mode, text="Lower Rate Limit: ").grid(row=1, column=0)
+    Label(AAI_mode, text="Lower Rate Limit: ").grid(row=1, column=0, padx=100)
     enter_lrl = Entry(AAI_mode, textvariable=lrl_value).grid(row=1, column=1)
 
     Label(AAI_mode, text="Upper Rate Limit: ").grid(row=2, column=0)
@@ -377,15 +382,15 @@ def set_mode_VVI():
     mode_frame.grid(row=1, column=0, columnspan=2)
 
     # parameters for this mode to be modified
-    global lrl_value, url_value, aa_value, apw_value, vrp_value
+    global lrl_value, url_value, va_value, vpw_value, vrp_value
     lrl_value = StringVar()
     url_value = StringVar()
     va_value = StringVar()
     vpw_value = StringVar()
     vrp_value = StringVar()
 
-    Label(VVI_mode, text="Lower Rate Limit: ").grid(row=1, column=0)
-    enter_lrl = Entry(VVI_mode, textvariable=lrl_value).grid(row=1, column=1)
+    Label(VVI_mode, text="Lower Rate Limit: ").grid(row=1, column=0, padx=50)
+    enter_lrl = Entry(VVI_mode, textvariable=lrl_value).grid(row=1, column=1, padx=100)
 
     Label(VVI_mode, text="Upper Rate Limit: ").grid(row=2, column=0)
     enter_url = Entry(VVI_mode, textvariable=url_value).grid(row=2, column=1)
@@ -445,6 +450,7 @@ def pacemaker_parameters():
     # initialize pacemaker mode windows
     global mode_frame
     mode_frame = Frame(pm_params)
+    mode_frame.grid(row=1, column=0, columnspan=2)
 
     set_mode_AOO()
     set_mode_VOO()
@@ -471,9 +477,9 @@ def DCM_login():
     DCM.title("Welcome to DCM")
 
     nav_bar()
-    nav.grid(row=0, column=0)
+    nav.grid(row=0)
 
     pacemaker_parameters()
-    pm_params.grid(row=1, column=0)
+    pm_params.grid(row=1, column=0, sticky = W)
 
 welcome_page()
