@@ -3,6 +3,7 @@ import tkinter.font as tkFont
 from Pacemaker_Modes import *
 import os
 
+
 # IMPORTANT VARIABLES
 user_data_file = "user_data.txt"
 user_count = 0
@@ -150,6 +151,7 @@ def welcome_page():
     welcome.title("Login to DCM")
 
     # fonts
+    global header
     header = tkFont.Font(welcome, family="Roman", size=24, weight="bold")
     print(tkFont.families())
 
@@ -168,17 +170,34 @@ def welcome_page():
 # NAVIGATION BAR AT TOP OF WINDOW
 def nav_bar():
     global nav
+    global pmStatus
+    global connectStatus
+
     nav = Frame(DCM)
 
-    Label(nav, text="Welcome to DCM, " + user.get()).grid(row=0, column=0)
-    Label(nav, text="ICON1", padx=50 ).grid(row=0, column=1)
-    Label(nav, text="ICON2", padx=50).grid(row=0, column=2)
-    Label(nav, text="", padx=400).grid(row=0, column=3)
-    Button(nav, text="Log Out", padx=10, pady=5, command=back_to_welcome).grid(row=0, column=4)
+    Label(nav, text="     Welcome to the DCM, " + user.get() + ": ", font=("Calibri", 14)).grid(row=0, column=0)
+    pmStatus = Label(nav, text="Pacemaker Device Status: Pacemaker Device Change Detected", font=("Calibri", 13), padx = 35)
+    pmStatus.grid(row=0, column=1, sticky = W)
+    Button(nav, text="Dismiss", font=("Calibri", 12), command=changePmStatus).grid(row=0, column=2, pady=3, ipadx= 50)
+    Button(nav, text="About", font=("Calibri", 12)).grid(row=1, column=0, pady=3, ipadx= 50)
+    connectStatus = Label(nav, text="Connection Status: Connecting", font=("Calibri", 13), padx= 35 )
+    connectStatus.grid(row=1, column=1, sticky = W)
+    Button(nav, text="Change Device", font=("Calibri", 12), command=changeConnectStatus).grid(row=1, column=2, pady=3, ipadx= 27)
+    Label(nav, text= "-------------------------------------------------------", font=("Calibri", 13), padx = 10).grid(row=2, column=0, sticky = W)
+    Label(nav, text= "     ---------------------------------------------------------------------------------------------", font=("Calibri", 13), padx = 10).grid(row=2, column=1, sticky = W)
+    Button(nav, text="Log Out", font=("Calibri", 12), command=back_to_welcome).grid(row=2, column=2, pady=3, ipadx= 50)
+
+def changePmStatus():
+    pmStatus.config(text ="Pacemaker Device Status: No Issues")
+
+def changeConnectStatus():
+    connectStatus.config(text ="Connection Status: Disconnected")
 
 def back_to_welcome():
     DCM.destroy()
     welcome_page()
+
+#def about():
 
 # AOO MODE PARAMETERS
 def set_mode_AOO():
@@ -204,7 +223,7 @@ def set_mode_AOO():
     enter_lrl = Entry(AOO_mode, textvariable = lrl_value).grid(row=1, column=1)
 
     Label(AOO_mode, text="Upper Rate Limit: ").grid(row=2, column=0)
-    enter_url = Entry(AOO_mode, textvariable=url_value).grid(row=2, column=1)
+    enter_url = Entry(AOO_mode, textvariable =url_value).grid(row=2, column=1)
 
     Label(AOO_mode, text="Atrial Amplitude: ").grid(row=3, column=0)
     enter_aa = Entry(AOO_mode, textvariable=aa_value).grid(row=3, column=1)
@@ -234,7 +253,7 @@ def send_AOO():
         message.config(text="                     Update Success!                     ", fg="green")
 
     except:
-        message.config(text="Update Failed: please use integers", fg="red")
+        message.config(text="Update Failed: please use integers", fg="red", font=("Calibri", 20))
 
     # for testing values are correct
     print(mode.get_LRL())
@@ -389,27 +408,28 @@ def set_mode_VVI():
     vpw_value = StringVar()
     vrp_value = StringVar()
 
-    Label(VVI_mode, text="Lower Rate Limit: ").grid(row=1, column=0, padx=50)
-    enter_lrl = Entry(VVI_mode, textvariable=lrl_value).grid(row=1, column=1, padx=100)
 
-    Label(VVI_mode, text="Upper Rate Limit: ").grid(row=2, column=0)
+    Label(VVI_mode, text="Lower Rate Limit: ").grid(row=1, column=0, padx=85, pady = 2)
+    enter_lrl = Entry(VVI_mode, textvariable=lrl_value).grid(row=1, column=1)
+
+    Label(VVI_mode, text="Upper Rate Limit: ").grid(row=2, column=0, pady=2)
     enter_url = Entry(VVI_mode, textvariable=url_value).grid(row=2, column=1)
 
-    Label(VVI_mode, text="Atrial Amplitude: ").grid(row=3, column=0)
+    Label(VVI_mode, text="Atrial Amplitude: ").grid(row=3, column=0, pady=2)
     enter_va = Entry(VVI_mode, textvariable=va_value).grid(row=3, column=1)
 
-    Label(VVI_mode, text="Atrial Pulse Width: ").grid(row=4, column=0)
+    Label(VVI_mode, text="Atrial Pulse Width: ").grid(row=4, column=0, pady=2)
     enter_vpw = Entry(VVI_mode, textvariable=vpw_value).grid(row=4, column=1)
 
-    Label(VVI_mode, text="VRP: ").grid(row=5, column=0)
+    Label(VVI_mode, text="VRP: ").grid(row=5, column=0, pady=2)
     enter_vrp = Entry(VVI_mode, textvariable=vrp_value).grid(row=5, column=1)
 
-    Button(VVI_mode, text="Update", padx=20, pady=10, command=send_VVI).grid(row=6, columnspan=2)
+    Button(VVI_mode, text="Update", padx=20, pady=10, command=send_VVI).grid(row=6, columnspan=2, pady= 2)
 
 def send_VVI():
     mode = VVI()
 
-    message = Label(VVI_mode, text="                                                         ", font=("Calibri", 24), fg="green")
+    message = Label(VVI_mode, text="", font=("Calibri", 24), fg="green")
     message.grid(row=7, column=0, columnspan=2)
 
     # make sure values entered are valid
@@ -425,10 +445,10 @@ def send_VVI():
         mode.set_VA(int(va_value.get()))
         mode.set_VPW(int(vpw_value.get()))
         mode.set_VRP(int(vrp_value.get()))
-        message.config(text="                     Update Success!                     ", fg="green")
+        message.config(text="          Update Success!          ", fg="green")
 
     except:
-        message.config(text="Update Failed: please use integers", fg="red")
+        message.config(text="Update Failed: Please use integers", fg="red", font=("Calibri", 18))
 
     # for testing values are correct
     print(mode.get_LRL())
@@ -467,19 +487,20 @@ def pacemaker_parameters():
     pm_modes.menu.add_command(label="AAI", command=set_mode_AAI)
     pm_modes.menu.add_command(label="VVI", command=set_mode_VVI)
 
-    pm_modes.grid(row=0, column=0)
+    pm_modes.grid(row=0, column=0, pady= 2)
 
 def DCM_login():
     global DCM
     welcome.destroy()
     DCM = Tk()
-    DCM.geometry("1280x720")
-    DCM.title("Welcome to DCM")
+    DCM.geometry("980x720")
+    DCM.title("DCM")
 
     nav_bar()
     nav.grid(row=0)
 
     pacemaker_parameters()
-    pm_params.grid(row=1, column=0, sticky = W)
+    pm_params.grid(row=1, column=0, sticky = W, pady = 5)
+
 
 welcome_page()
