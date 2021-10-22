@@ -4,6 +4,10 @@ from Pacemaker_Modes import *
 import os
 
 
+
+
+#NOTES DEFINE THE SEND FUNCTIONS TRY CATCH BLOCK IN A SEPERATE FUNCTION THAT RETURNS IF CONDITIONS ARE NOT MET WITH A ERROR MSG
+
 # IMPORTANT VARIABLES
 user_data_file = "user_data.txt"
 user_count = 0
@@ -219,16 +223,16 @@ def set_mode_AOO():
     aa_value = StringVar()
     apw_value = StringVar()
 
-    Label(AOO_mode, text="Lower Rate Limit: ").grid(row=1, column=0, padx=100)
+    Label(AOO_mode, text="Lower Rate Limit: ").grid(row=1, column=0, padx= 85, pady=2)
     enter_lrl = Entry(AOO_mode, textvariable = lrl_value).grid(row=1, column=1)
 
-    Label(AOO_mode, text="Upper Rate Limit: ").grid(row=2, column=0)
+    Label(AOO_mode, text="Upper Rate Limit: ").grid(row=2, column=0, pady=2)
     enter_url = Entry(AOO_mode, textvariable =url_value).grid(row=2, column=1)
 
-    Label(AOO_mode, text="Atrial Amplitude: ").grid(row=3, column=0)
+    Label(AOO_mode, text="Atrial Amplitude: ").grid(row=3, column=0, pady=2)
     enter_aa = Entry(AOO_mode, textvariable=aa_value).grid(row=3, column=1)
 
-    Label(AOO_mode, text="Atrial Pulse Width: ").grid(row=4, column=0)
+    Label(AOO_mode, text="Atrial Pulse Width: ").grid(row=4, column=0, pady=2)
     enter_apw = Entry(AOO_mode, textvariable=apw_value).grid(row=4, column=1)
 
     Button(AOO_mode, text="Update", padx=20, pady=10, command=send_AOO).grid(row=5, columnspan=2)
@@ -279,19 +283,19 @@ def set_mode_VOO():
     va_value = StringVar()
     vpw_value = StringVar()
 
-    Label(VOO_mode, text="Lower Rate Limit: ").grid(row=1, column=0, padx=100)
+    Label(VOO_mode, text="Lower Rate Limit: ").grid(row=1, column=0, padx= 85, pady=2)
     enter_lrl = Entry(VOO_mode, textvariable=lrl_value).grid(row=1, column=1)
 
-    Label(VOO_mode, text="Upper Rate Limit: ").grid(row=2, column=0)
+    Label(VOO_mode, text="Upper Rate Limit: ").grid(row=2, column=0, pady=2)
     enter_url = Entry(VOO_mode, textvariable=url_value).grid(row=2, column=1)
 
-    Label(VOO_mode, text="Atrial Amplitude: ").grid(row=3, column=0)
+    Label(VOO_mode, text="Atrial Amplitude: ").grid(row=3, column=0, pady=2)
     enter_va = Entry(VOO_mode, textvariable=va_value).grid(row=3, column=1)
 
-    Label(VOO_mode, text="Atrial Pulse Width: ").grid(row=4, column=0)
+    Label(VOO_mode, text="Atrial Pulse Width: ").grid(row=4, column=0, pady=2)
     enter_vpw = Entry(VOO_mode, textvariable=vpw_value).grid(row=4, column=1)
 
-    Button(VOO_mode, text="Update", padx=20, pady=10, command=send_VOO).grid(row=5, columnspan=2)
+    Button(VOO_mode, text="Update", padx=20, pady=10, command=send_VOO).grid(row=5, columnspan=2, pady=2)
 
 def send_VOO():
     mode = VOO()
@@ -340,22 +344,22 @@ def set_mode_AAI():
     apw_value = StringVar()
     arp_value = StringVar()
 
-    Label(AAI_mode, text="Lower Rate Limit: ").grid(row=1, column=0, padx=100)
+    Label(AAI_mode, text="Lower Rate Limit: ").grid(row=1, column=0, padx=85 , pady=2)
     enter_lrl = Entry(AAI_mode, textvariable=lrl_value).grid(row=1, column=1)
 
-    Label(AAI_mode, text="Upper Rate Limit: ").grid(row=2, column=0)
+    Label(AAI_mode, text="Upper Rate Limit: ").grid(row=2, column=0, pady=2)
     enter_url = Entry(AAI_mode, textvariable=url_value).grid(row=2, column=1)
 
-    Label(AAI_mode, text="Atrial Amplitude: ").grid(row=3, column=0)
+    Label(AAI_mode, text="Atrial Amplitude: ").grid(row=3, column=0, pady=2)
     enter_aa = Entry(AAI_mode, textvariable=aa_value).grid(row=3, column=1)
 
-    Label(AAI_mode, text="Atrial Pulse Width: ").grid(row=4, column=0)
+    Label(AAI_mode, text="Atrial Pulse Width: ").grid(row=4, column=0, pady=2)
     enter_apw = Entry(AAI_mode, textvariable=apw_value).grid(row=4, column=1)
 
-    Label(AAI_mode, text="ARP: ").grid(row=5, column=0)
+    Label(AAI_mode, text="ARP: ").grid(row=5, column=0, pady=2)
     enter_arp = Entry(AAI_mode, textvariable=arp_value).grid(row=5, column=1)
 
-    Button(AAI_mode, text="Update", padx=20, pady=10, command=send_AAI).grid(row=6, columnspan=2)
+    Button(AAI_mode, text="Update", padx=20, pady=10, command=send_AAI).grid(row=6, columnspan=2 , pady=2)
 
 def send_AAI():
     mode = AAI()
