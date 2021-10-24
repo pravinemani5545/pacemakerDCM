@@ -19,6 +19,8 @@ def erase_user_data():
     file.write("0\n")
     file.close()
 
+
+
 # REGISTRATION PAGE ====================================================================================================
 def register_page():
     global register
@@ -75,17 +77,15 @@ def register_new_user():
         file.write(user.get() + "," + password.get() + "\n")
         file.close()
 
-        Label(register, text="Registration Success", font=("Calibri", 24), fg="green").grid(row=4, column=0,
+        Label(register, text="                 Registration Success                 ", font=("Calibri", 24), fg="green").grid(row=4, column=0,
                                                                                             columnspan=2)
     elif verifyUsers == False:
-        Label(register, text="Registration Failed: Number of Users Exceeded Limit", font=("Calibri", 24),
+        Label(register, text="Registration Failed: Number of Users Exceeded Limit", font=("Calibri", 16),
               fg="red").grid(row=4, column=0, columnspan=2)
 
     elif veryifyNewAccount == False:
-        Label(register, text="Registration Failed: User Already Registered", font=("Calibri", 24),
+        Label(register, text="Registration Failed: User Already Registered", font=("Calibri", 18),
               fg="red").grid(row=4, column=0, columnspan=2)
-
-
 
 def check_new_account():
 
@@ -101,7 +101,6 @@ def check_new_account():
 
     return True
 
-
 # CHECK TO SEE IF CURRENT USERS > USER LIMIT (10)
 def check_user_limit():
     global user_count
@@ -116,6 +115,8 @@ def check_user_limit():
     else:
         user_count = user_count + 1
         return True
+
+
 
 # LOGIN PAGE ===========================================================================================================
 def login_page():
@@ -153,7 +154,7 @@ def login_check():
     flag = 1  # to track if user was found or not
     verify = check_user_limit()  # get latest user_count
 
-    message = Label(login, text="", font=("Calibri", 24), fg="green")
+    message = Label(login, text="", font=("Calibri", 18), fg="green")
     message.grid(row=4, column=0, columnspan=2)  # initialize label
 
     for i in range(1, user_count):
@@ -171,6 +172,8 @@ def login_check():
     if (flag):
         message.config(text="Login Failed: Username Not Recognized", fg="red")
 
+
+
 # WELCOME PAGE ============================================================================================================
 def welcome_page():
     global welcome
@@ -187,14 +190,17 @@ def welcome_page():
     Label(text="").grid(row=1, column=0)
     Button(text="Login", padx=20, pady=10, command=login_page).grid(row=2, column=0)
     Label(text="").grid(row=3, column=0)
-    Label(text="Not a registered user?").grid(row=4, column=0)
+    Label(text="Not a registered user?").grid(row=4, column=0, pady = 10)
     Button(text="Register", padx=20, pady=10, command=register_page).grid(row=5, column=0)
     Label(text="", pady=100).grid(row=6, column=0)
     Button(text="Quit", padx=20, pady=10, command=welcome.destroy).grid(row=6, column=0)
 
     welcome.mainloop()
 
+
+
 # ACTUAL DCM ===========================================================================================================
+
 # NAVIGATION BAR AT TOP OF WINDOW
 def nav_bar():
     global nav
@@ -235,7 +241,9 @@ def about():
     Label(aboutScr, text=" Application software revision number in use: PLACEHOLDER", font=("Calibri", 14)).grid(row=2, column=0, pady= 4, padx = 10)
     Label(aboutScr, text=" DCM serial number: PLACEHOLDER", font=("Calibri", 14)).grid(row=3, column=0, pady= 4, padx = 10)
     Label(aboutScr, text=" Institution name: McMaster University ", font=("Calibri", 14)).grid(row=4, column=0, pady= 4, padx = 10)
-    Button(aboutScr, text="Return", font=("Calibri", 14), command= aboutScr.destroy).grid(row=5, column=0, pady = 7, ipadx= 30, ipady= 5, padx = 10)
+    Button(aboutScr, text="Close", font=("Calibri", 14), command= aboutScr.destroy).grid(row=5, column=0, pady = 7, ipadx= 30, ipady= 5, padx = 10)
+
+
 
 # AOO MODE PARAMETERS
 def set_mode_AOO():
@@ -273,25 +281,59 @@ def set_mode_AOO():
 
 def send_AOO():
     mode = AOO()
+    errormsg = ""
+    error = False
 
-    message = Label(AOO_mode, text="                                                         ", font=("Calibri", 24), fg="green")
-    message.grid(row=6, column=0, columnspan=2)
+    message = Label(AOO_mode, text=" ", font=("Calibri", 30), fg="green")
+    message.grid(row=6, column=0, columnspan=2,pady= 15)
 
     # make sure values entered are valid
     try:
-        int(lrl_value.get())
-        int(url_value.get())
-        int(aa_value.get())
-        int(apw_value.get())
+        lrlval = int(lrl_value.get())
+        urlval = int(url_value.get())
+        aaval = float(aa_value.get())
+        apwval = float(apw_value.get())
 
-        mode.set_LRL(int(lrl_value.get()))
-        mode.set_URL(int(url_value.get()))
-        mode.set_AA(int(aa_value.get()))
-        mode.set_APW(int(apw_value.get()))
-        message.config(text="                     Update Success!                     ", fg="green")
+        if(lrlval>175 or lrlval<30):
+            error = True
+            errormsg = "        Please make sure your lrl value         \n         is between 30-175 ppm        "
+
+        elif(lrlval>=30 and lrlval<=50 and (lrlval%5 != 0)):
+            error = True
+            errormsg = "        Please make sure you increment lrl        \n         by 5 ppm for vals of 30-50 ppm!        "
+
+        elif(lrlval>=90 and lrlval<=175 and (lrlval%5 != 0)):
+            error = True
+            errormsg = "        Please make sure you increment lrl         \n         by 5 ppm for vals of 90-175 ppm!        "
+
+        if (urlval>175 or urlval<50):
+            error = True
+            errormsg = "        Please make sure your lrl value         \n         is between 50-175 ppm        "
+
+        elif(urlval>=50 and urlval<=175):
+            if(urlval%5 != 0):
+                error = True
+                errormsg = "        Please make sure you increment url         \n         by 5 ppm for vals of 50-175 ppm!        "
+
+        if(aaval != 0 and aaval != 1.25 and aaval != 2.5 and aaval != 3.75 and aaval != 5):
+            error = True
+            errormsg = "        Please make sure you increment amplitude         \n         value is 0, 1.25, 2.5, 3.75, or 5!        "
+        
+        if(apwval != 0.05 and not(0.1 <= apwval <=1.9 and (apwval*100)%10 == 0)):
+            error = True
+            errormsg = "        Please make sure your apw value is         \n         either 0.05 or 0.1-1.9 in increments of 0.1!        "
+
+        if error == False:
+            mode.set_LRL(int(lrl_value.get()))
+            mode.set_URL(int(url_value.get()))
+            mode.set_AA(float(aa_value.get()))
+            mode.set_APW(float(apw_value.get()))
+            message.config(text="                         Update Success!                         ", fg="green")
+        else:
+            message.config(text= f"        Update Failed: \n {errormsg}        ", fg="red", font=("Calibri", 12))
 
     except:
-        message.config(text="Update Failed: please use integers", fg="red", font=("Calibri", 20))
+        message.config(text="      Update Failed:       \n       Please use integers for lrl and url       \n       Please use floats for aa and apw      ", fg="red", font=("Calibri", 12))
 
     # for testing values are correct
     print(mode.get_LRL())
@@ -323,35 +365,71 @@ def set_mode_VOO():
     Label(VOO_mode, text="Upper Rate Limit: ").grid(row=2, column=0, pady=2)
     enter_url = Entry(VOO_mode, textvariable=url_value).grid(row=2, column=1)
 
-    Label(VOO_mode, text="Atrial Amplitude: ").grid(row=3, column=0, pady=2)
+    Label(VOO_mode, text="Ventrical Amplitude: ").grid(row=3, column=0, pady=2)
     enter_va = Entry(VOO_mode, textvariable=va_value).grid(row=3, column=1)
 
-    Label(VOO_mode, text="Atrial Pulse Width: ").grid(row=4, column=0, pady=2)
+    Label(VOO_mode, text="Ventrical Pulse Width: ").grid(row=4, column=0, pady=2)
     enter_vpw = Entry(VOO_mode, textvariable=vpw_value).grid(row=4, column=1)
 
     Button(VOO_mode, text="Update", padx=20, pady=10, command=send_VOO).grid(row=5, columnspan=2, pady=2)
 
+
+
 def send_VOO():
     mode = VOO()
+    errormsg = ""
+    error = False
 
-    message = Label(VOO_mode, text="                                                         ", font=("Calibri", 24), fg="green")
-    message.grid(row=6, column=0, columnspan=2)
+    message = Label(VOO_mode, text="", font=("Calibri", 30), fg="green")
+    message.grid(row=6, column=0, columnspan=2, pady= 15)
 
     # make sure values entered are valid
     try:
-        int(lrl_value.get())
-        int(url_value.get())
-        int(va_value.get())
-        int(vpw_value.get())
+        lrlval = int(lrl_value.get())
+        urlval = int(url_value.get())
+        vaval = float(va_value.get())
+        vpwval = float(vpw_value.get())
 
-        mode.set_LRL(int(lrl_value.get()))
-        mode.set_URL(int(url_value.get()))
-        mode.set_VA(int(va_value.get()))
-        mode.set_VPW(int(vpw_value.get()))
-        message.config(text="                     Update Success!                     ", fg="green")
+        if(lrlval>175 or lrlval<30):
+            error = True
+            errormsg = "        Please make sure your lrl value         \n         is between 30-175 ppm        "
+
+        elif(lrlval>=30 and lrlval<=50 and (lrlval%5 != 0)):
+            error = True
+            errormsg = "        Please make sure you increment lrl        \n         by 5 ppm for vals of 30-50 ppm!        "
+
+        elif(lrlval>=90 and lrlval<=175 and (lrlval%5 != 0)):
+            error = True
+            errormsg = "        Please make sure you increment lrl         \n         by 5 ppm for vals of 90-175 ppm!        "
+
+        if (urlval>175 or urlval<50):
+            error = True
+            errormsg = "        Please make sure your lrl value         \n         is between 50-175 ppm        "
+
+        elif(urlval>=50 and urlval<=175):
+            if(urlval%5 != 0):
+                error = True
+                errormsg = "        Please make sure you increment url         \n         by 5 ppm for vals of 50-175 ppm!        "
+                
+        if(vaval != 0 and vaval != 1.25 and vaval != 2.5 and vaval != 3.75 and vaval != 5):
+            error = True
+            errormsg = "        Please make sure you increment amplitude         \n         value is 0, 1.25, 2.5, 3.75, or 5!        "
+        
+        if(vpwval != 0.05 and not(0.1 <= vpwval <=1.9 and (vpwval*100)%10 == 0)):
+            error = True
+            errormsg = "        Please make sure your vpw value is         \n         either 0.05 or 0.1-1.9 in increments of 0.1!        "
+
+        if error == False:
+            mode.set_LRL(int(lrl_value.get()))
+            mode.set_URL(int(url_value.get()))
+            mode.set_VA(float(va_value.get()))
+            mode.set_VPW(float(vpw_value.get()))
+            message.config(text="                         Update Success!                         ", fg="green")
+        else:
+            message.config(text= f"        Update Failed: \n {errormsg}        ", fg="red", font=("Calibri", 12))
 
     except:
-        message.config(text="Update Failed: please use integers", fg="red")
+        message.config(text="      Update Failed:       \n       Please use integers for lrl and url       \n       Please use floats for va and vpw      ", fg="red", font=("Calibri", 12))
 
     # for testing values are correct
     print(mode.get_LRL())
@@ -397,27 +475,66 @@ def set_mode_AAI():
 
 def send_AAI():
     mode = AAI()
+    errormsg = ""
+    error = False
 
-    message = Label(AAI_mode, text="                                                         ", font=("Calibri", 24), fg="green")
-    message.grid(row=7, column=0, columnspan=2)
+    message = Label(AAI_mode, text="", font=("Calibri", 30), fg="green")
+    message.grid(row=7, column=0, columnspan=2, pady= 15)
 
     # make sure values entered are valid
     try:
-        int(lrl_value.get())
-        int(url_value.get())
-        int(aa_value.get())
-        int(apw_value.get())
-        int(arp_value.get())
+        lrlval = int(lrl_value.get())
+        urlval = int(url_value.get())
+        aaval = float(aa_value.get())
+        apwval = float(apw_value.get())
+        arpval = int(arp_value.get())
 
-        mode.set_LRL(int(lrl_value.get()))
-        mode.set_URL(int(url_value.get()))
-        mode.set_AA(int(aa_value.get()))
-        mode.set_APW(int(apw_value.get()))
-        mode.set_ARP(int(arp_value.get()))
-        message.config(text="                     Update Success!                     ", fg="green")
+        if(lrlval>175 or lrlval<30):
+            error = True
+            errormsg = "        Please make sure your lrl value         \n         is between 30-175 ppm        "
+
+        elif(lrlval>=30 and lrlval<=50 and (lrlval%5 != 0)):
+            error = True
+            errormsg = "        Please make sure you increment lrl        \n         by 5 ppm for vals of 30-50 ppm!        "
+
+        elif(lrlval>=90 and lrlval<=175 and (lrlval%5 != 0)):
+            error = True
+            errormsg = "        Please make sure you increment lrl         \n         by 5 ppm for vals of 90-175 ppm!        "
+
+        if (urlval>175 or urlval<50):
+            error = True
+            errormsg = "        Please make sure your lrl value         \n         is between 50-175 ppm        "
+
+        elif(urlval>=50 and urlval<=175):
+            if(urlval%5 != 0):
+                error = True
+                errormsg = "        Please make sure you increment url         \n         by 5 ppm for vals of 50-175 ppm!        "
+
+        if(aaval != 0 and aaval != 1.25 and aaval != 2.5 and aaval != 3.75 and aaval != 5):
+            error = True
+            errormsg = "        Please make sure you increment amplitude         \n         value is 0, 1.25, 2.5, 3.75, or 5!        "
+        
+        if(apwval != 0.05 and not(0.1 <= apwval <=1.9 and (apwval*100)%10 == 0)):
+            error = True
+            errormsg = "        Please make sure your apw value is         \n         either 0.05 or 0.1-1.9 in increments of 0.1!        "
+
+        if(not(arpval>=150 and arpval<=500 and (arpval%10 == 0))):
+            error = True
+            errormsg = "        Please make sure your arp value is         \n         between 150 and 500 in increments of 10!        "
+        
+
+        if error == False:
+            mode.set_LRL(int(lrl_value.get()))
+            mode.set_URL(int(url_value.get()))
+            mode.set_AA(float(aa_value.get()))
+            mode.set_APW(float(apw_value.get()))
+            mode.set_ARP(int(arp_value.get()))
+            message.config(text="                         Update Success!                         ", fg="green")
+        else:
+            message.config(text= f"        Update Failed: \n {errormsg}        ", fg="red", font=("Calibri", 12))
 
     except:
-        message.config(text="Update Failed: please use integers", fg="red")
+        message.config(text="      Update Failed:       \n       Please use integers for lrl, url, and arp       \n       Please use floats for aa and apw      ", fg="red", font=("Calibri", 12))
 
     # for testing values are correct
     print(mode.get_LRL())
@@ -453,10 +570,10 @@ def set_mode_VVI():
     Label(VVI_mode, text="Upper Rate Limit: ").grid(row=2, column=0, pady=2)
     enter_url = Entry(VVI_mode, textvariable=url_value).grid(row=2, column=1)
 
-    Label(VVI_mode, text="Atrial Amplitude: ").grid(row=3, column=0, pady=2)
+    Label(VVI_mode, text="Ventricular Amplitude: ").grid(row=3, column=0, pady=2)
     enter_va = Entry(VVI_mode, textvariable=va_value).grid(row=3, column=1)
 
-    Label(VVI_mode, text="Atrial Pulse Width: ").grid(row=4, column=0, pady=2)
+    Label(VVI_mode, text="Ventricular Pulse Width: ").grid(row=4, column=0, pady=2)
     enter_vpw = Entry(VVI_mode, textvariable=vpw_value).grid(row=4, column=1)
 
     Label(VVI_mode, text="VRP: ").grid(row=5, column=0, pady=2)
@@ -466,27 +583,65 @@ def set_mode_VVI():
 
 def send_VVI():
     mode = VVI()
+    errormsg = ""
+    error = False
 
-    message = Label(VVI_mode, text="", font=("Calibri", 24), fg="green")
-    message.grid(row=7, column=0, columnspan=2)
+    message = Label(VVI_mode, text="", font=("Calibri",30), fg="green")
+    message.grid(row=7, column=0, columnspan=2, pady = 15)
 
     # make sure values entered are valid
     try:
-        int(lrl_value.get())
-        int(url_value.get())
-        int(va_value.get())
-        int(vpw_value.get())
-        int(vrp_value.get())
+        lrlval = int(lrl_value.get())
+        urlval = int(url_value.get())
+        vaval = float(va_value.get())
+        vpwval = float(vpw_value.get())
+        vrpval = int(vrp_value.get())
 
-        mode.set_LRL(int(lrl_value.get()))
-        mode.set_URL(int(url_value.get()))
-        mode.set_VA(int(va_value.get()))
-        mode.set_VPW(int(vpw_value.get()))
-        mode.set_VRP(int(vrp_value.get()))
-        message.config(text="          Update Success!          ", fg="green")
+        if(lrlval>175 or lrlval<30):
+            error = True
+            errormsg = "        Please make sure your lrl value         \n         is between 30-175 ppm        "
+
+        elif(lrlval>=30 and lrlval<=50 and (lrlval%5 != 0)):
+            error = True
+            errormsg = "        Please make sure you increment lrl        \n         by 5 ppm for vals of 30-50 ppm!        "
+
+        elif(lrlval>=90 and lrlval<=175 and (lrlval%5 != 0)):
+            error = True
+            errormsg = "        Please make sure you increment lrl         \n         by 5 ppm for vals of 90-175 ppm!        "
+
+        if (urlval>175 or urlval<50):
+            error = True
+            errormsg = "        Please make sure your lrl value         \n         is between 50-175 ppm        "
+
+        elif(urlval>=50 and urlval<=175):
+            if(urlval%5 != 0):
+                error = True
+                errormsg = "        Please make sure you increment url         \n         by 5 ppm for vals of 50-175 ppm!        "
+
+        if(vaval != 0 and vaval != 1.25 and vaval != 2.5 and vaval != 3.75 and vaval != 5):
+            error = True
+            errormsg = "        Please make sure you increment amplitude         \n         value is 0, 1.25, 2.5, 3.75, or 5!        "
+        
+        if(vpwval != 0.05 and not(0.1 <= vpwval <=1.9 and (vpwval*100)%10 == 0)):
+            error = True
+            errormsg = "        Please make sure your vpw value is         \n         either 0.05 or 0.1-1.9 in increments of 0.1!        "
+
+        if(not(vrpval>=150 and vrpval<=500 and (vrpval%10 == 0))):
+            error = True
+            errormsg = "        Please make sure your vrp value is         \n         between 150 and 500 in increments of 10!        "
+
+        if(error == False):
+            mode.set_LRL(int(lrl_value.get()))
+            mode.set_URL(int(url_value.get()))
+            mode.set_VA(float(va_value.get()))
+            mode.set_VPW(float(vpw_value.get()))
+            mode.set_VRP(int(vrp_value.get()))
+            message.config(text="              Update Success!              ", fg="green")
+        else:
+            message.config(text= f"        Update Failed: \n {errormsg}        ", fg="red", font=("Calibri", 12))
 
     except:
-        message.config(text="Update Failed: Please use integers", fg="red", font=("Calibri", 18))
+        message.config(text= "      Update Failed:       \n       Please use integers for lrl, url, and vrp       \n       Please use floats for va and vpw      ", fg="red", font=("Calibri", 12))
 
     # for testing values are correct
     print(mode.get_LRL())
@@ -510,6 +665,8 @@ def pacemaker_parameters():
     mode_frame = Frame(pm_params)
     mode_frame.grid(row=1, column=0, columnspan=2)
 
+
+    #DO WE NEED TO PRESET ALL OF THEM ???????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????
     set_mode_AOO()
     set_mode_VOO()
     set_mode_AAI()
@@ -539,8 +696,6 @@ def DCM_login():
 
     pacemaker_parameters()
     pm_params.grid(row=1, column=0, sticky = W, pady = 5)
-
-
 
 welcome_page()
 
