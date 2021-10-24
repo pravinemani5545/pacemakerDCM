@@ -296,32 +296,37 @@ def send_AOO():
 
         if(lrlval>175 or lrlval<30):
             error = True
-            errormsg = "        Please make sure your lrl value         \n         is between 30-175 ppm        "
+            errormsg = "        Please make sure your lrl value         \n         is between 30-175 ppm.        "
 
         elif(lrlval>=30 and lrlval<=50 and (lrlval%5 != 0)):
             error = True
-            errormsg = "        Please make sure you increment lrl        \n         by 5 ppm for vals of 30-50 ppm!        "
+            errormsg = "        Please make sure you increment lrl        \n         by 5 ppm for vals of 30-50 ppm.        "
 
         elif(lrlval>=90 and lrlval<=175 and (lrlval%5 != 0)):
             error = True
-            errormsg = "        Please make sure you increment lrl         \n         by 5 ppm for vals of 90-175 ppm!        "
+            errormsg = "        Please make sure you increment lrl         \n         by 5 ppm for vals of 90-175 ppm.        "
 
         if (urlval>175 or urlval<50):
             error = True
-            errormsg = "        Please make sure your lrl value         \n         is between 50-175 ppm        "
+            errormsg = "        Please make sure your url value         \n         is between 50-175 ppm.        "
 
         elif(urlval>=50 and urlval<=175):
             if(urlval%5 != 0):
                 error = True
-                errormsg = "        Please make sure you increment url         \n         by 5 ppm for vals of 50-175 ppm!        "
+                errormsg = "        Please make sure you increment url         \n         by 5 ppm for vals of 50-175 ppm.        "
 
-        if(aaval != 0 and aaval != 1.25 and aaval != 2.5 and aaval != 3.75 and aaval != 5):
+        if (aaval <0  or aaval>5):
             error = True
-            errormsg = "        Please make sure you increment amplitude         \n         value is 0, 1.25, 2.5, 3.75, or 5!        "
+            errormsg = "        Please make sure your amplitude value         \n         is between 0 and 5 Volts.        "
+
+        elif(aaval>=0 and aaval<=5):
+            if((aaval*100)%5 != 0):
+                error = True
+                errormsg = "        Please make sure you increment amplitude         \n         by values of 0.05 V.        "
         
         if(apwval != 0.05 and not(0.1 <= apwval <=1.9 and (apwval*100)%10 == 0)):
             error = True
-            errormsg = "        Please make sure your apw value is         \n         either 0.05 or 0.1-1.9 in increments of 0.1!        "
+            errormsg = "        Please make sure your apw value is either         \n         0.05ms or 0.1ms - 1.9ms in increments of 0.1ms.        "
 
         if error == False:
             mode.set_LRL(int(lrl_value.get()))
@@ -392,32 +397,37 @@ def send_VOO():
 
         if(lrlval>175 or lrlval<30):
             error = True
-            errormsg = "        Please make sure your lrl value         \n         is between 30-175 ppm        "
+            errormsg = "        Please make sure your lrl value         \n         is between 30-175 ppm.        "
 
         elif(lrlval>=30 and lrlval<=50 and (lrlval%5 != 0)):
             error = True
-            errormsg = "        Please make sure you increment lrl        \n         by 5 ppm for vals of 30-50 ppm!        "
+            errormsg = "        Please make sure you increment lrl        \n         by 5 ppm for vals of 30-50 ppm.        "
 
         elif(lrlval>=90 and lrlval<=175 and (lrlval%5 != 0)):
             error = True
-            errormsg = "        Please make sure you increment lrl         \n         by 5 ppm for vals of 90-175 ppm!        "
+            errormsg = "        Please make sure you increment lrl         \n         by 5 ppm for vals of 90-175 ppm.        "
 
         if (urlval>175 or urlval<50):
             error = True
-            errormsg = "        Please make sure your lrl value         \n         is between 50-175 ppm        "
+            errormsg = "        Please make sure your url value         \n         is between 50-175 ppm.        "
 
         elif(urlval>=50 and urlval<=175):
             if(urlval%5 != 0):
                 error = True
-                errormsg = "        Please make sure you increment url         \n         by 5 ppm for vals of 50-175 ppm!        "
+                errormsg = "        Please make sure you increment url         \n         by 5 ppm for vals of 50-175 ppm.        "
                 
-        if(vaval != 0 and vaval != 1.25 and vaval != 2.5 and vaval != 3.75 and vaval != 5):
+        if (vaval <0  or vaval>5):
             error = True
-            errormsg = "        Please make sure you increment amplitude         \n         value is 0, 1.25, 2.5, 3.75, or 5!        "
+            errormsg = "        Please make sure your amplitude value         \n         is between 0 and 5 Volts.        "
+
+        elif(vaval>=0 and vaval<=5):
+            if((vaval*100)%5 != 0):
+                error = True
+                errormsg = "        Please make sure you increment amplitude         \n         by values of 0.05 V.        "
         
         if(vpwval != 0.05 and not(0.1 <= vpwval <=1.9 and (vpwval*100)%10 == 0)):
             error = True
-            errormsg = "        Please make sure your vpw value is         \n         either 0.05 or 0.1-1.9 in increments of 0.1!        "
+            errormsg = "        Please make sure your vpw value is either         \n         0.05ms or 0.1ms - 1.9ms in increments of 0.1ms.        "
 
         if error == False:
             mode.set_LRL(int(lrl_value.get()))
@@ -491,36 +501,41 @@ def send_AAI():
 
         if(lrlval>175 or lrlval<30):
             error = True
-            errormsg = "        Please make sure your lrl value         \n         is between 30-175 ppm        "
+            errormsg = "        Please make sure your lrl value         \n         is between 30-175 ppm.        "
 
         elif(lrlval>=30 and lrlval<=50 and (lrlval%5 != 0)):
             error = True
-            errormsg = "        Please make sure you increment lrl        \n         by 5 ppm for vals of 30-50 ppm!        "
+            errormsg = "        Please make sure you increment lrl        \n         by 5 ppm for vals of 30-50 ppm.        "
 
         elif(lrlval>=90 and lrlval<=175 and (lrlval%5 != 0)):
             error = True
-            errormsg = "        Please make sure you increment lrl         \n         by 5 ppm for vals of 90-175 ppm!        "
+            errormsg = "        Please make sure you increment lrl         \n         by 5 ppm for vals of 90-175 ppm.        "
 
         if (urlval>175 or urlval<50):
             error = True
-            errormsg = "        Please make sure your lrl value         \n         is between 50-175 ppm        "
+            errormsg = "        Please make sure your url value         \n         is between 50-175 ppm.        "
 
         elif(urlval>=50 and urlval<=175):
             if(urlval%5 != 0):
                 error = True
-                errormsg = "        Please make sure you increment url         \n         by 5 ppm for vals of 50-175 ppm!        "
+                errormsg = "        Please make sure you increment url         \n         by 5 ppm for vals of 50-175 ppm.        "
 
-        if(aaval != 0 and aaval != 1.25 and aaval != 2.5 and aaval != 3.75 and aaval != 5):
+        if (aaval <0  or aaval>5):
             error = True
-            errormsg = "        Please make sure you increment amplitude         \n         value is 0, 1.25, 2.5, 3.75, or 5!        "
+            errormsg = "        Please make sure your amplitude value         \n         is between 0 and 5 Volts.        "
+
+        elif(aaval>=0 and aaval<=5):
+            if((aaval*100)%5 != 0):
+                error = True
+                errormsg = "        Please make sure you increment amplitude         \n         by values of 0.05 V.        "
         
         if(apwval != 0.05 and not(0.1 <= apwval <=1.9 and (apwval*100)%10 == 0)):
             error = True
-            errormsg = "        Please make sure your apw value is         \n         either 0.05 or 0.1-1.9 in increments of 0.1!        "
+            errormsg = "        Please make sure your apw value is either         \n         0.05ms or 0.1ms - 1.9ms in increments of 0.1ms!.        "
 
         if(not(arpval>=150 and arpval<=500 and (arpval%10 == 0))):
             error = True
-            errormsg = "        Please make sure your arp value is         \n         between 150 and 500 in increments of 10!        "
+            errormsg = "        Please make sure your arp value is between          \n         150ms and 500ms in increments of 10ms.        "
         
 
         if error == False:
@@ -599,36 +614,41 @@ def send_VVI():
 
         if(lrlval>175 or lrlval<30):
             error = True
-            errormsg = "        Please make sure your lrl value         \n         is between 30-175 ppm        "
+            errormsg = "        Please make sure your lrl value         \n         is between 30-175 ppm.        "
 
         elif(lrlval>=30 and lrlval<=50 and (lrlval%5 != 0)):
             error = True
-            errormsg = "        Please make sure you increment lrl        \n         by 5 ppm for vals of 30-50 ppm!        "
+            errormsg = "        Please make sure you increment lrl        \n         by 5 ppm for vals of 30-50 ppm.        "
 
         elif(lrlval>=90 and lrlval<=175 and (lrlval%5 != 0)):
             error = True
-            errormsg = "        Please make sure you increment lrl         \n         by 5 ppm for vals of 90-175 ppm!        "
+            errormsg = "        Please make sure you increment lrl         \n         by 5 ppm for vals of 90-175 ppm.        "
 
         if (urlval>175 or urlval<50):
             error = True
-            errormsg = "        Please make sure your lrl value         \n         is between 50-175 ppm        "
+            errormsg = "        Please make sure your url value         \n         is between 50-175 ppm.        "
 
         elif(urlval>=50 and urlval<=175):
             if(urlval%5 != 0):
                 error = True
-                errormsg = "        Please make sure you increment url         \n         by 5 ppm for vals of 50-175 ppm!        "
+                errormsg = "        Please make sure you increment url         \n         by 5 ppm for vals of 50-175 ppm.        "
 
-        if(vaval != 0 and vaval != 1.25 and vaval != 2.5 and vaval != 3.75 and vaval != 5):
+        if (vaval <0  or vaval>5):
             error = True
-            errormsg = "        Please make sure you increment amplitude         \n         value is 0, 1.25, 2.5, 3.75, or 5!        "
-        
+            errormsg = "        Please make sure your amplitude value         \n         is between 0 and 5 Volts.        "
+
+        elif(vaval>=0 and vaval<=5):
+            if((vaval*100)%5 != 0):
+                error = True
+                errormsg = "        Please make sure you increment amplitude         \n         by values of 0.05 V.        "
+
         if(vpwval != 0.05 and not(0.1 <= vpwval <=1.9 and (vpwval*100)%10 == 0)):
             error = True
-            errormsg = "        Please make sure your vpw value is         \n         either 0.05 or 0.1-1.9 in increments of 0.1!        "
+            errormsg = "        Please make sure your vpw value is either          \n        0.05ms or 0.1ms - 1.9ms in increments of 0.1 ms.        "
 
         if(not(vrpval>=150 and vrpval<=500 and (vrpval%10 == 0))):
             error = True
-            errormsg = "        Please make sure your vrp value is         \n         between 150 and 500 in increments of 10!        "
+            errormsg = "        Please make sure your vrp value is between          \n         150ms and 500ms in increments of 10 ms.        "
 
         if(error == False):
             mode.set_LRL(int(lrl_value.get()))
