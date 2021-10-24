@@ -4,8 +4,6 @@ from Pacemaker_Modes import *
 import os
 
 
-
-
 #NOTES DEFINE THE SEND FUNCTIONS TRY CATCH BLOCK IN A SEPERATE FUNCTION THAT RETURNS IF CONDITIONS ARE NOT MET WITH A ERROR MSG
 
 # IMPORTANT VARIABLES
@@ -52,15 +50,21 @@ def register_page():
 
 # ADD REGISTRATION INFO TO DATA FILE
 def register_new_user():
-    verify = check_user_limit()
+    verifyUsers = check_user_limit()
+    veryifyNewAccount = check_new_account()
+
+    print(veryifyNewAccount)
 
     # write data to file
-    if verify:
+    if verifyUsers and veryifyNewAccount:
         # update user_count and restore previous data to file
         file = open(user_data_file, "r")
         data = file.readlines()
         data[0] = str(user_count) + "\n"
         file.close()
+
+        print(data)
+
 
         file = open(user_data_file, "w")
         file.writelines(data)
@@ -73,9 +77,29 @@ def register_new_user():
 
         Label(register, text="Registration Success", font=("Calibri", 24), fg="green").grid(row=4, column=0,
                                                                                             columnspan=2)
-    else:
+    elif verifyUsers == False:
         Label(register, text="Registration Failed: Number of Users Exceeded Limit", font=("Calibri", 24),
               fg="red").grid(row=4, column=0, columnspan=2)
+
+    elif veryifyNewAccount == False:
+        Label(register, text="Registration Failed: User Already Registered", font=("Calibri", 24),
+              fg="red").grid(row=4, column=0, columnspan=2)
+
+
+
+def check_new_account():
+
+    file = open(user_data_file, "r")
+    data = file.readlines()
+    file.close()
+
+    print(data)
+
+    for username in data[1:]:
+        if(username.split(',')[0] == user.get()):
+            return False
+
+    return True
 
 
 # CHECK TO SEE IF CURRENT USERS > USER LIMIT (10)
@@ -181,15 +205,16 @@ def nav_bar():
 
     Label(nav, text="     Welcome to the DCM, " + user.get() + ": ", font=("Calibri", 14)).grid(row=0, column=0)
     pmStatus = Label(nav, text="Pacemaker Device Status: Pacemaker Device Change Detected", font=("Calibri", 13), padx = 35)
-    pmStatus.grid(row=0, column=1, sticky = W)
-    Button(nav, text="Dismiss", font=("Calibri", 12), command=changePmStatus).grid(row=0, column=2, pady=3, ipadx= 50)
-    Button(nav, text="About", font=("Calibri", 12)).grid(row=1, column=0, pady=3, ipadx= 50)
-    connectStatus = Label(nav, text="Connection Status: Connecting", font=("Calibri", 13), padx= 35 )
+    pmStatus.grid(row=0, column=1, sticky = W, columnspan= 2)
+    Button(nav, text="Dismiss", font=("Calibri", 12), command=changePmStatus).grid(row=0, column=3, pady=3, ipadx= 50)
+    Button(nav, text="About", font=("Calibri", 12), command = about).grid(row=1, column=0, pady=3, ipadx= 50)
+    connectStatus = Label(nav, text="Connection Status:  Connecting ", font=("Calibri", 13), padx= 35 )
     connectStatus.grid(row=1, column=1, sticky = W)
-    Button(nav, text="Change Device", font=("Calibri", 12), command=changeConnectStatus).grid(row=1, column=2, pady=3, ipadx= 27)
+    Label(nav, text="[PORTS PLACEHOLDER]", font=("Calibri", 13), padx= 10 ).grid(row=1, column=2, sticky = W)
+    Button(nav, text="Change Device", font=("Calibri", 12), command=changeConnectStatus).grid(row=1, column=3, pady=3, ipadx= 27)
     Label(nav, text= "-------------------------------------------------------", font=("Calibri", 13), padx = 10).grid(row=2, column=0, sticky = W)
-    Label(nav, text= "     ---------------------------------------------------------------------------------------------", font=("Calibri", 13), padx = 10).grid(row=2, column=1, sticky = W)
-    Button(nav, text="Log Out", font=("Calibri", 12), command=back_to_welcome).grid(row=2, column=2, pady=3, ipadx= 50)
+    Label(nav, text= "     ---------------------------------------------------------------------------------------------", font=("Calibri", 13), padx = 10).grid(row=2, column=1, sticky = W, columnspan= 2)
+    Button(nav, text="Log Out", font=("Calibri", 12), command=back_to_welcome).grid(row=2, column=3, pady=3, ipadx= 50)
 
 def changePmStatus():
     pmStatus.config(text ="Pacemaker Device Status: No Issues")
@@ -201,7 +226,16 @@ def back_to_welcome():
     DCM.destroy()
     welcome_page()
 
-#def about():
+def about():
+    aboutScr = Toplevel(DCM)
+    aboutScr.title("About")
+    aboutScr.geometry("500x300")
+    Label(aboutScr, text=" About ", font=("Calibri", 18)).grid(row=0, column=0, pady= 7, padx = 10)
+    Label(aboutScr, text=" Application model number: PLACEHOLDER", font=("Calibri", 14)).grid(row=1, column=0, pady= 4, padx = 10)
+    Label(aboutScr, text=" Application software revision number in use: PLACEHOLDER", font=("Calibri", 14)).grid(row=2, column=0, pady= 4, padx = 10)
+    Label(aboutScr, text=" DCM serial number: PLACEHOLDER", font=("Calibri", 14)).grid(row=3, column=0, pady= 4, padx = 10)
+    Label(aboutScr, text=" Institution name: McMaster University ", font=("Calibri", 14)).grid(row=4, column=0, pady= 4, padx = 10)
+    Button(aboutScr, text="Return", font=("Calibri", 14), command= aboutScr.destroy).grid(row=5, column=0, pady = 7, ipadx= 30, ipady= 5, padx = 10)
 
 # AOO MODE PARAMETERS
 def set_mode_AOO():
@@ -507,4 +541,6 @@ def DCM_login():
     pm_params.grid(row=1, column=0, sticky = W, pady = 5)
 
 
+
 welcome_page()
+
