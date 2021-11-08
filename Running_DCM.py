@@ -118,6 +118,7 @@ def check_user_limit():
 
 
 
+
 # LOGIN PAGE ===========================================================================================================
 def login_page():
     global login
@@ -196,6 +197,21 @@ def welcome_page():
     Button(text="Quit", padx=20, pady=10, command=welcome.destroy).grid(row=6, column=0)
 
     welcome.mainloop()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -717,5 +733,6 @@ def DCM_login():
     pacemaker_parameters()
     pm_params.grid(row=1, column=0, sticky = W, pady = 5)
 
+erase_user_data()
 welcome_page()
 
