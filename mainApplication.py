@@ -16,5 +16,5 @@ class mainApplication(Frame):
 
 if __name__ == "__main__":
     root = Tk()
-    mainApplication(root).pack(side="top", fill="both", expand=True)
+    mainApplication(root)
     root.mainloop()
