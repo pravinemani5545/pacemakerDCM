@@ -7,6 +7,7 @@ class nav:
     def __init__(self, parent, *args, **kwargs):
         self.nav = parent
         self.userName = args[1];
+        self.DCM = args[0]
 
         Label(self.nav, text="     Welcome to the DCM, " + self.userName + ": ", font=("Calibri", 14)).grid(row=0, column=0)
         self.pmStatus = Label(self.nav, text="Pacemaker Device Status: Pacemaker Device Change Detected", font=("Calibri", 13), padx = 35)
@@ -19,7 +20,7 @@ class nav:
         Button(self.nav, text="Change Device", font=("Calibri", 12), command=self.changeConnectStatus).grid(row=1, column=3, pady=3, ipadx= 27)
         Label(self.nav, text= "-------------------------------------------------------", font=("Calibri", 13), padx = 10).grid(row=2, column=0, sticky = W)
         Label(self.nav, text= "     ---------------------------------------------------------------------------------------------", font=("Calibri", 13), padx = 10).grid(row=2, column=1, sticky = W, columnspan= 2)
-        Button(self.nav, text="Log Out", font=("Calibri", 12), command= lambda : self.back_to_welcome(args[0])).grid(row=2, column=3, pady=3, ipadx= 50)
+        Button(self.nav, text="Log Out", font=("Calibri", 12), command= lambda : self.back_to_welcome(self.DCM)).grid(row=2, column=3, pady=3, ipadx= 50)
 
         self.nav.grid(row=0)
     

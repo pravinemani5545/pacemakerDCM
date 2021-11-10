@@ -49,10 +49,10 @@ class pmParams:
 
         # parameters for this mode to be modified
         
-        self.lrl_value = StringVar()
-        self.url_value = StringVar()
-        self.aa_value = StringVar()
-        self.apw_value = StringVar()
+        self.lrl_value = StringVar(self.AOO_mode)
+        self.url_value = StringVar(self.AOO_mode)
+        self.aa_value = StringVar(self.AOO_mode)
+        self.apw_value = StringVar(self.AOO_mode)
 
         Label(self.AOO_mode, text="Lower Rate Limit (ppm): ").grid(row=1, column=0, padx= 85, pady=2)
         enter_lrl = Entry(self.AOO_mode, textvariable = self.lrl_value).grid(row=1, column=1)
@@ -76,8 +76,14 @@ class pmParams:
         message = Label(self.AOO_mode, text=" ", font=("Calibri", 30), fg="green")
         message.grid(row=6, column=0, columnspan=2,pady= 15)
 
-        # make sure values entered are valid
+        # make sure values entered are 
+        
         try:
+            print(int(self.lrl_value.get()))
+            print(int(self.url_value.get()))
+            print(float(self.aa_value.get()))
+            print(float(self.apw_value.get()))
+            
             lrlval = int(self.lrl_value.get())
             urlval = int(self.url_value.get())
             aaval = float(self.aa_value.get())
@@ -126,7 +132,8 @@ class pmParams:
             else:
                 message.config(text= f"        Update Failed: \n {errormsg}        ", fg="red", font=("Calibri", 12))
 
-        except:
+        except Exception as e:
+            print(f"EXCEPTION: {e}")
             message.config(text="      Update Failed:       \n       Please use integers for lrl and url       \n       Please use floats for aa and apw      ", fg="red", font=("Calibri", 12))
 
         # for testing values are correct
@@ -146,10 +153,10 @@ class pmParams:
 
         # parameters for this mode to be modified
         
-        self.lrl_value = StringVar()
-        self.url_value = StringVar()
-        self.va_value = StringVar()
-        self.vpw_value = StringVar()
+        self.lrl_value = StringVar(self.VOO_mode)
+        self.url_value = StringVar(self.VOO_mode)
+        self.va_value = StringVar(self.VOO_mode)
+        self.vpw_value = StringVar(self.VOO_mode)
 
         Label(self.VOO_mode, text="Lower Rate Limit (ppm): ").grid(row=1, column=0, padx= 85, pady=2)
         enter_lrl = Entry(self.VOO_mode, textvariable=self.lrl_value).grid(row=1, column=1)
@@ -242,11 +249,11 @@ class pmParams:
         self.mode_frame.grid(row=1, column=0, columnspan=2)
 
         # parameters for this mode to be modified
-        self.lrl_value = StringVar()
-        self.url_value = StringVar()
-        self.aa_value = StringVar()
-        self.apw_value = StringVar()
-        self.arp_value = StringVar()
+        self.lrl_value = StringVar(self.AAI_mode)
+        self.url_value = StringVar(self.AAI_mode)
+        self.aa_value = StringVar(self.AAI_mode)
+        self.apw_value = StringVar(self.AAI_mode)
+        self.arp_value = StringVar(self.AAI_mode)
 
         Label(self.AAI_mode, text="Lower Rate Limit (ppm): ").grid(row=1, column=0, padx=85 , pady=2)
         enter_lrl = Entry(self.AAI_mode, textvariable=self.lrl_value).grid(row=1, column=1)
@@ -352,11 +359,11 @@ class pmParams:
 
         # parameters for this mode to be modified
         
-        self.lrl_value = StringVar()
-        self.url_value = StringVar()
-        self.va_value = StringVar()
-        self.vpw_value = StringVar()
-        self.vrp_value = StringVar()
+        self.lrl_value = StringVar(self.VVI_mode)
+        self.url_value = StringVar(self.VVI_mode)
+        self.va_value = StringVar(self.VVI_mode)
+        self.vpw_value = StringVar(self.VVI_mode)
+        self.vrp_value = StringVar(self.VVI_mode)
 
 
         Label(self.VVI_mode, text="Lower Rate Limit (ppm): ").grid(row=1, column=0, padx=85, pady = 2)
