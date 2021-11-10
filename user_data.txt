@@ -1,4 +1,2 @@
-3
+1
 pravine,mani
-naruto,uzu
-pravinem,mani

@@ -47,7 +47,7 @@ class loginPage:
                 if (self.password.get() == user_data[1].strip("\n")):  # check to see if password is correct
                     message.config(text="                        Login Success                        ")
                     flag = 0
-                    self.DCM_login()  # go to main DCM page
+                    self.DCM_login(self.user.get())  # go to main DCM page
                 else:
                     message.config(text="Login Failed: Password Not Recognized", fg="red")
                     flag = 0
@@ -70,6 +70,7 @@ class loginPage:
             self.user_count = self.user_count + 1
             return True
     
-    def DCM_login(self):
+    def DCM_login(self, userName):
+        
         self.DCMScreen = Tk()
-        self.DCMWindow = DCM(self.DCMScreen)
+        self.DCMWindow = DCM(self.DCMScreen, userName)

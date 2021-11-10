@@ -2,16 +2,24 @@ from tkinter import *
 from pmParams import *
 from nav import *
 
-class DCM:
+
+class DCM():
     def __init__(self, parent, *args, **kwargs):
         self.DCM = parent
         self.DCM.geometry("980x720")
         self.DCM.title("DCM")
 
-    def frameNav(self):
         self.navFrm = Frame(self.DCM)
-        self.nav = nav(self.DCM)
+        self.nav = nav(self.navFrm, self.DCM, args[0])
 
-    def framePmParams(self):
-        self.pmParamsFrm = Frame(self.welcome)
+        self.pmParamsFrm = Frame(self.DCM)
         self.pmParams = pmParams(self.pmParamsFrm)
+
+
+def main(): 
+    root = Tk()
+    app = DCM(root, "billy")
+    root.mainloop()
+
+if __name__ == "__main__":
+    main()

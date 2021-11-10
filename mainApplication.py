@@ -6,15 +6,17 @@
 from tkinter import *
 from welcome_page import *
 
-class mainApplication(Frame):
+class mainApplication:
 
-    def __init__(self, parent, *args, **kwargs):
-        Frame.__init__(self, parent, *args, **kwargs)
+    def __init__(self, parent,  *args, **kwargs):
         self.root = parent
         self.welcome = welcomePage(self.root);
 
 
-if __name__ == "__main__":
+def main(): 
     root = Tk()
-    mainApplication(root)
+    app = mainApplication(root)
     root.mainloop()
+
+if __name__ == "__main__":
+    main()
