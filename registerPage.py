@@ -36,7 +36,7 @@ class registerPage:
         print(veryifyNewAccount)
 
         # write data to file  
-        if verifyUsers and veryifyNewAccount:
+        if verifyUsers and veryifyNewAccount == 4:
             # update user_count and restore previous data to file
             file = open(user_data_file, "r")
             data = file.readlines()
@@ -61,9 +61,19 @@ class registerPage:
             Label(self.register, text="Registration Failed: Number of Users Exceeded Limit", font=("Calibri", 16),
                 fg="red").grid(row=4, column=0, columnspan=2)
 
-        elif veryifyNewAccount == False:
+        elif veryifyNewAccount == 1:
             Label(self.register, text="Registration Failed: User Already Registered", font=("Calibri", 18),
                 fg="red").grid(row=4, column=0, columnspan=2)
+
+        elif veryifyNewAccount == 2:
+            Label(self.register, text="Registration Failed: Username cannot be empty", font=("Calibri", 18),
+                fg="red").grid(row=4, column=0, columnspan=2)
+
+        elif veryifyNewAccount == 3:
+            Label(self.register, text="Registration Failed: Password cannot be empty", font=("Calibri", 18),
+                fg="red").grid(row=4, column=0, columnspan=2)
+    
+
 
     def check_user_limit(self):
 
@@ -88,6 +98,10 @@ class registerPage:
 
         for username in data[1:]:
             if(username.split(',')[0] == self.user.get()):
-                return False
+                return 1
+            if(self.user.get() == ""):
+                return 2
+            if(self.password.get() == ""):
+                return 3
 
-        return True
+        return 4

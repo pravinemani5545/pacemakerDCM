@@ -45,16 +45,12 @@ class loginPage:
             user_data = data[i].split(",")
             if (self.user.get() == user_data[0]):  # check to see if user is in list
                 if (self.password.get() == user_data[1].strip("\n")):  # check to see if password is correct
-                    message.config(text="                        Login Success                        ")
+                    message.config(text="                      Login Success                        ")
                     flag = 0
                     self.DCM_login(self.user.get())  # go to main DCM page
-                else:
-                    message.config(text="Login Failed: Password Not Recognized", fg="red")
-                    flag = 0
-                    break;
 
         if (flag):
-            message.config(text="Login Failed: Username Not Recognized", fg="red")
+            message.config(text="Login Failed: Username and/or \n Password Not Recognized", fg="red")
 
 
     def check_user_limit(self):
