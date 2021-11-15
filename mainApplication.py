@@ -1,17 +1,12 @@
 # Use Tkinter for python 2, tkinter for python 3
-#import tkinter as tk
-
-
-#IGNORE FOR NOWWWW
 from tkinter import *
-from welcome_page import *
+from welcomePage import *
 
 class mainApplication:
 
     def __init__(self, parent,  *args, **kwargs):
         self.root = parent
-        self.welcome = welcomePage(self.root);
-
+        self.welcome = welcomePage(self.root)
 
 def main(): 
     root = Tk()

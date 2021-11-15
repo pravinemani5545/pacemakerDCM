@@ -13,10 +13,9 @@ class welcomePage:
         #self.parent = parent
         self.welcome = parent
         #tk.Frame(self.parent)
-        
+
         self.welcome.geometry("500x500")
         self.welcome.title("Login to DCM")
-
 
         Label(self.welcome,text="Pacemaker DCM", font= "Calibri" , justify=CENTER).grid(row=0, column=0, padx=140)
         Label(self.welcome,text="").grid(row=1, column=0)
@@ -36,7 +35,6 @@ class welcomePage:
     def topLevelLogin(self):
         self.loginPg = Toplevel(self.welcome)
         self.LoginWindow = loginPage(self.loginPg)
-      
 
 def main(): 
     root = Tk()

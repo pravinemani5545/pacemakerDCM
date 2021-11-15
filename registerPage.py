@@ -9,7 +9,7 @@ class registerPage:
         self.register = parent
         self.register.title("Register New User")
         self.register.geometry("500x500")
-        self.user_count  = 0
+        self.user_count = 0
         self.user = StringVar()
         self.password = StringVar()
 
@@ -33,7 +33,7 @@ class registerPage:
         verifyUsers = self.check_user_limit()
         veryifyNewAccount = self.check_new_account()
 
-        print(veryifyNewAccount)
+        # print(veryifyNewAccount)
 
         # write data to file  
         if verifyUsers and veryifyNewAccount == 4:
@@ -43,8 +43,7 @@ class registerPage:
             data[0] = str(self.user_count) + "\n"
             file.close()
 
-            print(data)
-
+            # print(data)
 
             file = open(user_data_file, "w")
             file.writelines(data)
@@ -94,7 +93,7 @@ class registerPage:
         data = file.readlines()
         file.close()
 
-        print(data)
+        # print(data)
 
         for username in data[1:]:
             if(username.split(',')[0] == self.user.get()):
@@ -104,4 +103,5 @@ class registerPage:
             if(self.password.get() == ""):
                 return 3
 
+        # if user registration info is valid
         return 4

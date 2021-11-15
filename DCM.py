@@ -2,7 +2,6 @@ from tkinter import *
 from pmParams import *
 from nav import *
 
-
 class DCM():
     def __init__(self, parent, *args, **kwargs):
         self.DCM = parent
@@ -13,12 +12,11 @@ class DCM():
         self.nav = nav(self.navFrm, self.DCM, args[0])
 
         self.pmParamsFrm = Frame(self.DCM)
-        self.pmParams = pmParams(self.pmParamsFrm)
-
+        self.pmParams = pmParams(self.pmParamsFrm, args[0])
 
 def main(): 
     root = Tk()
-    app = DCM(root, "billy")
+    app = DCM(root)
     root.mainloop()
 
 if __name__ == "__main__":
