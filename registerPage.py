@@ -1,6 +1,6 @@
 from tkinter import *
-import os
 
+# file address storing user login information
 user_data_file = "user_data.txt"
 
 class registerPage:
@@ -9,41 +9,37 @@ class registerPage:
         self.register = parent
         self.register.title("Register New User")
         self.register.geometry("500x500")
-        self.user_count = 0
-        self.user = StringVar()
-        self.password = StringVar()
+
+        user = StringVar()
+        password = StringVar()
 
         Label(self.register, text="Create New Account", font=("Calibri", 24)).grid(row=0, column=0, padx=120, pady=10,
                                                                             columnspan=2)
 
         Label(self.register, text="Username:").grid(row=1, column=0, pady=10)
-        enter_user = Entry(self.register, textvariable=self.user)
+        enter_user = Entry(self.register, textvariable=user)
         enter_user.grid(row=1, column=1)
 
         Label(self.register, text="Password:").grid(row=2, column=0, pady=10)
-        enter_pass = Entry(self.register, textvariable=self.password)
+        enter_pass = Entry(self.register, textvariable=password)
         enter_pass.grid(row=2, column=1)
 
-        Button(self.register, text="Register", padx=20, pady=10, command=self.register_new_user).grid(row=3, column=0, pady=20,
+        Button(self.register, text="Register", padx=20, pady=10, command= lambda: self.register_new_user(user, password)).grid(row=3, column=0, pady=20,
                                                                                             columnspan=2)
         Button(self.register, text="Return to Menu", padx=20, pady=10, command=self.register.destroy).grid(row=5, column=0, pady=20,
                                                                                                 columnspan=2)
 
-    def register_new_user(self):
-        verifyUsers = self.check_user_limit()
-        veryifyNewAccount = self.check_new_account()
-
-        # print(veryifyNewAccount)
+    def register_new_user(self, username, password):
+        verifyUsers, user_count = self.check_user_limit()
+        veryifyNewAccount = self.check_new_account(username, password)
 
         # write data to file  
-        if verifyUsers and veryifyNewAccount == 4:
+        if verifyUsers and veryifyNewAccount == 6:
             # update user_count and restore previous data to file
             file = open(user_data_file, "r")
             data = file.readlines()
-            data[0] = str(self.user_count) + "\n"
+            data[0] = str(user_count) + "\n"
             file.close()
-
-            # print(data)
 
             file = open(user_data_file, "w")
             file.writelines(data)
@@ -51,7 +47,7 @@ class registerPage:
 
             # append new data to file
             file = open(user_data_file, "a")
-            file.write(self.user.get() + "," + self.password.get() + "\n")
+            file.write(username.get() + "," + password.get() + "\n")
             file.close()
 
             Label(self.register, text="                 Registration Success                 ", font=("Calibri", 24), fg="green").grid(row=4, column=0,
@@ -69,39 +65,48 @@ class registerPage:
                 fg="red").grid(row=4, column=0, columnspan=2)
 
         elif veryifyNewAccount == 3:
+            Label(self.register, text="Registration Failed: Username cannot contain commas", font=("Calibri", 18),
+                fg="red").grid(row=4, column=0, columnspan=2)
+
+        elif veryifyNewAccount == 4:
             Label(self.register, text="Registration Failed: Password cannot be empty", font=("Calibri", 18),
                 fg="red").grid(row=4, column=0, columnspan=2)
-    
 
+        elif veryifyNewAccount == 5:
+            Label(self.register, text="Registration Failed: Password cannot contain commas", font=("Calibri", 18),
+                fg="red").grid(row=4, column=0, columnspan=2)
 
     def check_user_limit(self):
+            user_count = 0
 
             # get latest user_count from first line in file
             file = open(user_data_file, "r")
-            self.user_count = int(file.readline())
+            user_count = int(file.readline())
             file.close()
 
-            if self.user_count == 10:
-                return False
+            if user_count == 10:
+                return False, user_count
             else:
-                self.user_count = self.user_count + 1
-                return True
+                user_count = user_count + 1
+                return True, user_count
             
-    def check_new_account(self):
+    def check_new_account(self, username, password):
 
         file = open(user_data_file, "r")
         data = file.readlines()
         file.close()
 
-        # print(data)
-
-        for username in data[1:]:
-            if(username.split(',')[0] == self.user.get()):
+        for users in data[1:]:
+            if(users.split(',')[0] == username.get()):
                 return 1
-            if(self.user.get() == ""):
+            if(username.get() == ""):
                 return 2
-            if(self.password.get() == ""):
+            if (username.get() == ","):
                 return 3
+            if(password.get() == ""):
+                return 4
+            if (password.get() == ","):
+                return 5
 
         # if user registration info is valid
-        return 4
+        return 6
