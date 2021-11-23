@@ -7,7 +7,7 @@ class pmParams:
         self.pmParams = parent
         self.userName = args[0]
 
-        # displays current mode
+        # displays current mode name
         self.mode_name = Label(self.pmParams, text="")
         self.mode_name.grid(row=0, column=1)
 
@@ -42,8 +42,8 @@ class pmParams:
         # forget previous mode frame and set this as new one
 
         self.mode_frame.grid_forget()
-        mode_frame = self.AOO_mode
-        mode_frame.grid(row=1, column=0, columnspan=2)
+        self.mode_frame = self.AOO_mode
+        self.mode_frame.grid(row=1, column=0, columnspan=2)
 
         # parameters for this mode to be modified
 

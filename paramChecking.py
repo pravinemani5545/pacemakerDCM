@@ -5,15 +5,15 @@ def check_LRL(lrlval):
 
     if (lrlval > 175 or lrlval < 30):
         error = True
-        errormsg = "        Please make sure your lrl value         \n         is between 30-175 ppm.        "
+        errormsg = "        Please make sure the LRL value          \n           is between 30-175 ppm.        "
 
     elif (lrlval >= 30 and lrlval <= 50 and (lrlval % 5 != 0)):
         error = True
-        errormsg = "        Please make sure you increment lrl        \n         by 5 ppm for vals of 30-50 ppm.        "
+        errormsg = "        Please make sure the increment LRL         \n         by 5 ppm for vals of 30-50 ppm.        "
 
     elif (lrlval >= 90 and lrlval <= 175 and (lrlval % 5 != 0)):
         error = True
-        errormsg = "        Please make sure you increment lrl         \n         by 5 ppm for vals of 90-175 ppm.        "
+        errormsg = "        Please make sure the increment LRL         \n         by 5 ppm for vals of 90-175 ppm.        "
 
     return error, errormsg
 
@@ -21,13 +21,9 @@ def check_URL(urlval):
     errormsg = ""
     error = False
 
-    if (urlval > 175 or urlval < 50):
+    if (urlval > 175 or urlval < 50 or urlval % 5 != 0):
         error = True
-        errormsg = "        Please make sure your url value         \n         is between 50-175 ppm.        "
-
-    elif (urlval >= 50 and urlval <= 175 and (urlval % 5 != 0)):
-            error = True
-            errormsg = "        Please make sure you increment url         \n         by 5 ppm for vals of 50-175 ppm.        "
+        errormsg = "        Please make sure the URL value          \n         is between 50-175 ppm, incremented by 5ppm.        "
 
     return error, errormsg
 
@@ -35,14 +31,9 @@ def check_AA(aaval):
     errormsg = ""
     error = False
 
-    if (aaval < 0 or aaval > 5):
+    if (aaval < 0 or aaval > 5 or (aaval * 100) % 10 != 0):
         error = True
-        errormsg = "        Please make sure your amplitude value         \n         is between 0 and 5 Volts.        "
-
-    elif (aaval >= 0 and aaval <= 5):
-        if ((aaval * 100) % 5 != 0):
-            error = True
-            errormsg = "        Please make sure you increment amplitude         \n         by values of 0.05 V.        "
+        errormsg = "        Please make sure the AA value         \n         is between 0 and 5 V, incremented by 0.1 V.        "
 
     return error, errormsg
 
@@ -50,14 +41,9 @@ def check_VA(vaval):
     errormsg = ""
     error = False
 
-    if (vaval < 0 or vaval > 5):
+    if (vaval < 0 or vaval > 5 or (vaval * 100) % 10 != 0):
         error = True
-        errormsg = "        Please make sure your amplitude value         \n         is between 0 and 5 Volts.        "
-
-    elif (vaval >= 0 and vaval <= 5):
-        if ((vaval * 100) % 5 != 0):
-            error = True
-            errormsg = "        Please make sure you increment amplitude         \n         by values of 0.05 V.        "
+        errormsg = "        Please make sure the VA value         \n         is between 0 and 5 V, incremented by 0.1 V.        "
 
     return error, errormsg
 
@@ -65,9 +51,9 @@ def check_APW(apwval):
     errormsg = ""
     error = False
 
-    if (apwval != 0.05 and not (0.1 <= apwval <= 1.9 and (apwval * 100) % 10 == 0)):
+    if (apwval > 30 or apwval <1):
         error = True
-        errormsg = "        Please make sure your apw value is either         \n         0.05ms or 0.1ms - 1.9ms in increments of 0.1ms.        "
+        errormsg = "        Please make sure the APW value is between         \n         1 and 30ms, incremented by 1ms.        "
 
     return error, errormsg
 
@@ -75,9 +61,9 @@ def check_VPW(vpwval):
     errormsg = ""
     error = False
 
-    if (vpwval != 0.05 and not (0.1 <= vpwval <= 1.9 and (vpwval * 100) % 10 == 0)):
+    if (vpwval > 30 or vpwval < 1):
         error = True
-        errormsg = "        Please make sure your vpw value is either         \n         0.05ms or 0.1ms - 1.9ms in increments of 0.1ms.        "
+        errormsg = "        Please make sure the VPW value is between         \n         1 and 30ms, incremented by 1ms.        "
 
     return error, errormsg
 
@@ -87,11 +73,11 @@ def check_ARP(lrlval, arpval):
 
     if (not (arpval >= 150 and arpval <= 500 and (arpval % 10 == 0))):
         error = True
-        errormsg = "        Please make sure your arp value is between          \n         150ms and 500ms in increments of 10ms.        "
+        errormsg = "        Please make sure the ARP value is between          \n         150-500ms, incremented by 10ms.        "
 
-    if (60000//lrlval >= arpval):
+    elif (60000//lrlval >= arpval):
         error = True
-        errormsg = "        Please make sure the pacewidth (lrl value in ms)     \n         is less than the pulse period (arp)"
+        errormsg = "        Please make sure the pacewidth (LRL value in ms)     \n         is less than the pulse period (ARP).        "
 
     return error, errormsg
 
@@ -101,10 +87,128 @@ def check_VRP(lrlval, vrpval):
 
     if (not (vrpval >= 150 and vrpval <= 500 and (vrpval % 10 == 0))):
         error = True
-        errormsg = "        Please make sure your vrp value is between          \n         150ms and 500ms in increments of 10 ms.        "
+        errormsg = "        Please make sure the VRP value is between          \n         150-500ms, incremented by 10 ms.        "
 
-    if (60000//lrlval >= vrpval):
+    elif (60000//lrlval >= vrpval):
         error = True
-        errormsg = "        Please make sure the pacewidth (lrl value in ms)     \n         is less than the pulse period (vrp)"
+        errormsg = "        Please make sure the pacewidth (LRL value in ms)     \n         is less than the pulse period (VRP).        "
+
+    return error, errormsg
+
+def check_SENSE_RATE(max):
+    errormsg = ""
+    error = False
+
+    if (max > 175 or max < 50 or max % 5 != 0):
+        error = True
+        errormsg = "        Please make sure the maximum sensor rate value         \n         is between 50-175 ppm, incremented by 5ppm.        "
+
+    return error, errormsg
+
+def check_AV_DELAY(delay):
+    errormsg = ""
+    error = False
+
+    if (delay > 300 or delay < 70 or delay % 10 != 0):
+        error = True
+        errormsg = "        Please make sure the fixed AV delay value        \n         is between 70-300 ms, incremented by 10ppm.        "
+
+    return error, errormsg
+
+def check_AS (sensitivity):
+    errormsg = ""
+    error = False
+
+    if (sensitivity > 5 or sensitivity < 0 or (sensitivity * 100) % 10 != 0):
+        error = True
+        errormsg = "        Please make sure the atrial sensitivty value         \n         is between 0-5 V, incremented by 0.1V.        "
+
+    return error, errormsg
+
+def check_VS (sensitivity):
+    errormsg = ""
+    error = False
+
+    if (sensitivity > 5 or sensitivity < 0 or (sensitivity * 100) % 10 != 0):
+        error = True
+        errormsg = "        Please make sure the ventricular sensitivty value         \n         is between 0-5 V, incremented by 0.1V.        "
+
+    return error, errormsg
+
+def check_PVARP(pvarp):
+    errormsg = ""
+    error = False
+
+    if (pvarp > 500 or pvarp < 150 or PVARP % 10 != 0):
+        error = True
+        errormsg = "        Please make sure the PVARP value         \n         is between 150-500ms, incremented by 10ms.        "
+
+    return error, errormsg
+
+def check_HYSTERESIS(hys):
+    errormsg = ""
+    error = False
+
+    if (hys != 0 and (hys > 175 or hys < 30)):
+        error = True
+        errormsg = "        Please make sure the hysteresis value        \n        is off (0) or between 30-175 ppm.        "
+
+    elif (hys >= 30 and hys <= 50 and (hys % 5 != 0)):
+        error = True
+        errormsg = "        Please make sure the hysteresis is incremented        \n        by 5 ppm for vals of 30-50 ppm.        "
+
+    elif (hys >= 90 and hys <= 175 and (hys % 5 != 0)):
+        error = True
+        errormsg = "        Please make sure the hysteresis is incremented        \n        by 5 ppm for vals of 90-175 ppm.        "
+
+    return error, errormsg
+
+def check_RATE_SMOOTHING(rate):
+    errormsg = ""
+    error = False
+
+    if (rate > 25 or rate < 0 or (rate != 25 and rate % 3 != 0)):
+        error = True
+        errormsg = "        Please make sure the rate value       \n        is 0, 3, 6, 9, 12, 15, 18, 21, or 25%.        "
+
+    return error, errormsg
+
+def check_THRESHOLD(threshold):
+    errormsg = ""
+    error = False
+
+    if (threshold > 0 or threshold < 7):
+        error = True
+        errormsg = "        Please make sure the threshold value       \n        is between 0 and 7, incremented by 1.        "
+
+    return error, errormsg
+
+def check_RXN_TIME(rxn):
+    errormsg = ""
+    error = False
+
+    if (rxn > 50 or rxn < 10 or rxn % 10 != 0):
+        error = True
+        errormsg = "        Please make sure the reaction time         \n         is between 10-50ms, incremented by 10ms.        "
+
+    return error, errormsg
+
+def check_RESPONSE(response):
+    errormsg = ""
+    error = False
+
+    if (response > 16 or response < 1):
+        error = True
+        errormsg = "        Please make sure the response factor         \n         is between 1-16, incremented by 1.        "
+
+    return error, errormsg
+
+def check_RECOVERY(recovery):
+    errormsg = ""
+    error = False
+
+    if (recovery > 16 or recovery < 2):
+        error = True
+        errormsg = "        Please make sure the recovery time         \n         is between 2-16 minutes, incremented by 1 minute.        "
 
     return error, errormsg
