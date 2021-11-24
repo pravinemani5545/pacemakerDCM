@@ -51,7 +51,7 @@ def check_APW(apwval):
     errormsg = ""
     error = False
 
-    if (apwval > 30 or apwval <1):
+    if (apwval > 30 or apwval < 1):
         error = True
         errormsg = "        Please make sure the APW value is between         \n         1 and 30ms, incremented by 1ms.        "
 
@@ -95,7 +95,7 @@ def check_VRP(lrlval, vrpval):
 
     return error, errormsg
 
-def check_SENSE_RATE(max):
+def check_MAX_SENSE_RATE(max):
     errormsg = ""
     error = False
 
@@ -121,7 +121,7 @@ def check_AS (sensitivity):
 
     if (sensitivity > 5 or sensitivity < 0 or (sensitivity * 100) % 10 != 0):
         error = True
-        errormsg = "        Please make sure the atrial sensitivty value         \n         is between 0-5 V, incremented by 0.1V.        "
+        errormsg = "        Please make sure the atrial sensitivity value         \n         is between 0-5 V, incremented by 0.1V.        "
 
     return error, errormsg
 
@@ -131,7 +131,7 @@ def check_VS (sensitivity):
 
     if (sensitivity > 5 or sensitivity < 0 or (sensitivity * 100) % 10 != 0):
         error = True
-        errormsg = "        Please make sure the ventricular sensitivty value         \n         is between 0-5 V, incremented by 0.1V.        "
+        errormsg = "        Please make sure the ventricular sensitivity value         \n         is between 0-5 V, incremented by 0.1V.        "
 
     return error, errormsg
 
@@ -139,7 +139,7 @@ def check_PVARP(pvarp):
     errormsg = ""
     error = False
 
-    if (pvarp > 500 or pvarp < 150 or PVARP % 10 != 0):
+    if (pvarp > 500 or pvarp < 150 or pvarp % 10 != 0):
         error = True
         errormsg = "        Please make sure the PVARP value         \n         is between 150-500ms, incremented by 10ms.        "
 
@@ -167,19 +167,9 @@ def check_RATE_SMOOTHING(rate):
     errormsg = ""
     error = False
 
-    if (rate > 25 or rate < 0 or (rate != 25 and rate % 3 != 0)):
+    if (rate > 25 or rate < 0 or (rate != 25 and rate % 3 != 0) or rate == 24):
         error = True
         errormsg = "        Please make sure the rate value       \n        is 0, 3, 6, 9, 12, 15, 18, 21, or 25%.        "
-
-    return error, errormsg
-
-def check_THRESHOLD(threshold):
-    errormsg = ""
-    error = False
-
-    if (threshold > 0 or threshold < 7):
-        error = True
-        errormsg = "        Please make sure the threshold value       \n        is between 0 and 7, incremented by 1.        "
 
     return error, errormsg
 

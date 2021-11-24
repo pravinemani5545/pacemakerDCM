@@ -115,7 +115,20 @@ class ALL():
         return self.RATE_SMOOTHING
 
     def set_ACT_THRESHOLD(self, value):
-        self.ACT_THRESHOLD = value
+        if value == "V-Low":
+            self.ACT_THRESHOLD = 0
+        if value == "Low":
+            self.ACT_THRESHOLD = 1
+        if value == "Med-Low":
+            self.ACT_THRESHOLD = 2
+        if value == "Med":
+            self.ACT_THRESHOLD = 3
+        if value == "Med-High":
+            self.ACT_THRESHOLD = 4
+        if value == "High":
+            self.ACT_THRESHOLD = 5
+        if value == "V-High":
+            self.ACT_THRESHOLD = 6
 
     def get_ACT_THRESHOLD(self):
         return self.ACT_THRESHOLD
@@ -269,7 +282,7 @@ class AOOR(ALL):
         self.paramList = [self.LRL, self.URL, self.AA, self.APW, self.MAX_SENSE_RATE, self.ACT_THRESHOLD,
                           self.REACTION_TIME, self.RESPONSE_FACTOR, self.RECOVERY_TIME]
         self.user = user
-        self.data_file = "aaor_data.txt"
+        self.data_file = "aoor_data.txt"
 
     def updateParamList(self):
         self.paramList = [self.LRL, self.URL, self.AA, self.APW, self.MAX_SENSE_RATE, self.ACT_THRESHOLD,

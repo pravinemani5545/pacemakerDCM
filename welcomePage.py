@@ -17,7 +17,7 @@ class welcomePage:
         self.welcome.geometry("500x500")
         self.welcome.title("Login to DCM")
 
-        Label(self.welcome,text="Pacemaker DCM", font= "Calibri" , justify=CENTER).grid(row=0, column=0, padx=140)
+        Label(self.welcome,text="Pacemaker DCM", font=("Bahnschrift", 25) , justify=CENTER).grid(row=0, column=0, padx=140)
         Label(self.welcome,text="").grid(row=1, column=0)
         Button(self.welcome,text="Login", padx=20, pady=10, command= self.topLevelLogin).grid(row=2, column=0)
         Label(self.welcome,text="").grid(row=3, column=0)

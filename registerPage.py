@@ -13,7 +13,7 @@ class registerPage:
         user = StringVar()
         password = StringVar()
 
-        Label(self.register, text="Create New Account", font=("Calibri", 24)).grid(row=0, column=0, padx=120, pady=10,
+        Label(self.register, text="Create New Account", font=("Bahnschrift", 24)).grid(row=0, column=0, padx=120, pady=10,
                                                                             columnspan=2)
 
         Label(self.register, text="Username:").grid(row=1, column=0, pady=10)
