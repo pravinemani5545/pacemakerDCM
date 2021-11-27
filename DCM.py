@@ -1,4 +1,3 @@
-from tkinter import *
 from pmParams import *
 from nav import *
 import serial
@@ -17,7 +16,8 @@ class DCM():
         self.pmParamsFrm = Frame(self.DCM)
         self.pmParams = pmParams(self.pmParamsFrm, args[0], self.ser)
 
-def main(): 
+
+def main():
     root = Tk()
     app = DCM(root)
     root.mainloop()

@@ -94,7 +94,7 @@ class pmParams:
         try:
             error, errormsg = check_LRL(int(lrl.get()))
             if error == False:
-                error, errormsg = check_URL(int(url.get()))
+                error, errormsg = check_URL(int(url.get()), int(lrl.get()))
                 if error == False:
                     error, errormsg = check_AA(float(aa.get()))
                     if error == False:
@@ -168,7 +168,7 @@ class pmParams:
         try:
             error, errormsg = check_LRL(int(lrl.get()))
             if error == False:
-                error, errormsg = check_URL(int(url.get()))
+                error, errormsg = check_URL(int(url.get()), int(lrl.get()))
                 if error == False:
                     error, errormsg = check_VA(float(va.get()))
                     if error == False:
@@ -263,7 +263,7 @@ class pmParams:
         try:
             error, errormsg = check_LRL(int(lrl.get()))
             if error == False:
-                error, errormsg = check_URL(int(url.get()))
+                error, errormsg = check_URL(int(url.get()), int(lrl.get()))
                 if error == False:
                     error, errormsg = check_AA(float(aa.get()))
                     if error == False:
@@ -371,7 +371,7 @@ class pmParams:
         try:
             error, errormsg = check_LRL(int(lrl.get()))
             if error == False:
-                error, errormsg = check_URL(int(url.get()))
+                error, errormsg = check_URL(int(url.get()), int(lrl.get()))
                 if error == False:
                     error, errormsg = check_VA(float(va.get()))
                     if error == False:
@@ -471,7 +471,7 @@ class pmParams:
         try:
             error, errormsg = check_LRL(int(lrl.get()))
             if error == False:
-                error, errormsg = check_URL(int(url.get()))
+                error, errormsg = check_URL(int(url.get()), int(lrl.get()))
                 if error == False:
                     error, errormsg = check_VA(float(va.get()))
                     if error == False:
@@ -577,13 +577,13 @@ class pmParams:
         try:
             error, errormsg = check_LRL(int(lrl.get()))
             if error == False:
-                error, errormsg = check_URL(int(url.get()))
+                error, errormsg = check_URL(int(url.get()), int(lrl.get()))
                 if error == False:
                     error, errormsg = check_AA(float(aa.get()))
                     if error == False:
                         error, errormsg = check_APW(int(apw.get()))
                         if error == False:
-                            error, errormsg = check_MAX_SENSE_RATE(int(max.get()))
+                            error, errormsg = check_MAX_SENSE_RATE(int(max.get()), int(url.get()), int(lrl.get()))
                             if error == False:
                                 error, errormsg = check_RXN_TIME(int(rxn.get()))
                                 if error == False:
@@ -687,13 +687,13 @@ class pmParams:
         try:
             error, errormsg = check_LRL(int(lrl.get()))
             if error == False:
-                error, errormsg = check_URL(int(url.get()))
+                error, errormsg = check_URL(int(url.get()), int(lrl.get()))
                 if error == False:
                     error, errormsg = check_VA(float(va.get()))
                     if error == False:
                         error, errormsg = check_VPW(int(vpw.get()))
                         if error == False:
-                            error, errormsg = check_MAX_SENSE_RATE(int(max.get()))
+                            error, errormsg = check_MAX_SENSE_RATE(int(max.get()), int(url.get()), int(lrl.get()))
                             if error == False:
                                 error, errormsg = check_RXN_TIME(int(rxn.get()))
                                 if error == False:
@@ -819,7 +819,7 @@ class pmParams:
         try:
             error, errormsg = check_LRL(int(lrl.get()))
             if error == False:
-                error, errormsg = check_URL(int(url.get()))
+                error, errormsg = check_URL(int(url.get()), int(lrl.get()))
                 if error == False:
                     error, errormsg = check_AA(float(aa.get()))
                     if error == False:
@@ -833,7 +833,7 @@ class pmParams:
                                     if error == False:
                                         error, errormsg = check_RATE_SMOOTHING(int(rate.get()))
                                         if error == False:
-                                            error, errormsg = check_MAX_SENSE_RATE(int(max.get()))
+                                            error, errormsg = check_MAX_SENSE_RATE(int(max.get()), int(url.get()), int(lrl.get()))
                                             if error == False:
                                                 error, errormsg = check_RXN_TIME(int(rxn.get()))
                                                 if error == False:
@@ -961,7 +961,7 @@ class pmParams:
         try:
             error, errormsg = check_LRL(int(lrl.get()))
             if error == False:
-                error, errormsg = check_URL(int(url.get()))
+                error, errormsg = check_URL(int(url.get()), int(lrl.get()))
                 if error == False:
                     error, errormsg = check_VA(float(va.get()))
                     if error == False:
@@ -973,7 +973,8 @@ class pmParams:
                                 if error == False:
                                     error, errormsg = check_RATE_SMOOTHING(int(rate.get()))
                                     if error == False:
-                                        error, errormsg = check_MAX_SENSE_RATE(int(max.get()))
+                                        error, errormsg = check_MAX_SENSE_RATE(int(max.get()), int(url.get()),
+                                                                               int(lrl.get()))
                                         if error == False:
                                             error, errormsg = check_RXN_TIME(int(rxn.get()))
                                             if error == False:
@@ -1095,7 +1096,7 @@ class pmParams:
         try:
             error, errormsg = check_LRL(int(lrl.get()))
             if error == False:
-                error, errormsg = check_URL(int(url.get()))
+                error, errormsg = check_URL(int(url.get()), int(lrl.get()))
                 if error == False:
                     error, errormsg = check_VA(float(va.get()))
                     if error == False:
@@ -1109,7 +1110,7 @@ class pmParams:
                                     if error == False:
                                         error, errormsg = check_RXN_TIME(int(rxn.get()))
                                         if error == False:
-                                            error, errormsg = check_MAX_SENSE_RATE(int(max.get()))
+                                            error, errormsg = check_MAX_SENSE_RATE(int(max.get()), int(url.get()), int(lrl.get()))
                                             if error == False:
                                                 error, errormsg = check_RESPONSE(int(response.get()))
                                                 if error == False:

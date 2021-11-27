@@ -17,13 +17,17 @@ def check_LRL(lrlval):
 
     return error, errormsg
 
-def check_URL(urlval):
+def check_URL(urlval, lrlval):
     errormsg = ""
     error = False
 
     if (urlval > 175 or urlval < 50 or urlval % 5 != 0):
         error = True
         errormsg = "        Please make sure the URL value          \n         is between 50-175 ppm, incremented by 5ppm.        "
+
+    if (lrlval >= urlval):
+        error = True
+        errormsg = "        Please make sure the LRL value          \n         is less than the URL value.        "
 
     return error, errormsg
 
@@ -95,13 +99,21 @@ def check_VRP(lrlval, vrpval):
 
     return error, errormsg
 
-def check_MAX_SENSE_RATE(max):
+def check_MAX_SENSE_RATE(max, urlval, lrlval):
     errormsg = ""
     error = False
 
     if (max > 175 or max < 50 or max % 5 != 0):
         error = True
         errormsg = "        Please make sure the maximum sensor rate value         \n         is between 50-175 ppm, incremented by 5ppm.        "
+
+    elif (max > urlval):
+        error = True
+        errormsg = "        Please make sure the maximum sensor rate value         \n         is less than the URL value.        "
+
+    elif (max < lrlval):
+        error = True
+        errormsg = "        Please make sure the maximum sensor rate value         \n         is greater than the LRL value.        "
 
     return error, errormsg
 
