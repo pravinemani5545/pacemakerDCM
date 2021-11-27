@@ -24,48 +24,6 @@ class nav:
         self.connectStatus = Label(self.nav, text="Connection Status:  Disconnected ", font=("Calibri", 13), padx= 35 )
         self.connectStatus.grid(row=1, column=1, sticky = W)
 
-
-
-
-
-
-
-        #Label(self.nav, text="[PORTS PLACEHOLDER]", font=("Calibri", 13), padx= 10 ).grid(row=1, column=2, sticky = W)
-        self.ser = serial.Serial()
-        self.ser.baudrate = 115200
-        #ser.port = 'COM6'
-        #ser.open()
-        ports = list(comports())
-        self.portnums = []
-
-        com_ports = Menubutton(self.nav, text="Connect to COM Port", relief = GROOVE)
-        com_ports.menu = Menu(com_ports, tearoff=0)
-        com_ports["menu"] = com_ports.menu
-
-        for port in sorted(ports):
-            self.portnums.append(("{}".format(port)))
-
-        print(self.portnums)
-        print(self.portnums[portIndex])
-
-        for x in range(len(self.portnums)):
-            com_ports.menu.add_command(label = self.portnums[x], command = self.on_select)
-
-        com_ports.grid(row=1, column=2, sticky = W)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         Button(self.nav, text="Change Device", font=("Calibri", 12), command=self.changeConnectStatus).grid(row=1, column=3, pady=3, ipadx= 27)
 
 
