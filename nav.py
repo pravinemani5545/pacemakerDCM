@@ -2,6 +2,8 @@ from tkinter import *
 from loginPage import *
 from mainApplication import *
 from serial.tools.list_ports import comports
+from functools import partial
+from serialcom import*
 import serial
 
 class nav:
@@ -11,6 +13,7 @@ class nav:
         self.nav = parent
         self.DCM = args[0]
         self.userName = args[1];
+        self.serial = args[2]
         
 
         Label(self.nav, text="     Welcome to the DCM, " + self.userName + ": ", font=("Calibri", 14)).grid(row=0, column=0)
@@ -23,46 +26,23 @@ class nav:
 
         self.connectStatus = Label(self.nav, text="Connection Status:  Disconnected ", font=("Calibri", 13), padx= 35 )
         self.connectStatus.grid(row=1, column=1, sticky = W)
-
-
-
-
-
-
-
-        #Label(self.nav, text="[PORTS PLACEHOLDER]", font=("Calibri", 13), padx= 10 ).grid(row=1, column=2, sticky = W)
-        self.ser = serial.Serial()
-        self.ser.baudrate = 115200
-        #ser.port = 'COM6'
-        #ser.open()
-        ports = list(comports())
+       
+       
+        '''self.ser.baudrate = 115200
+        ports = list(comports())'''
         self.portnums = []
 
         com_ports = Menubutton(self.nav, text="Connect to COM Port", relief = GROOVE)
         com_ports.menu = Menu(com_ports, tearoff=0)
         com_ports["menu"] = com_ports.menu
 
-        for port in sorted(ports):
+        for port in sorted(self.serial.ports):
             self.portnums.append(("{}".format(port)))
 
         print(self.portnums)
-        print(self.portnums[portIndex])
-
         for x in range(len(self.portnums)):
-            com_ports.menu.add_command(label = self.portnums[x], command = self.on_select)
-
+            com_ports.menu.add_command(label = self.portnums[x], command = partial(self.on_select, x))
         com_ports.grid(row=1, column=2, sticky = W)
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -81,17 +61,20 @@ class nav:
     def changeConnectStatus(self):
         self.connectStatus.config(text ="Connection Status: Disconnected")
     
-    def on_select(self,selection):
-        print(selection)
+    def on_select(self,index):
+        print(index)
+        comport = self.portnums[index][0:4]
 
-        '''print(index)
-        print(self.portnums[index])
-            self.ser.port = port
+        print(comport)
+
         try:
-            self.ser.port = port
-            print("Connected to " + port)
+            self.serial.ser.port = comport
+            print("Connected to " + comport)
+            self.connectStatus.config(text ="Connection Status: Connected to " + comport)
+
         except serial.serialutil.SerialException:
-            print("Port not Connected")'''
+            print("Port not Connected")
+            self.connectStatus.config(text ="Disconnected")
 
 
     def back_to_welcome(self,DCM):
