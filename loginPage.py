@@ -1,5 +1,6 @@
 from tkinter import *
 from DCM import *
+from welcomePage import *
 import os
 
 user_data_file = "user_data.txt"
@@ -8,6 +9,7 @@ class loginPage:
 
     def __init__(self, parent, *args, **kwargs):
         self.login = parent
+        self.welcome = args[0]
         self.login.title("Login")
         self.login.geometry("500x500")
 
@@ -24,7 +26,7 @@ class loginPage:
         enter_pass.grid(row=2, column=1)
 
         Button(self.login, text="Login", padx=20, pady=10, command= lambda: self.login_check(user, password)).grid(row=3, column=0, pady=20, columnspan=2)
-        Button(self.login, text="Return to Menu", padx=20, pady=10, command=self.login.destroy).grid(row=5, column=0, pady=20,
+        Button(self.login, text="Return to Menu", padx=20, pady=10, command= self.login.destroy).grid(row=5, column=0, pady=20,
                                                                                         columnspan=2)
                                                                         
     def login_check(self, username, password):
@@ -65,3 +67,7 @@ class loginPage:
 
         self.DCMScreen = Tk()
         self.DCMWindow = DCM(self.DCMScreen, username)
+        self.welcome.destroy()
+
+        
+
