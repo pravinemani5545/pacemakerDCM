@@ -157,33 +157,6 @@ def check_PVARP(pvarp):
 
     return error, errormsg
 
-def check_HYSTERESIS(hys):
-    errormsg = ""
-    error = False
-
-    if (hys != 0 and (hys > 175 or hys < 30)):
-        error = True
-        errormsg = "        Please make sure the hysteresis value        \n        is off (0) or between 30-175 ppm.        "
-
-    elif (hys >= 30 and hys <= 50 and (hys % 5 != 0)):
-        error = True
-        errormsg = "        Please make sure the hysteresis is incremented        \n        by 5 ppm for vals of 30-50 ppm.        "
-
-    elif (hys >= 90 and hys <= 175 and (hys % 5 != 0)):
-        error = True
-        errormsg = "        Please make sure the hysteresis is incremented        \n        by 5 ppm for vals of 90-175 ppm.        "
-
-    return error, errormsg
-
-def check_RATE_SMOOTHING(rate):
-    errormsg = ""
-    error = False
-
-    if (rate > 25 or rate < 0 or (rate != 25 and rate % 3 != 0) or rate == 24):
-        error = True
-        errormsg = "        Please make sure the rate value       \n        is 0, 3, 6, 9, 12, 15, 18, 21, or 25%.        "
-
-    return error, errormsg
 
 def check_RXN_TIME(rxn):
     errormsg = ""

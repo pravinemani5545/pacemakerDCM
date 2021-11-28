@@ -1,3 +1,8 @@
+from serialcom import*
+import serial
+import struct
+
+
 class ALL():
     def __init__(self, user):
         self.LRL = 0                # lower rate limit
@@ -13,12 +18,11 @@ class ALL():
         self.VS = 0                 # ventricular sensitivity
         self.MAX_SENSE_RATE = 0
         self.FIXED_AV_DELAY = 0
-        self.HYSTERESIS = 0
-        self.RATE_SMOOTHING = 0
         self.ACT_THRESHOLD = 0
         self.REACTION_TIME = 0
         self.RESPONSE_FACTOR = 0
         self.RECOVERY_TIME = 0
+        self.MODE = 0
 
         self.paramList = []
         self.user = user
@@ -102,18 +106,6 @@ class ALL():
     def get_FIXED_AV_DELAY(self):
         return self.FIXED_AV_DELAY
 
-    def set_HYSTERESIS(self, value):
-        self.HYSTERESIS = value
-
-    def get_HYSTERESIS(self):
-        return self.HYSTERESIS
-
-    def set_RATE_SMOOTHING(self, value):
-        self.RATE_SMOOTHING = value
-
-    def get_RATE_SMOOTHING(self):
-        return self.RATE_SMOOTHING
-
     def set_ACT_THRESHOLD(self, value):
         if value == "V-Low":
             self.ACT_THRESHOLD = 0
@@ -151,7 +143,7 @@ class ALL():
     def get_RECOVERY_TIME(self):
         return self.RECOVERY_TIME
 
-    def write_params(self):
+    def write_params(self, serial):
         file = open(self.data_file, "r")
         data = file.readlines()
         file.close()
@@ -178,6 +170,20 @@ class ALL():
             file.write(str(params) + ",")
         file.write("\n")
         file.close()
+
+        serial.ser.open()
+        self.packed = struct.pack('<BBBIIBBffffIIIBBBBB',34,14,1,self.URL,self.LRL,self.VPW,self.APW,self.VA,self.AA,self.VS,self.AS,self.VRP,self.ARP,self.FIXED_AV_DELAY,self.ACT_THRESHOLD,self.REACTION_TIME,self.RESPONSE_FACTOR,self.RECOVERY_TIME,self.MAX_SENSE_RATE)
+        serial.ser.write(self.packed)
+    
+    def read_echo(self, serial):
+        read = serial.ser.readline(160)
+        print(read)
+
+        fromSim = struct.unpack('<BIIBBffffIIIBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB', read)
+        print(fromSim)
+
+        serial.ser.close()
+        
 
     def updateParamList(self):
         self.paramList = []
@@ -219,17 +225,13 @@ class AAI(ALL):
         self.ARP = 0
         self.AS = 0
         self.PVARP = 0
-        self.HYSTERESIS = 0
-        self.RATE_SMOOTHING = 0
 
-        self.paramList = [self.LRL, self.URL, self.AA, self.APW, self.ARP, self.AS, self.PVARP, self.HYSTERESIS,
-                          self.RATE_SMOOTHING]
+        self.paramList = [self.LRL, self.URL, self.AA, self.APW, self.ARP, self.AS, self.PVARP]
         self.user = user
         self.data_file = "aai_data.txt"
 
     def updateParamList(self):
-        self.paramList = [self.LRL, self.URL, self.AA, self.APW, self.ARP, self.AS, self.PVARP, self.HYSTERESIS,
-                          self.RATE_SMOOTHING]
+        self.paramList = [self.LRL, self.URL, self.AA, self.APW, self.ARP, self.AS, self.PVARP]
 
 
 class VVI(ALL):
@@ -240,15 +242,13 @@ class VVI(ALL):
         self.VPW = 0
         self.VRP = 0
         self.VS = 0
-        self.HYSTERESIS = 0
-        self.RATE_SMOOTHING = 0
 
-        self.paramList = [self.LRL, self.URL, self.VA, self.VPW, self.VRP, self.VS, self.HYSTERESIS, self.RATE_SMOOTHING]
+        self.paramList = [self.LRL, self.URL, self.VA, self.VPW, self.VRP, self.VS]
         self.user = user
         self.data_file = "vvi_data.txt"
 
     def updateParamList(self):
-        self.paramList = [self.LRL, self.URL, self.VA, self.VPW, self.VRP, self.VS, self.HYSTERESIS, self.RATE_SMOOTHING]
+        self.paramList = [self.LRL, self.URL, self.VA, self.VPW, self.VRP, self.VS]
 
 class DOO(ALL):
     def __init__(self, user):
@@ -297,23 +297,19 @@ class AAIR(ALL):
         self.AS = 0
         self.ARP = 0
         self.PVARP = 0
-        self.HYSTERESIS = 0
-        self.RATE_SMOOTHING = 0
         self.MAX_SENSE_RATE = 0
         self.ACT_THRESHOLD = 0
         self.REACTION_TIME = 0
         self.RESPONSE_FACTOR = 0
         self.RECOVERY_TIME = 0
 
-        self.paramList = [self.LRL, self.URL, self.AA, self.APW, self.AS, self.ARP, self.PVARP, self.HYSTERESIS,
-                          self.RATE_SMOOTHING, self.MAX_SENSE_RATE, self.ACT_THRESHOLD, self.REACTION_TIME,
+        self.paramList = [self.LRL, self.URL, self.AA, self.APW, self.AS, self.ARP, self.PVARP, self.MAX_SENSE_RATE, self.ACT_THRESHOLD, self.REACTION_TIME,
                           self.RESPONSE_FACTOR, self.RECOVERY_TIME]
         self.user = user
         self.data_file = "aair_data.txt"
 
     def updateParamList(self):
-        self.paramList = [self.LRL, self.URL, self.AA, self.APW, self.AS, self.ARP, self.PVARP, self.HYSTERESIS,
-                          self.RATE_SMOOTHING, self.MAX_SENSE_RATE, self.ACT_THRESHOLD, self.REACTION_TIME,
+        self.paramList = [self.LRL, self.URL, self.AA, self.APW, self.AS, self.ARP, self.PVARP, self.MAX_SENSE_RATE, self.ACT_THRESHOLD, self.REACTION_TIME,
                           self.RESPONSE_FACTOR, self.RECOVERY_TIME]
 
 class VOOR(ALL):
@@ -345,23 +341,19 @@ class VVIR(ALL):
         self.VPW = 0
         self.VS = 0
         self.VRP = 0
-        self.HYSTERESIS = 0
-        self.RATE_SMOOTHING = 0
         self.MAX_SENSE_RATE = 0
         self.ACT_THRESHOLD = 0
         self.REACTION_TIME = 0
         self.RESPONSE_FACTOR = 0
         self.RECOVERY_TIME = 0
 
-        self.paramList = [self.LRL, self.URL, self.VA, self.VPW, self.VS, self.VRP, self.HYSTERESIS,
-                          self.RATE_SMOOTHING, self.MAX_SENSE_RATE, self.ACT_THRESHOLD, self.REACTION_TIME,
+        self.paramList = [self.LRL, self.URL, self.VA, self.VPW, self.VS, self.VRP, self.MAX_SENSE_RATE, self.ACT_THRESHOLD, self.REACTION_TIME,
                           self.RESPONSE_FACTOR, self.RECOVERY_TIME]
         self.user = user
         self.data_file = "vvir_data.txt"
 
     def updateParamList(self):
-        self.paramList = [self.LRL, self.URL, self.VA, self.VPW, self.VS, self.VRP, self.HYSTERESIS,
-                          self.RATE_SMOOTHING, self.MAX_SENSE_RATE, self.ACT_THRESHOLD, self.REACTION_TIME,
+        self.paramList = [self.LRL, self.URL, self.VA, self.VPW, self.VS, self.VRP, self.MAX_SENSE_RATE, self.ACT_THRESHOLD, self.REACTION_TIME,
                           self.RESPONSE_FACTOR, self.RECOVERY_TIME]
 
 class DOOR(ALL):

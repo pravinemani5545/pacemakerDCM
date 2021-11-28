@@ -1,11 +1,13 @@
 from loginPage import *
 from pacemakerModes import *
 from paramChecking import *
+from serialcom import*
 
 class pmParams:
     def __init__(self, parent, *args, **kwargs):
         self.pmParams = parent
         self.userName = args[0]
+        self.serial = args[1]
 
         # displays current mode name
         self.mode_name = Label(self.pmParams, text="")
@@ -94,7 +96,7 @@ class pmParams:
         try:
             error, errormsg = check_LRL(int(lrl.get()))
             if error == False:
-                error, errormsg = check_URL(int(url.get()), int(lrl.get()))
+                error, errormsg = check_URL(int(url.get()),int(lrl.get()))
                 if error == False:
                     error, errormsg = check_AA(float(aa.get()))
                     if error == False:
@@ -105,7 +107,8 @@ class pmParams:
                 mode.set_URL(int(url.get()))
                 mode.set_AA(float(aa.get()))
                 mode.set_APW(int(apw.get()))
-                mode.write_params()
+                mode.write_params(self.serial)
+                mode.read_echo(self.serial)
 
                 self.message.destroy()
                 self.message = Label(self.AOO_mode, text="Update Success!", font=("Calibri", 25), fg="green")
@@ -168,7 +171,7 @@ class pmParams:
         try:
             error, errormsg = check_LRL(int(lrl.get()))
             if error == False:
-                error, errormsg = check_URL(int(url.get()), int(lrl.get()))
+                error, errormsg = check_URL(int(url.get()),int(lrl.get()))
                 if error == False:
                     error, errormsg = check_VA(float(va.get()))
                     if error == False:
@@ -179,7 +182,8 @@ class pmParams:
                 mode.set_URL(int(url.get()))
                 mode.set_VA(float(va.get()))
                 mode.set_VPW(int(vpw.get()))
-                mode.write_params()
+                mode.write_params(self.serial)
+                mode.read_echo(self.serial)
 
                 self.message.destroy()
                 self.message = Label(self.VOO_mode, text="Update Success!", font=("Calibri", 25), fg="green")
@@ -240,12 +244,6 @@ class pmParams:
         Label(self.AAI_mode, text="Post VARP (ms): ").grid(row=2, column=3, padx=85, pady=2)
         enter_pvarp = Entry(self.AAI_mode, textvariable=pvarp).grid(row=2, column=4)
 
-        Label(self.AAI_mode, text="Hysteresis (ppm): ").grid(row=3, column=3, padx=85, pady=2)
-        enter_hys = Entry(self.AAI_mode, textvariable=hys).grid(row=3, column=4)
-
-        Label(self.AAI_mode, text="Rate Smoothing (%): ").grid(row=4, column=3, padx=85, pady=2)
-        enter_rate = Entry(self.AAI_mode, textvariable=rate).grid(row=4, column=4)
-
         Button(self.AAI_mode, text="Update", padx=20, pady=10, command=lambda:
         self.send_AAI(lrl, url, aa, apw, arp, sense, pvarp, hys, rate)).grid(row=6, column=4, pady=20)
 
@@ -263,7 +261,7 @@ class pmParams:
         try:
             error, errormsg = check_LRL(int(lrl.get()))
             if error == False:
-                error, errormsg = check_URL(int(url.get()), int(lrl.get()))
+                error, errormsg = check_URL(int(url.get()))
                 if error == False:
                     error, errormsg = check_AA(float(aa.get()))
                     if error == False:
@@ -274,10 +272,6 @@ class pmParams:
                                 error, errormsg = check_AS(float(sense.get()))
                                 if error == False:
                                     error, errormsg = check_PVARP(int(pvarp.get()))
-                                    if error == False:
-                                        error, errormsg = check_HYSTERESIS(int(hys.get()))
-                                        if error == False:
-                                            error, errormsg = check_RATE_SMOOTHING(int(rate.get()))
 
             if error == False:
                 mode.set_LRL(int(lrl.get()))
@@ -287,8 +281,6 @@ class pmParams:
                 mode.set_ARP(int(arp.get()))
                 mode.set_AS(float(sense.get()))
                 mode.set_PVARP(int(pvarp.get()))
-                mode.set_HYSTERESIS(int(hys.get()))
-                mode.set_RATE_SMOOTHING(int(rate.get()))
                 mode.write_params()
 
                 self.message.destroy()
@@ -348,12 +340,6 @@ class pmParams:
         Label(self.VVI_mode, text="Ventricular Sensitivity (V): ").grid(row=1, column=3, padx=85, pady=2)
         enter_sense = Entry(self.VVI_mode, textvariable=sense).grid(row=1, column=4)
 
-        Label(self.VVI_mode, text="Hysteresis (ppm): ").grid(row=2, column=3, padx=85, pady=2)
-        enter_hys = Entry(self.VVI_mode, textvariable=hys).grid(row=2, column=4)
-
-        Label(self.VVI_mode, text="Rate Smoothing (%): ").grid(row=3, column=3, padx=85, pady=2)
-        enter_rate = Entry(self.VVI_mode, textvariable=rate).grid(row=3, column=4)
-
         Button(self.VVI_mode, text="Update", padx=20, pady=10,
                command=lambda: self.send_VVI(lrl, url, va, vpw, vrp, sense, hys, rate)).grid(row=6, column=4, pady=20)
 
@@ -371,7 +357,7 @@ class pmParams:
         try:
             error, errormsg = check_LRL(int(lrl.get()))
             if error == False:
-                error, errormsg = check_URL(int(url.get()), int(lrl.get()))
+                error, errormsg = check_URL(int(url.get()))
                 if error == False:
                     error, errormsg = check_VA(float(va.get()))
                     if error == False:
@@ -380,10 +366,6 @@ class pmParams:
                             error, errormsg = check_VRP(int(lrl.get()), int(vrp.get()))
                             if error == False:
                                 error, errormsg = check_VS(float(sense.get()))
-                                if error == False:
-                                    error, errormsg = check_HYSTERESIS(int(hys.get()))
-                                    if error == False:
-                                        error, errormsg = check_RATE_SMOOTHING(int(rate.get()))
 
             if (error == False):
                 mode.set_LRL(int(lrl.get()))
@@ -392,8 +374,6 @@ class pmParams:
                 mode.set_VPW(float(vpw.get()))
                 mode.set_VRP(int(vrp.get()))
                 mode.set_VS(float(sense.get()))
-                mode.set_HYSTERESIS(int(hys.get()))
-                mode.set_RATE_SMOOTHING(int(rate.get()))
                 mode.write_params()
 
                 self.message.destroy()
@@ -471,7 +451,7 @@ class pmParams:
         try:
             error, errormsg = check_LRL(int(lrl.get()))
             if error == False:
-                error, errormsg = check_URL(int(url.get()), int(lrl.get()))
+                error, errormsg = check_URL(int(url.get()))
                 if error == False:
                     error, errormsg = check_VA(float(va.get()))
                     if error == False:
@@ -577,13 +557,13 @@ class pmParams:
         try:
             error, errormsg = check_LRL(int(lrl.get()))
             if error == False:
-                error, errormsg = check_URL(int(url.get()), int(lrl.get()))
+                error, errormsg = check_URL(int(url.get()))
                 if error == False:
                     error, errormsg = check_AA(float(aa.get()))
                     if error == False:
                         error, errormsg = check_APW(int(apw.get()))
                         if error == False:
-                            error, errormsg = check_MAX_SENSE_RATE(int(max.get()), int(url.get()), int(lrl.get()))
+                            error, errormsg = check_MAX_SENSE_RATE(int(max.get()))
                             if error == False:
                                 error, errormsg = check_RXN_TIME(int(rxn.get()))
                                 if error == False:
@@ -687,13 +667,13 @@ class pmParams:
         try:
             error, errormsg = check_LRL(int(lrl.get()))
             if error == False:
-                error, errormsg = check_URL(int(url.get()), int(lrl.get()))
+                error, errormsg = check_URL(int(url.get()))
                 if error == False:
                     error, errormsg = check_VA(float(va.get()))
                     if error == False:
                         error, errormsg = check_VPW(int(vpw.get()))
                         if error == False:
-                            error, errormsg = check_MAX_SENSE_RATE(int(max.get()), int(url.get()), int(lrl.get()))
+                            error, errormsg = check_MAX_SENSE_RATE(int(max.get()))
                             if error == False:
                                 error, errormsg = check_RXN_TIME(int(rxn.get()))
                                 if error == False:
@@ -775,16 +755,10 @@ class pmParams:
         Label(self.AAIR_mode, text="Post VARP (ms): ").grid(row=6, column=0, padx=85, pady=2)
         enter_pvarp = Entry(self.AAIR_mode, textvariable=pvarp).grid(row=6, column=1)
 
-        Label(self.AAIR_mode, text="Hysteresis (ppm): ").grid(row=7, column=0, padx=85, pady=2)
-        enter_hys = Entry(self.AAIR_mode, textvariable=hys).grid(row=7, column=1)
-
         thresh_vals = ("V-Low", "Low", "Med-Low", "Med", "Med-High", "High", "V-High")
         Label(self.AAIR_mode, text="Activity Threshold : ").grid(row=1, column=2, padx=85, pady=2)
         enter_threshold = Spinbox(self.AAIR_mode, values=thresh_vals, state="readonly", textvariable=threshold).grid(
             row=1, column=3)
-
-        Label(self.AAIR_mode, text="Rate Smoothing (%): ").grid(row=2, column=2, padx=85, pady=2)
-        enter_rate = Entry(self.AAIR_mode, textvariable=rate).grid(row=2, column=3)
 
         Label(self.AAIR_mode, text="Max Sensor Rate (ppm): ").grid(row=3, column=2, pady=2)
         enter_max = Entry(self.AAIR_mode, textvariable=max).grid(row=3, column=3)
@@ -819,7 +793,7 @@ class pmParams:
         try:
             error, errormsg = check_LRL(int(lrl.get()))
             if error == False:
-                error, errormsg = check_URL(int(url.get()), int(lrl.get()))
+                error, errormsg = check_URL(int(url.get()))
                 if error == False:
                     error, errormsg = check_AA(float(aa.get()))
                     if error == False:
@@ -829,19 +803,15 @@ class pmParams:
                             if error == False:
                                 error, errormsg = check_PVARP(int(pvarp.get()))
                                 if error == False:
-                                    error, errormsg = check_HYSTERESIS(int(hys.get()))
+                                    error, errormsg = check_MAX_SENSE_RATE(int(max.get()))            
                                     if error == False:
-                                        error, errormsg = check_RATE_SMOOTHING(int(rate.get()))
+                                        error, errormsg = check_RXN_TIME(int(rxn.get()))
                                         if error == False:
-                                            error, errormsg = check_MAX_SENSE_RATE(int(max.get()), int(url.get()), int(lrl.get()))
+                                            error, errormsg = check_RESPONSE(int(response.get()))
                                             if error == False:
-                                                error, errormsg = check_RXN_TIME(int(rxn.get()))
+                                                error, errormsg = check_RECOVERY(int(recovery.get()))
                                                 if error == False:
-                                                    error, errormsg = check_RESPONSE(int(response.get()))
-                                                    if error == False:
-                                                        error, errormsg = check_RECOVERY(int(recovery.get()))
-                                                        if error == False:
-                                                            error, errormsg = check_AS(float(sense.get()))
+                                                    error, errormsg = check_AS(float(sense.get()))
 
             if error == False:
                 mode.set_LRL(int(lrl.get()))
@@ -850,9 +820,7 @@ class pmParams:
                 mode.set_APW(int(apw.get()))
                 mode.set_ARP(int(arp.get()))
                 mode.set_PVARP(int(pvarp.get()))
-                mode.set_HYSTERESIS(int(hys.get()))
                 mode.set_ACT_THRESHOLD(threshold.get())
-                mode.set_RATE_SMOOTHING(int(rate.get()))
                 mode.set_MAX_SENSE_RATE(int(max.get()))
                 mode.set_REACTION_TIME(int(rxn.get()))
                 mode.set_RESPONSE_FACTOR(int(response.get()))
@@ -920,16 +888,10 @@ class pmParams:
         Label(self.VVIR_mode, text="Ventricular Sensitivity (V): ").grid(row=6, column=0, padx=85, pady=2)
         enter_sense = Entry(self.VVIR_mode, textvariable=sense).grid(row=6, column=1)
 
-        Label(self.VVIR_mode, text="Hysteresis (ppm): ").grid(row=7, column=0, padx=85, pady=2)
-        enter_hys = Entry(self.VVIR_mode, textvariable=hys).grid(row=7, column=1)
-
         thresh_vals = ("V-Low", "Low", "Med-Low", "Med", "Med-High", "High", "V-High")
         Label(self.VVIR_mode, text="Activity Threshold : ").grid(row=1, column=2, padx=85, pady=2)
         enter_threshold = Spinbox(self.VVIR_mode, values=thresh_vals, state="readonly",
                                   textvariable=threshold).grid(row=1, column=3)
-
-        Label(self.VVIR_mode, text="Rate Smoothing (%): ").grid(row=2, column=2, padx=85, pady=2)
-        enter_rate = Entry(self.VVIR_mode, textvariable=rate).grid(row=2, column=3)
 
         Label(self.VVIR_mode, text="Max Sensor Rate (ppm): ").grid(row=3, column=2, pady=2)
         enter_max = Entry(self.VVIR_mode, textvariable=max).grid(row=3, column=3)
@@ -961,7 +923,7 @@ class pmParams:
         try:
             error, errormsg = check_LRL(int(lrl.get()))
             if error == False:
-                error, errormsg = check_URL(int(url.get()), int(lrl.get()))
+                error, errormsg = check_URL(int(url.get()))
                 if error == False:
                     error, errormsg = check_VA(float(va.get()))
                     if error == False:
@@ -969,20 +931,15 @@ class pmParams:
                         if error == False:
                             error, errormsg = check_VRP(int(lrl.get()), int(vrp.get()))
                             if error == False:
-                                error, errormsg = check_HYSTERESIS(int(hys.get()))
+                                error, errormsg = check_MAX_SENSE_RATE(int(max.get()))
                                 if error == False:
-                                    error, errormsg = check_RATE_SMOOTHING(int(rate.get()))
+                                    error, errormsg = check_RXN_TIME(int(rxn.get()))
                                     if error == False:
-                                        error, errormsg = check_MAX_SENSE_RATE(int(max.get()), int(url.get()),
-                                                                               int(lrl.get()))
+                                        error, errormsg = check_RESPONSE(int(response.get()))
                                         if error == False:
-                                            error, errormsg = check_RXN_TIME(int(rxn.get()))
+                                            error, errormsg = check_RECOVERY(int(recovery.get()))
                                             if error == False:
-                                                error, errormsg = check_RESPONSE(int(response.get()))
-                                                if error == False:
-                                                    error, errormsg = check_RECOVERY(int(recovery.get()))
-                                                    if error == False:
-                                                        error, errormsg = check_VS(float(sense.get()))
+                                                error, errormsg = check_VS(float(sense.get()))
 
             if error == False:
                 mode.set_LRL(int(lrl.get()))
@@ -990,9 +947,7 @@ class pmParams:
                 mode.set_VA(float(va.get()))
                 mode.set_VPW(int(vpw.get()))
                 mode.set_VRP(int(vrp.get()))
-                mode.set_HYSTERESIS(int(hys.get()))
                 mode.set_ACT_THRESHOLD(threshold.get())
-                mode.set_RATE_SMOOTHING(int(rate.get()))
                 mode.set_MAX_SENSE_RATE(int(max.get()))
                 mode.set_REACTION_TIME(int(rxn.get()))
                 mode.set_RESPONSE_FACTOR(int(response.get()))
@@ -1096,7 +1051,7 @@ class pmParams:
         try:
             error, errormsg = check_LRL(int(lrl.get()))
             if error == False:
-                error, errormsg = check_URL(int(url.get()), int(lrl.get()))
+                error, errormsg = check_URL(int(url.get()))
                 if error == False:
                     error, errormsg = check_VA(float(va.get()))
                     if error == False:
@@ -1110,7 +1065,7 @@ class pmParams:
                                     if error == False:
                                         error, errormsg = check_RXN_TIME(int(rxn.get()))
                                         if error == False:
-                                            error, errormsg = check_MAX_SENSE_RATE(int(max.get()), int(url.get()), int(lrl.get()))
+                                            error, errormsg = check_MAX_SENSE_RATE(int(max.get()))
                                             if error == False:
                                                 error, errormsg = check_RESPONSE(int(response.get()))
                                                 if error == False:
