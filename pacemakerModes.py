@@ -183,7 +183,6 @@ class ALL():
         print(fromSim)
 
         serial.ser.close()
-        
 
     def updateParamList(self):
         self.paramList = []
