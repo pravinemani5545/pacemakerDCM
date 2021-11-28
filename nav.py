@@ -26,6 +26,7 @@ class nav:
 
         self.connectStatus = Label(self.nav, text="Connection Status:  Disconnected ", font=("Calibri", 13), padx= 35 )
         self.connectStatus.grid(row=1, column=1, sticky = W)
+<<<<<<< HEAD
        
        
         '''self.ser.baudrate = 115200
@@ -45,6 +46,8 @@ class nav:
         com_ports.grid(row=1, column=2, sticky = W)
 
 
+=======
+>>>>>>> 9f30e80500dd399b40b6697303dbdffc79e47570
 
         Button(self.nav, text="Change Device", font=("Calibri", 12), command=self.changeConnectStatus).grid(row=1, column=3, pady=3, ipadx= 27)
 
