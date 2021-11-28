@@ -83,7 +83,7 @@ class pmParams:
         Button(self.AOO_mode, text="Update", padx=20, pady=10, command= lambda : self.send_AOO(lrl, url, aa, apw)).grid(row=5,column=1,pady=20)
 
     def send_AOO(self, lrl, url, aa, apw):
-        mode = AOO(self.userName)
+        mode = Mode(self.userName, 2)
         errormsg = ""
         error = False
 
@@ -158,7 +158,7 @@ class pmParams:
                command=lambda: self.send_VOO(lrl, url, va, vpw)).grid(row=5, column=1, pady=20)
 
     def send_VOO(self, lrl, url, va, vpw):
-        mode = VOO(self.userName)
+        mode = Mode(self.userName, 1)
         errormsg = ""
         error = True
 
@@ -220,8 +220,6 @@ class pmParams:
         arp = StringVar(self.AAI_mode)
         sense = StringVar(self.AAI_mode)
         pvarp = StringVar(self.AAI_mode)
-        hys = StringVar(self.AAI_mode)
-        rate = StringVar(self.AAI_mode)
 
         Label(self.AAI_mode, text="Lower Rate Limit (ppm): ").grid(row=1, column=0, padx=85, pady=2)
         enter_lrl = Entry(self.AAI_mode, textvariable=lrl).grid(row=1, column=1)
@@ -245,10 +243,10 @@ class pmParams:
         enter_pvarp = Entry(self.AAI_mode, textvariable=pvarp).grid(row=2, column=4)
 
         Button(self.AAI_mode, text="Update", padx=20, pady=10, command=lambda:
-        self.send_AAI(lrl, url, aa, apw, arp, sense, pvarp, hys, rate)).grid(row=6, column=4, pady=20)
+        self.send_AAI(lrl, url, aa, apw, arp, sense, pvarp)).grid(row=6, column=4, pady=20)
 
-    def send_AAI(self, lrl, url, aa, apw, arp, sense, pvarp, hys, rate):
-        mode = AAI(self.userName)
+    def send_AAI(self, lrl, url, aa, apw, arp, sense, pvarp):
+        mode = Mode(self.userName, 4)
         errormsg = ""
         error = False
 
@@ -319,8 +317,6 @@ class pmParams:
         vpw = StringVar(self.VVI_mode)
         vrp = StringVar(self.VVI_mode)
         sense = StringVar(self.VVI_mode)
-        hys = StringVar(self.VVI_mode)
-        rate = StringVar(self.VVI_mode)
 
         Label(self.VVI_mode, text="Lower Rate Limit (ppm): ").grid(row=1, column=0, padx=85, pady=2)
         enter_lrl = Entry(self.VVI_mode, textvariable=lrl).grid(row=1, column=1)
@@ -341,10 +337,10 @@ class pmParams:
         enter_sense = Entry(self.VVI_mode, textvariable=sense).grid(row=1, column=4)
 
         Button(self.VVI_mode, text="Update", padx=20, pady=10,
-               command=lambda: self.send_VVI(lrl, url, va, vpw, vrp, sense, hys, rate)).grid(row=6, column=4, pady=20)
+               command=lambda: self.send_VVI(lrl, url, va, vpw, vrp, sense)).grid(row=6, column=4, pady=20)
 
-    def send_VVI(self, lrl, url, va, vpw, vrp, sense, hys, rate):
-        mode = VVI(self.userName)
+    def send_VVI(self, lrl, url, va, vpw, vrp, sense):
+        mode = Mode(self.userName, 3)
         errormsg = ""
         error = False
 
@@ -438,7 +434,7 @@ class pmParams:
 
     # DOO PARAMETERS
     def send_DOO(self, lrl, url, va, vpw, aa, apw, av):
-        mode = DOO(self.userName)
+        mode = Mode(self.userName, 5)
         errormsg = ""
         error = True
 
@@ -544,7 +540,7 @@ class pmParams:
                                  recovery)).grid(row=6,column=3, pady=20)
 
     def send_AOOR(self, lrl, url, aa, apw, max, threshold, rxn, response, recovery):
-        mode = AOOR(self.userName)
+        mode = Mode(self.userName, 7)
         errormsg = ""
         error = False
 
@@ -654,7 +650,7 @@ class pmParams:
                                               recovery)).grid(row=6, column=3, pady=20)
 
     def send_VOOR(self, lrl, url, va, vpw, max, threshold, rxn, response, recovery):
-        mode = VOOR(self.userName)
+        mode = Mode(self.userName, 6)
         errormsg = ""
         error = False
 
@@ -729,8 +725,6 @@ class pmParams:
         sense = StringVar(self.AAIR_mode)
         arp = StringVar(self.AAIR_mode)
         pvarp = StringVar(self.AAIR_mode)
-        hys = StringVar(self.AAIR_mode)
-        rate = StringVar(self.AAIR_mode)
         max = StringVar(self.AAIR_mode)
         threshold = StringVar(self.AAIR_mode)
         rxn = StringVar(self.AAIR_mode)
@@ -777,10 +771,10 @@ class pmParams:
 
         Button(self.AAIR_mode, text="Update", padx=20, pady=10,
                command=lambda: self.send_AAIR(lrl, url, aa, apw, max, threshold, rxn, response,
-                                              recovery, arp, pvarp, hys, rate, sense)).grid(row=8, column=3, pady=20)
+                                              recovery, arp, pvarp, sense)).grid(row=8, column=3, pady=20)
 
-    def send_AAIR(self, lrl, url, aa, apw, max, threshold, rxn, response, recovery, arp, pvarp, hys, rate, sense):
-        mode = AAIR(self.userName)
+    def send_AAIR(self, lrl, url, aa, apw, max, threshold, rxn, response, recovery, arp, pvarp, sense):
+        mode = Mode(self.userName, 9)
         errormsg = ""
         error = False
 
@@ -862,8 +856,6 @@ class pmParams:
         vpw = StringVar(self.VVIR_mode)
         sense = StringVar(self.VVIR_mode)
         vrp = StringVar(self.VVIR_mode)
-        hys = StringVar(self.VVIR_mode)
-        rate = StringVar(self.VVIR_mode)
         max = StringVar(self.VVIR_mode)
         threshold = StringVar(self.VVIR_mode)
         rxn = StringVar(self.VVIR_mode)
@@ -907,10 +899,10 @@ class pmParams:
 
         Button(self.VVIR_mode, text="Update", padx=20, pady=10,
                command=lambda: self.send_VVIR(lrl, url, va, vpw, max, threshold, rxn, response,
-                                              recovery, vrp, hys, rate, sense)).grid(row=8, column=3, pady=20)
+                                              recovery, vrp, sense)).grid(row=8, column=3, pady=20)
 
-    def send_VVIR(self, lrl, url, va, vpw, max, threshold, rxn, response, recovery, vrp, hys, rate, sense):
-        mode = VVIR(self.userName)
+    def send_VVIR(self, lrl, url, va, vpw, max, threshold, rxn, response, recovery, vrp, sense):
+        mode = Mode(self.userName, 8)
         errormsg = ""
         error = False
 
@@ -1038,7 +1030,7 @@ class pmParams:
                command=lambda: self.send_DOOR(lrl, url, va, vpw, aa, apw, av, threshold, rxn, max, response, recovery)).grid(row=7, column=3, pady=20)
 
     def send_DOOR(self, lrl, url, va, vpw, aa, apw, av, threshold, rxn, max, response, recovery):
-        mode = DOOR(self.userName)
+        mode = Mode(self.userName, 10)
         errormsg = ""
         error = True
 

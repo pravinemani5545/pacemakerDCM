@@ -2,9 +2,8 @@ from serialcom import*
 import serial
 import struct
 
-
-class ALL():
-    def __init__(self, user):
+class Mode():
+    def __init__(self, user, mode):
         self.LRL = 0                # lower rate limit
         self.URL = 0                # upper rate limit
         self.AA = 0                 # atrial amplitude
@@ -22,11 +21,10 @@ class ALL():
         self.REACTION_TIME = 0
         self.RESPONSE_FACTOR = 0
         self.RECOVERY_TIME = 0
-        self.MODE = 0
+        self.MODE = mode             # current pacemaker mode
 
         self.paramList = []
         self.user = user
-        self.data_file = ""
 
     def set_LRL(self, value):
         self.LRL = value
@@ -144,7 +142,8 @@ class ALL():
         return self.RECOVERY_TIME
 
     def write_params(self, serial):
-        file = open(self.data_file, "r")
+        data_file = self.chooseDataFile(self.MODE)
+        file = open(data_file, "r")
         data = file.readlines()
         file.close()
 
@@ -160,11 +159,11 @@ class ALL():
             old_data.append(data[i + 1])
 
         # write other patients' data back to file and append new data for current patient
-        file = open(self.data_file, "w")
+        file = open(data_file, "w")
         file.writelines(old_data)
         file.close()
 
-        file = open(self.data_file, "a")
+        file = open(data_file, "a")
         file.write(self.user + "\n")
         for params in self.paramList:
             file.write(str(params) + ",")
@@ -183,201 +182,33 @@ class ALL():
         print(fromSim)
 
         serial.ser.close()
-        
 
     def updateParamList(self):
-        self.paramList = []
+        self.paramList = [self.LRL, self.URL, self.AA, self.APW, self.ARP, self.AS, self.PVARP,
+                          self.VA, self.VPW, self.VRP, self.VS,  self.MAX_SENSE_RATE, self.FIXED_AV_DELAY,
+                          self.ACT_THRESHOLD, self.REACTION_TIME, self.RESPONSE_FACTOR, self.RECOVERY_TIME, self.MODE]
 
-class AOO(ALL):
-    def __init__(self, user):
-        self.LRL = 0
-        self.URL = 0
-        self.AA = 0
-        self.APW = 0
-
-        self.paramList = [self.LRL, self.URL, self.AA, self.APW]
-        self.user = user
-        self.data_file = "aoo_data.txt"
-
-    def updateParamList(self):
-        self.paramList = [self.LRL, self.URL, self.AA, self.APW]
-
-class VOO(ALL):
-    def __init__(self, user):
-        self.LRL = 0
-        self.URL = 0
-        self.VA = 0
-        self.VPW = 0
-
-        self.paramList = [self.LRL, self.URL, self.VA, self.VPW]
-        self.user = user
-        self.data_file = "voo_data.txt"
-
-    def updateParamList(self):
-        self.paramList = [self.LRL, self.URL, self.VA, self.VPW]
-
-class AAI(ALL):
-    def __init__(self, user):
-        self.LRL = 0
-        self.URL = 0
-        self.AA = 0
-        self.APW = 0
-        self.ARP = 0
-        self.AS = 0
-        self.PVARP = 0
-
-        self.paramList = [self.LRL, self.URL, self.AA, self.APW, self.ARP, self.AS, self.PVARP]
-        self.user = user
-        self.data_file = "aai_data.txt"
-
-    def updateParamList(self):
-        self.paramList = [self.LRL, self.URL, self.AA, self.APW, self.ARP, self.AS, self.PVARP]
-
-
-class VVI(ALL):
-    def __init__(self, user):
-        self.LRL = 0
-        self.URL = 0
-        self.VA = 0
-        self.VPW = 0
-        self.VRP = 0
-        self.VS = 0
-
-        self.paramList = [self.LRL, self.URL, self.VA, self.VPW, self.VRP, self.VS]
-        self.user = user
-        self.data_file = "vvi_data.txt"
-
-    def updateParamList(self):
-        self.paramList = [self.LRL, self.URL, self.VA, self.VPW, self.VRP, self.VS]
-
-class DOO(ALL):
-    def __init__(self, user):
-        self.LRL = 0
-        self.URL = 0
-        self.AA = 0
-        self.APW = 0
-        self.VA = 0
-        self.VPW = 0
-        self.FIXED_AV_DELAY = 0
-
-        self.paramList = [self.LRL, self.URL, self.VA, self.VPW, self.AA, self.APW, self.FIXED_AV_DELAY]
-        self.user = user
-        self.data_file = "doo_data.txt"
-
-    def updateParamList(self):
-        self.paramList = [self.LRL, self.URL, self.VA, self.VPW, self.AA, self.APW, self.FIXED_AV_DELAY]
-
-class AOOR(ALL):
-    def __init__(self, user):
-        self.LRL = 0
-        self.URL = 0
-        self.AA = 0
-        self.APW = 0
-        self.MAX_SENSE_RATE = 0
-        self.ACT_THRESHOLD = 0
-        self.REACTION_TIME = 0
-        self.RESPONSE_FACTOR = 0
-        self.RECOVERY_TIME = 0
-
-        self.paramList = [self.LRL, self.URL, self.AA, self.APW, self.MAX_SENSE_RATE, self.ACT_THRESHOLD,
-                          self.REACTION_TIME, self.RESPONSE_FACTOR, self.RECOVERY_TIME]
-        self.user = user
-        self.data_file = "aoor_data.txt"
-
-    def updateParamList(self):
-        self.paramList = [self.LRL, self.URL, self.AA, self.APW, self.MAX_SENSE_RATE, self.ACT_THRESHOLD,
-                          self.REACTION_TIME, self.RESPONSE_FACTOR, self.RECOVERY_TIME]
-
-class AAIR(ALL):
-    def __init__(self, user):
-        self.LRL = 0
-        self.URL = 0
-        self.AA = 0
-        self.APW = 0
-        self.AS = 0
-        self.ARP = 0
-        self.PVARP = 0
-        self.MAX_SENSE_RATE = 0
-        self.ACT_THRESHOLD = 0
-        self.REACTION_TIME = 0
-        self.RESPONSE_FACTOR = 0
-        self.RECOVERY_TIME = 0
-
-        self.paramList = [self.LRL, self.URL, self.AA, self.APW, self.AS, self.ARP, self.PVARP, self.MAX_SENSE_RATE, self.ACT_THRESHOLD, self.REACTION_TIME,
-                          self.RESPONSE_FACTOR, self.RECOVERY_TIME]
-        self.user = user
-        self.data_file = "aair_data.txt"
-
-    def updateParamList(self):
-        self.paramList = [self.LRL, self.URL, self.AA, self.APW, self.AS, self.ARP, self.PVARP, self.MAX_SENSE_RATE, self.ACT_THRESHOLD, self.REACTION_TIME,
-                          self.RESPONSE_FACTOR, self.RECOVERY_TIME]
-
-class VOOR(ALL):
-    def __init__(self, user):
-        self.LRL = 0
-        self.URL = 0
-        self.VA = 0
-        self.VPW = 0
-        self.MAX_SENSE_RATE = 0
-        self.ACT_THRESHOLD = 0
-        self.REACTION_TIME = 0
-        self.RESPONSE_FACTOR = 0
-        self.RECOVERY_TIME = 0
-
-        self.paramList = [self.LRL, self.URL, self.VA, self.VPW, self.MAX_SENSE_RATE, self.ACT_THRESHOLD,
-                          self.REACTION_TIME, self.RESPONSE_FACTOR, self.RECOVERY_TIME]
-        self.user = user
-        self.data_file = "voor_data.txt"
-
-    def updateParamList(self):
-        self.paramList = [self.LRL, self.URL, self.VA, self.VPW, self.MAX_SENSE_RATE, self.ACT_THRESHOLD,
-                          self.REACTION_TIME, self.RESPONSE_FACTOR, self.RECOVERY_TIME]
-
-class VVIR(ALL):
-    def __init__(self, user):
-        self.LRL = 0
-        self.URL = 0
-        self.VA = 0
-        self.VPW = 0
-        self.VS = 0
-        self.VRP = 0
-        self.MAX_SENSE_RATE = 0
-        self.ACT_THRESHOLD = 0
-        self.REACTION_TIME = 0
-        self.RESPONSE_FACTOR = 0
-        self.RECOVERY_TIME = 0
-
-        self.paramList = [self.LRL, self.URL, self.VA, self.VPW, self.VS, self.VRP, self.MAX_SENSE_RATE, self.ACT_THRESHOLD, self.REACTION_TIME,
-                          self.RESPONSE_FACTOR, self.RECOVERY_TIME]
-        self.user = user
-        self.data_file = "vvir_data.txt"
-
-    def updateParamList(self):
-        self.paramList = [self.LRL, self.URL, self.VA, self.VPW, self.VS, self.VRP, self.MAX_SENSE_RATE, self.ACT_THRESHOLD, self.REACTION_TIME,
-                          self.RESPONSE_FACTOR, self.RECOVERY_TIME]
-
-class DOOR(ALL):
-    def __init__(self, user):
-        self.LRL = 0
-        self.URL = 0
-        self.VA = 0
-        self.VPW = 0
-        self.AA = 0
-        self.APW = 0
-        self.FIXED_AV_DELAY = 0
-        self.MAX_SENSE_RATE = 0
-        self.ACT_THRESHOLD = 0
-        self.REACTION_TIME = 0
-        self.RESPONSE_FACTOR = 0
-        self.RECOVERY_TIME = 0
-
-        self.paramList = [self.LRL, self.URL, self.VA, self.VPW, self.AA ,self.APW, self.FIXED_AV_DELAY,
-                          self.MAX_SENSE_RATE, self.ACT_THRESHOLD, self.REACTION_TIME, self.RESPONSE_FACTOR,
-                          self.RECOVERY_TIME]
-        self.user = user
-        self.data_file = "door_data.txt"
-
-    def updateParamList(self):
-        self.paramList = [self.LRL, self.URL, self.VA, self.VPW, self.AA, self.APW, self.FIXED_AV_DELAY,
-                          self.MAX_SENSE_RATE, self.ACT_THRESHOLD, self.REACTION_TIME, self.RESPONSE_FACTOR,
-                          self.RECOVERY_TIME]
+    def chooseDataFile(self, mode):
+        if (mode == 1):
+            return "voo_data.txt"
+        elif (mode == 2):
+            return "aoo_data.txt"
+        elif (mode == 3):
+            return "vvi_data.txt"
+        elif (mode == 4):
+            return "aai_data.txt"
+        elif (mode == 5):
+            return "doo_data.txt"
+        elif (mode == 6):
+            return "voor_data.txt"
+        elif (mode == 7):
+            return "aoor_data.txt"
+        elif (mode == 8):
+            return "vvir_data.txt"
+        elif (mode == 9):
+            return "aair_data.txt"
+        elif (mode == 10):
+            return "door_data.txt"
+        else:
+            return "ERROR! MODE DOESN'T EXIST!"     # this shouldn't be possible, but if the program
+                                                    # ever reaches this point the error is traceable
