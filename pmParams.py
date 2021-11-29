@@ -41,16 +41,16 @@ class pmParams:
         pm_modes.menu = Menu(pm_modes, tearoff=0)
         pm_modes["menu"] = pm_modes.menu
 
-        pm_modes.menu.add_command(label="AOO", command=self.set_mode_AOO)
-        pm_modes.menu.add_command(label="VOO", command=self.set_mode_VOO)
-        pm_modes.menu.add_command(label="AAI", command=self.set_mode_AAI)
-        pm_modes.menu.add_command(label="VVI", command=self.set_mode_VVI)
-        pm_modes.menu.add_command(label="DOO", command=self.set_mode_DOO)
-        pm_modes.menu.add_command(label="AOOR", command=self.set_mode_AOOR)
-        pm_modes.menu.add_command(label="VOOR", command=self.set_mode_VOOR)
-        pm_modes.menu.add_command(label="AAIR", command=self.set_mode_AAIR)
-        pm_modes.menu.add_command(label="VVIR", command=self.set_mode_VVIR)
-        pm_modes.menu.add_command(label="DOOR", command=self.set_mode_DOOR)
+        pm_modes.menu.add_command(label="AOO (2)", command=self.set_mode_AOO)
+        pm_modes.menu.add_command(label="VOO (1)", command=self.set_mode_VOO)
+        pm_modes.menu.add_command(label="AAI (4)", command=self.set_mode_AAI)
+        pm_modes.menu.add_command(label="VVI (3)", command=self.set_mode_VVI)
+        pm_modes.menu.add_command(label="DOO (5)", command=self.set_mode_DOO)
+        pm_modes.menu.add_command(label="AOOR (7)", command=self.set_mode_AOOR)
+        pm_modes.menu.add_command(label="VOOR (6)", command=self.set_mode_VOOR)
+        pm_modes.menu.add_command(label="AAIR (9)", command=self.set_mode_AAIR)
+        pm_modes.menu.add_command(label="VVIR (8)", command=self.set_mode_VVIR)
+        pm_modes.menu.add_command(label="DOOR (10)", command=self.set_mode_DOOR)
 
         pm_modes.grid(row=0, column=0, pady=2)
 
@@ -59,6 +59,9 @@ class pmParams:
         Button(self.pmParams, text="Atrial & Ventrical ECG", command= None).grid(row=4,column=3)
 
         self.pmParams.grid(row=1, column=0, sticky = W, pady = 5)
+    
+    def openAtrialEcg(self):
+
 
     # AOO MODE PARAMETERS
     def set_mode_AOO(self):
@@ -95,7 +98,7 @@ class pmParams:
         Label(self.AOO_mode, text="Upper Rate Limit (ppm): ").grid(row=2, column=2, padx=85, pady=2)
         Label(self.AOO_mode, text="Atrial Amplitude (V): ").grid(row=3, column=2, padx=85, pady=2)
         Label(self.AOO_mode, text="Atrial Pulse Width (ms): ").grid(row=4, column=2, padx=85, pady=2)
-        Button(self.AOO_mode, text="Get Current Settings", padx=20, pady=10, command = None).grid(row=5, column=3, pady=2)
+        Button(self.AOO_mode, text="Get Current Settings", padx=20, pady=10, command = self.echo_AOO).grid(row=5, column=3, pady=2)
 
     def send_AOO(self, lrl, url, aa, apw):
         mode = Mode(self.userName, 2)
@@ -143,33 +146,37 @@ class pmParams:
         except Exception as e:
             print(f"EXCEPTION: {e}")
             self.message.destroy()
-            self.message = Label(self.AOO_mode, text="Update Failed: \nPlease use floats for atrial amplitude\n"
-                                                "Please use integers for all other values", font=("Calibri", 15), fg="red")
+            self.message = Label(self.AOO_mode, 
+                                 text="Update Failed: \nPlease use floats for ventricular amplitude/sensitivity\n"
+                                      "Please use integers for all other values\n"
+                                      "Make sure you have connected to the UART COM", font=("Calibri", 15), fg="red")
             self.message.grid(row=6, columnspan=2, pady=15)
 
-    '''def echo_AOO(self):
+    def echo_AOO(self):
+        self.serial.ser.open()
+        self.serial.ser.flushInput()
+        self.serial.ser.flushOutput()
+        packed = struct.pack('<BBBIIBBffffIIIBBBBB',34,45,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0)
+        self.serial.ser.write(packed)
+        unpacked = struct.unpack('<BBBIIBBffffIIIBBBBB', packed)
+        print(unpacked)
 
-        serial.ser.open()
-        serial.ser.flushInput()
-        serial.ser.flushOutput()
-        self.packed = struct.pack('<BBBIIBBffffIIIBBBBB',34,81,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0)
-        self.unpacked = struct.unpack('<BBBIIBBffffIIIBBBBB', self.packed)
         sleep(1)
-        print("In waiting: " + str(serial.ser.in_waiting))
-        read = serial.ser.read(160)
+        print("In waiting: " + str(self.serial.ser.in_waiting))
+        read = self.serial.ser.read(160)
         print(read)
         fromSim = struct.unpack('<BIIBBffffIIIBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB', read)
         print(fromSim)
 
-        serial.ser.close()
+        self.serial.ser.close()
 
         Label(self.AOO_mode, text= fromSim[2]).grid(row=1, column=3,  pady=2)
         Label(self.AOO_mode, text= fromSim[1]).grid(row=2, column=3,  pady=2)
         Label(self.AOO_mode, text= fromSim[6]).grid(row=3, column=3,  pady=2)
-        Label(self.AOO_mode, text= fromSim[4]).grid(row=4, column=3,  pady=2)'''
+        Label(self.AOO_mode, text= fromSim[4]).grid(row=4, column=3,  pady=2)
+        Label(self.AOO_mode, text= "Current Mode number: " + str(fromSim[0])).grid(row=5, column=2,  pady=2)
 
-        
-
+    
 
     # VOO MODE PARAMETERS
     def set_mode_VOO(self):
@@ -207,7 +214,7 @@ class pmParams:
         Label(self.VOO_mode, text="Upper Rate Limit (ppm): ").grid(row=2, column=2, padx=85, pady=2)
         Label(self.VOO_mode, text="Ventrical Amplitude (V): ").grid(row=3, column=2, padx=85, pady=2)
         Label(self.VOO_mode, text="Ventrical Pulse Width (ms): ").grid(row=4, column=2, padx=85, pady=2)
-        Button(self.VOO_mode, text="Get Current Settings", padx=20, pady=10, command = None).grid(row=5, column=3, pady=2)
+        Button(self.VOO_mode, text="Get Current Settings", padx=20, pady=10, command = self.echo_VOO).grid(row=5, column=3, pady=2)
 
     def send_VOO(self, lrl, url, va, vpw):
         mode = Mode(self.userName, 1)
@@ -256,9 +263,35 @@ class pmParams:
             print(f"EXCEPTION: {e}")
             self.message.destroy()
             self.message = Label(self.VOO_mode,
-                                 text="Update Failed: \nPlease use floats for ventricular amplitude\n"
-                                      "Please use integers for all other values", font=("Calibri", 15), fg="red")
+                                 text="Update Failed: \nPlease use floats for ventricular amplitude/sensitivity\n"
+                                      "Please use integers for all other values\n"
+                                      "Make sure you have connected to the UART COM", font=("Calibri", 15), fg="red")
             self.message.grid(row=6, columnspan=2, pady=15)
+
+    def echo_VOO(self):
+        self.serial.ser.open()
+        self.serial.ser.flushInput()
+        self.serial.ser.flushOutput()
+        packed = struct.pack('<BBBIIBBffffIIIBBBBB',34,45,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0)
+        self.serial.ser.write(packed)
+        unpacked = struct.unpack('<BBBIIBBffffIIIBBBBB', packed)
+        print(unpacked)
+
+        sleep(1)
+        print("In waiting: " + str(self.serial.ser.in_waiting))
+        read = self.serial.ser.read(160)
+        print(read)
+        fromSim = struct.unpack('<BIIBBffffIIIBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB', read)
+        print(fromSim)
+
+        self.serial.ser.close()
+
+        Label(self.VOO_mode, text= fromSim[2]).grid(row=1, column=3,  pady=2)
+        Label(self.VOO_mode, text= fromSim[1]).grid(row=2, column=3,  pady=2)
+        Label(self.VOO_mode, text= fromSim[5]).grid(row=3, column=3,  pady=2)
+        Label(self.VOO_mode, text= fromSim[3]).grid(row=4, column=3,  pady=2)
+        Label(self.VOO_mode, text= "Current Mode number: " + str(fromSim[0])).grid(row=5, column=2,  pady=2)
+        
 
     # AAI MODE PARAMETERS
     def set_mode_AAI(self):
@@ -300,7 +333,7 @@ class pmParams:
         Label(self.AAI_mode, text="Post VARP (ms): ").grid(row=7, column=0,pady=2)
         enter_pvarp = Entry(self.AAI_mode, textvariable=pvarp).grid(row=7, column=1)
 
-        Button(self.AAI_mode, text="Update", padx=20, pady=10, command=lambda:
+        Button(self.AAI_mode, text="Update", padx=20, pady=10, command=lambda: 
         self.send_AAI(lrl, url, aa, apw, arp, sense, pvarp)).grid(row=8, column=1, pady=20)
 
         Label(self.AAI_mode, text="Lower Rate Limit (ppm): ").grid(row=1, column=2, padx=85, pady=2)
@@ -310,7 +343,7 @@ class pmParams:
         Label(self.AAI_mode, text="ARP (ms): ").grid(row=5, column=2, padx=85, pady=2)
         Label(self.AAI_mode, text="Atrial Sensitivity (V): ").grid(row=6, column=2, padx=85, pady=2)
         Label(self.AAI_mode, text="Post VARP (ms): ").grid(row=7, column=2, padx=85, pady=2)
-        Button(self.AAI_mode, text="Get Current Settings", padx=20, pady=10, command = None).grid(row=8, column=3, pady=2)
+        Button(self.AAI_mode, text="Get Current Settings", padx=20, pady=10, command = self.echo_AAI).grid(row=8, column=3, pady=2)
         
 
     def send_AAI(self, lrl, url, aa, apw, arp, sense, pvarp):
@@ -361,9 +394,8 @@ class pmParams:
                 Label(self.AAI_mode, text= echoFromSim[10]).grid(row=5, column=3,  pady=2)
                 Label(self.AAI_mode, text= echoFromSim[8]).grid(row=6, column=3,  pady=2)
                 Label(self.AAI_mode, text= "").grid(row=7, column=3,  pady=2)
-                Button(self.AAI_mode, text="Get Current Settings", padx=20, pady=10, command = None).grid(row=8, column=3, pady=2)
+            
                 
-
             else:
                 self.message.destroy()
                 self.message = Label(self.AAI_mode, text=f"Update Failed: \n {errormsg}", font=("Calibri", 15),
@@ -374,9 +406,37 @@ class pmParams:
             print(f"EXCEPTION: {e}")
             self.message.destroy()
             self.message = Label(self.AAI_mode,
-                                 text="Update Failed: \nPlease use floats for atrial amplitude/sensitivity\n"
-                                      "Please use integers for all other values", font=("Calibri", 15), fg="red")
+                                 text="Update Failed: \nPlease use floats for ventricular amplitude/sensitivity\n"
+                                      "Please use integers for all other values\n"
+                                      "Make sure you have connected to the UART COM", font=("Calibri", 15), fg="red")
             self.message.grid(row=9, columnspan=2, pady=15)
+
+    def echo_AAI(self):
+        self.serial.ser.open()
+        self.serial.ser.flushInput()
+        self.serial.ser.flushOutput()
+        packed = struct.pack('<BBBIIBBffffIIIBBBBB',34,45,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0)
+        self.serial.ser.write(packed)
+        unpacked = struct.unpack('<BBBIIBBffffIIIBBBBB', packed)
+        print(unpacked)
+
+        sleep(1)
+        print("In waiting: " + str(self.serial.ser.in_waiting))
+        read = self.serial.ser.read(160)
+        print(read)
+        fromSim = struct.unpack('<BIIBBffffIIIBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB', read)
+        print(fromSim)
+
+        self.serial.ser.close()
+
+        Label(self.AAI_mode, text= fromSim[2]).grid(row=1, column=3,  pady=2)
+        Label(self.AAI_mode, text= fromSim[1]).grid(row=2, column=3,  pady=2)
+        Label(self.AAI_mode, text= fromSim[6]).grid(row=3, column=3,  pady=2)
+        Label(self.AAI_mode, text= fromSim[4]).grid(row=4, column=3,  pady=2)
+        Label(self.AAI_mode, text= fromSim[10]).grid(row=5, column=3,  pady=2)
+        Label(self.AAI_mode, text= fromSim[8]).grid(row=6, column=3,  pady=2)
+        Label(self.AAI_mode, text= "").grid(row=7, column=3,  pady=2)
+        Label(self.AAI_mode, text= "Current Mode number: " + str(fromSim[0])).grid(row=8, column=2,  pady=2)
 
     # VVI MODE PARAMETERS
     def set_mode_VVI(self):
@@ -424,7 +484,7 @@ class pmParams:
         Label(self.VVI_mode, text="Ventricular Pulse Width (ms): ").grid(row=4, column=2, padx=85, pady=2)
         Label(self.VVI_mode, text="VRP (ms): ").grid(row=5, column=2, padx=85, pady=2)
         Label(self.VVI_mode, text="Ventricular Sensitivity (V): ").grid(row=6, column=2, padx=85, pady=2)
-        Button(self.VVI_mode, text="Get Current Settings", padx=20, pady=10, command = None).grid(row=7, column=3, pady=2)
+        Button(self.VVI_mode, text="Get Current Settings", padx=20, pady=10, command = self.echo_VVI).grid(row=7, column=3, pady=2)
 
     def send_VVI(self, lrl, url, va, vpw, vrp, sense):
         mode = Mode(self.userName, 3)
@@ -471,7 +531,7 @@ class pmParams:
                 Label(self.VVI_mode, text= echoFromSim[3]).grid(row=4, column=3,  pady=2)
                 Label(self.VVI_mode, text= echoFromSim[9]).grid(row=5, column=3,  pady=2)
                 Label(self.VVI_mode, text= echoFromSim[7]).grid(row=6, column=3,  pady=2)
-                Button(self.VVI_mode, text="Get Current Settings", padx=20, pady=10, command = None).grid(row=8, column=3, pady=2)
+                Button(self.VVI_mode, text="Get Current Settings", padx=20, pady=10, command = self.echo_VVI).grid(row=8, column=3, pady=2)
 
             else:
                 self.message.destroy()
@@ -483,8 +543,35 @@ class pmParams:
             self.message.destroy()
             self.message = Label(self.VVI_mode,
                                  text="Update Failed: \nPlease use floats for ventricular amplitude/sensitivity\n"
-                                      "Please use integers for all other values", font=("Calibri", 15), fg="red")
+                                      "Please use integers for all other values\n"
+                                      "Make sure you have connected to the UART COM", font=("Calibri", 15), fg="red")
             self.message.grid(row=8, columnspan=2, pady=15)
+
+    def echo_VVI(self):
+        self.serial.ser.open()
+        self.serial.ser.flushInput()
+        self.serial.ser.flushOutput()
+        packed = struct.pack('<BBBIIBBffffIIIBBBBB',34,45,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0)
+        self.serial.ser.write(packed)
+        unpacked = struct.unpack('<BBBIIBBffffIIIBBBBB', packed)
+        print(unpacked)
+
+        sleep(1)
+        print("In waiting: " + str(self.serial.ser.in_waiting))
+        read = self.serial.ser.read(160)
+        print(read)
+        fromSim = struct.unpack('<BIIBBffffIIIBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB', read)
+        print(fromSim)
+
+        self.serial.ser.close()
+
+        Label(self.VVI_mode, text= fromSim[2]).grid(row=1, column=3,  pady=2)
+        Label(self.VVI_mode, text= fromSim[1]).grid(row=2, column=3,  pady=2)
+        Label(self.VVI_mode, text= fromSim[5]).grid(row=3, column=3,  pady=2)
+        Label(self.VVI_mode, text= fromSim[3]).grid(row=4, column=3,  pady=2)
+        Label(self.VVI_mode, text= fromSim[9]).grid(row=5, column=3,  pady=2)
+        Label(self.VVI_mode, text= fromSim[7]).grid(row=6, column=3,  pady=2)
+        Label(self.vvI_mode, text= "Current Mode number: " + str(fromSim[0])).grid(row=7, column=2,  pady=2)
 
     # DOO MODE PARAMETERS
     def set_mode_DOO(self):
@@ -537,7 +624,7 @@ class pmParams:
         Label(self.DOO_mode, text="Ventricular Amplitude (V): ").grid(row=5, column=2, padx=85, pady=2)
         Label(self.DOO_mode, text="Ventricular Pulse Width (ms): ").grid(row=6, column=2, padx=85, pady=2)
         Label(self.DOO_mode, text="Fixed AV Delay(ms): ").grid(row=7, column=2, padx=85, pady=2)
-        Button(self.DOO_mode, text="Get Current Settings", padx=20, pady=10, command = None).grid(row=8, column=3, pady=2)
+        Button(self.DOO_mode, text="Get Current Settings", padx=20, pady=10, command = self.echo_DOO).grid(row=8, column=3, pady=2)
         
 
     # DOO PARAMETERS
@@ -598,9 +685,37 @@ class pmParams:
             print(f"EXCEPTION: {e}")
             self.message.destroy()
             self.message = Label(self.DOO_mode,
-                                 text="Update Failed: \nPlease use floats for ventricular/atrial amplitude\n"
-                                      "Please use integers for all other values", font=("Calibri", 15), fg="red")
+                                 text="Update Failed: \nPlease use floats for ventricular amplitude/sensitivity\n"
+                                      "Please use integers for all other values\n"
+                                      "Make sure you have connected to the UART COM", font=("Calibri", 15), fg="red")
             self.message.grid(row=9, columnspan=2, pady=15)
+    
+    def echo_DOO(self):
+        self.serial.ser.open()
+        self.serial.ser.flushInput()
+        self.serial.ser.flushOutput()
+        packed = struct.pack('<BBBIIBBffffIIIBBBBB',34,45,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0)
+        self.serial.ser.write(packed)
+        unpacked = struct.unpack('<BBBIIBBffffIIIBBBBB', packed)
+        print(unpacked)
+
+        sleep(1)
+        print("In waiting: " + str(self.serial.ser.in_waiting))
+        read = self.serial.ser.read(160)
+        print(read)
+        fromSim = struct.unpack('<BIIBBffffIIIBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB', read)
+        print(fromSim)
+
+        self.serial.ser.close()
+
+        Label(self.DOO_mode, text= fromSim[2]).grid(row=1, column=3,  pady=2)
+        Label(self.DOO_mode, text= fromSim[1]).grid(row=2, column=3,  pady=2)
+        Label(self.DOO_mode, text= fromSim[6]).grid(row=3, column=3,  pady=2)
+        Label(self.DOO_mode, text= fromSim[4]).grid(row=4, column=3,  pady=2)
+        Label(self.DOO_mode, text= fromSim[5]).grid(row=5, column=3,  pady=2)
+        Label(self.DOO_mode, text= fromSim[3]).grid(row=6, column=3,  pady=2)
+        Label(self.DOO_mode, text= fromSim[11]).grid(row=7, column=3,  pady=2)
+        Label(self.DOO_mode, text= "Current Mode number: " + str(fromSim[0])).grid(row=8, column=2,  pady=2)
 
     # AOOR MODE PARAMETERS
     def set_mode_AOOR(self):
@@ -665,7 +780,7 @@ class pmParams:
         Label(self.AOOR_mode, text="Reaction Time (ms): ").grid(row=7, column=2, padx=85, pady=2)
         Label(self.AOOR_mode, text="Response Factor : ").grid(row=8, column=2, padx=85, pady=2)
         Label(self.AOOR_mode, text="Recovery Time (mins) : ").grid(row=9, column=2, padx=85, pady=2)
-        Button(self.AOOR_mode, text="Get Current Settings", padx=20, pady=10, command = None).grid(row=10, column=3, pady=2)
+        Button(self.AOOR_mode, text="Get Current Settings", padx=20, pady=10, command = self.echo_AOOR).grid(row=10, column=3, pady=2)
 
     def send_AOOR(self, lrl, url, aa, apw, max, threshold, rxn, response, recovery):
         mode = Mode(self.userName, 7)
@@ -730,9 +845,40 @@ class pmParams:
         except Exception as e:
             print(f"EXCEPTION: {e}")
             self.message.destroy()
-            self.message = Label(self.AOOR_mode, text="Update Failed: \nPlease use floats for atrial amplitude\n"
-                                                "Please use integers for all other values", font=("Calibri", 15), fg="red")
+            self.message = Label(self.AOOR_mode, 
+                                 text="Update Failed: \nPlease use floats for ventricular amplitude/sensitivity\n"
+                                      "Please use integers for all other values\n"
+                                      "Make sure you have connected to the UART COM", font=("Calibri", 15), fg="red")
             self.message.grid(row=11, columnspan=2, pady=15)
+
+    def echo_AOOR(self):
+        self.serial.ser.open()
+        self.serial.ser.flushInput()
+        self.serial.ser.flushOutput()
+        packed = struct.pack('<BBBIIBBffffIIIBBBBB',34,45,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0)
+        self.serial.ser.write(packed)
+        unpacked = struct.unpack('<BBBIIBBffffIIIBBBBB', packed)
+        print(unpacked)
+
+        sleep(1)
+        print("In waiting: " + str(self.serial.ser.in_waiting))
+        read = self.serial.ser.read(160)
+        print(read)
+        fromSim = struct.unpack('<BIIBBffffIIIBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB', read)
+        print(fromSim)
+
+        self.serial.ser.close()
+
+        Label(self.AOOR_mode, text= fromSim[2]).grid(row=1, column=3,  pady=2)
+        Label(self.AOOR_mode, text= fromSim[1]).grid(row=2, column=3,  pady=2)
+        Label(self.AOOR_mode, text= fromSim[6]).grid(row=3, column=3,  pady=2)
+        Label(self.AOOR_mode, text= fromSim[4]).grid(row=4, column=3,  pady=2)
+        Label(self.AOOR_mode, text= fromSim[16]).grid(row=5, column=3,  pady=2)
+        Label(self.AOOR_mode, text= fromSim[12]).grid(row=6, column=3,  pady=2)
+        Label(self.AOOR_mode, text= fromSim[13]).grid(row=7, column=3,  pady=2)
+        Label(self.AOOR_mode, text= fromSim[14]).grid(row=8, column=3,  pady=2)
+        Label(self.AOOR_mode, text= fromSim[15]).grid(row=9, column=3,  pady=2)
+        Label(self.AOOR_mode, text= "Current Mode number: " + str(fromSim[0])).grid(row=10, column=2,  pady=2)
 
     # VOOR MODE PARAMETERS
     def set_mode_VOOR(self):
@@ -798,7 +944,7 @@ class pmParams:
         Label(self.VOOR_mode, text="Reaction Time (ms): ").grid(row=7, column=2, padx=85, pady=2)
         Label(self.VOOR_mode, text="Response Factor : ").grid(row=8, column=2, padx=85, pady=2)
         Label(self.VOOR_mode, text="Recovery Time (mins) : ").grid(row=9, column=2, padx=85, pady=2)
-        Button(self.VOOR_mode, text="Get Current Settings", padx=20, pady=10, command = None).grid(row=10, column=3, pady=2)
+        Button(self.VOOR_mode, text="Get Current Settings", padx=20, pady=10, command = self.echo_VOOR).grid(row=10, column=3, pady=2)
 
     def send_VOOR(self, lrl, url, va, vpw, max, threshold, rxn, response, recovery):
         mode = Mode(self.userName, 6)
@@ -864,10 +1010,40 @@ class pmParams:
         except Exception as e:
             print(f"EXCEPTION: {e}")
             self.message.destroy()
-            self.message = Label(self.VOOR_mode, text="Update Failed: \nPlease use floats for ventricular amplitude\n"
-                                                      "Please use integers for all other values", font=("Calibri", 15),
-                                 fg="red")
+            self.message = Label(self.VOOR_mode, 
+                                 text="Update Failed: \nPlease use floats for ventricular amplitude/sensitivity\n"
+                                      "Please use integers for all other values\n"
+                                      "Make sure you have connected to the UART COM", font=("Calibri", 15), fg="red")
             self.message.grid(row=11, columnspan=2, pady=15)
+    
+    def echo_VOOR(self):
+        self.serial.ser.open()
+        self.serial.ser.flushInput()
+        self.serial.ser.flushOutput()
+        packed = struct.pack('<BBBIIBBffffIIIBBBBB',34,45,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0)
+        self.serial.ser.write(packed)
+        unpacked = struct.unpack('<BBBIIBBffffIIIBBBBB', packed)
+        print(unpacked)
+
+        sleep(1)
+        print("In waiting: " + str(self.serial.ser.in_waiting))
+        read = self.serial.ser.read(160)
+        print(read)
+        fromSim = struct.unpack('<BIIBBffffIIIBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB', read)
+        print(fromSim)
+
+        self.serial.ser.close()
+
+        Label(self.VOOR_mode, text= fromSim[2]).grid(row=1, column=3,  pady=2)
+        Label(self.VOOR_mode, text= fromSim[1]).grid(row=2, column=3,  pady=2)
+        Label(self.VOOR_mode, text= fromSim[5]).grid(row=3, column=3,  pady=2)
+        Label(self.VOOR_mode, text= fromSim[3]).grid(row=4, column=3,  pady=2)
+        Label(self.VOOR_mode, text= fromSim[16]).grid(row=5, column=3,  pady=2)
+        Label(self.VOOR_mode, text= fromSim[12]).grid(row=6, column=3,  pady=2)
+        Label(self.VOOR_mode, text= fromSim[13]).grid(row=7, column=3,  pady=2)
+        Label(self.VOOR_mode, text= fromSim[14]).grid(row=8, column=3,  pady=2)
+        Label(self.VOOR_mode, text= fromSim[15]).grid(row=9, column=3,  pady=2)
+        Label(self.VOOR_mode, text= "Current Mode number: " + str(fromSim[0])).grid(row=10, column=2,  pady=2)
 
     # AAIR MODE PARAMETERS
     def set_mode_AAIR(self):
@@ -948,7 +1124,7 @@ class pmParams:
         Label(self.AAIR_mode, text="Response Factor : ").grid(row=10, column=2, padx=85, pady=2)
         Label(self.AAIR_mode, text="Recovery Time (mins) : ").grid(row=11, column=2, padx=85, pady=2)
         Label(self.AAIR_mode, text="Atrial Sensitivity (V): ").grid(row=12, column=2, padx=85, pady=2)
-        Button(self.AAIR_mode, text="Get Current Settings", padx=20, pady=10, command = None).grid(row=13, column=3, pady=2)
+        Button(self.AAIR_mode, text="Get Current Settings", padx=20, pady=10, command = self.echo_AAIR).grid(row=13, column=3, pady=2)
 
 
     def send_AAIR(self, lrl, url, aa, apw, max, threshold, rxn, response, recovery, arp, pvarp, sense):
@@ -1027,10 +1203,45 @@ class pmParams:
         except Exception as e:
             print(f"EXCEPTION: {e}")
             self.message.destroy()
-            self.message = Label(self.AAIR_mode, text="Update Failed: \nPlease use floats for atrial amplitude/sensitivity\n"
-                                                      "Please use integers for all other values", font=("Calibri", 15), fg="red")
+            self.message = Label(self.AAIR_mode, 
+                                 text="Update Failed: \nPlease use floats for ventricular amplitude/sensitivity\n"
+                                      "Please use integers for all other values\n"
+                                      "Make sure you have connected to the UART COM", font=("Calibri", 15), fg="red")
             self.message.grid(row=14, columnspan=2, pady=15)
 
+    def echo_AAIR(self):
+        self.serial.ser.open()
+        self.serial.ser.flushInput()
+        self.serial.ser.flushOutput()
+        packed = struct.pack('<BBBIIBBffffIIIBBBBB',34,45,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0)
+        self.serial.ser.write(packed)
+        unpacked = struct.unpack('<BBBIIBBffffIIIBBBBB', packed)
+        print(unpacked)
+
+        sleep(1)
+        print("In waiting: " + str(self.serial.ser.in_waiting))
+        read = self.serial.ser.read(160)
+        print(read)
+        fromSim = struct.unpack('<BIIBBffffIIIBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB', read)
+        print(fromSim)
+
+        self.serial.ser.close()
+
+        Label(self.AAIR_mode, text= fromSim[2]).grid(row=1, column=3,  pady=2)
+        Label(self.AAIR_mode, text= fromSim[1]).grid(row=2, column=3,  pady=2)
+        Label(self.AAIR_mode, text= fromSim[6]).grid(row=3, column=3,  pady=2)
+        Label(self.AAIR_mode, text= fromSim[4]).grid(row=4, column=3,  pady=2)
+        Label(self.AAIR_mode, text= fromSim[10]).grid(row=5, column=3,  pady=2)
+        Label(self.AAIR_mode, text= "").grid(row=6, column=3,  pady=2)
+        Label(self.AAIR_mode, text= fromSim[12]).grid(row=7, column=3,  pady=2)
+        Label(self.AAIR_mode, text= fromSim[16]).grid(row=8, column=3,  pady=2)
+        Label(self.AAIR_mode, text= fromSim[13]).grid(row=9, column=3,  pady=2)
+        Label(self.AAIR_mode, text= fromSim[14]).grid(row=10, column=3,  pady=2)
+        Label(self.AAIR_mode, text= fromSim[15]).grid(row=11, column=3,  pady=2)
+        Label(self.AAIR_mode, text= fromSim[8]).grid(row=12, column=3,  pady=2)
+        Label(self.AAIR_mode, text= "Current Mode number: " + str(fromSim[0])).grid(row=13, column=2,  pady=2)
+
+    
     # VVIR MODE PARAMETERS
     def set_mode_VVIR(self):
         # set up VVIR frame inside of pm_params frame
@@ -1105,7 +1316,7 @@ class pmParams:
         Label(self.VVIR_mode, text="Reaction Time (ms): ").grid(row=9, column=2, padx=85, pady=2)
         Label(self.VVIR_mode, text="Response Factor : ").grid(row=10, column=2, padx=85, pady=2)
         Label(self.VVIR_mode, text="Recovery Time (mins) : ").grid(row=11, column=2, padx=85, pady=2)
-        Button(self.VVIR_mode, text="Get Current Settings", padx=20, pady=10, command = None).grid(row=12, column=3, pady=2)
+        Button(self.VVIR_mode, text="Get Current Settings", padx=20, pady=10, command = self.echo_VVIR).grid(row=12, column=3, pady=2)
 
     def send_VVIR(self, lrl, url, va, vpw, max, threshold, rxn, response, recovery, vrp, sense):
         mode = Mode(self.userName, 8)
@@ -1182,8 +1393,42 @@ class pmParams:
             self.message.destroy()
             self.message = Label(self.VVIR_mode,
                                  text="Update Failed: \nPlease use floats for ventricular amplitude/sensitivity\n"
-                                      "Please use integers for all other values", font=("Calibri", 15), fg="red")
+                                      "Please use integers for all other values\n"
+                                      "Make sure you have connected to the UART COM", font=("Calibri", 15), fg="red")
             self.message.grid(row=13, columnspan=2, pady=15)
+
+    def echo_VVIR(self):
+        self.serial.ser.open()
+        self.serial.ser.flushInput()
+        self.serial.ser.flushOutput()
+        packed = struct.pack('<BBBIIBBffffIIIBBBBB',34,45,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0)
+        self.serial.ser.write(packed)
+        unpacked = struct.unpack('<BBBIIBBffffIIIBBBBB', packed)
+        print(unpacked)
+
+        sleep(1)
+        print("In waiting: " + str(self.serial.ser.in_waiting))
+        read = self.serial.ser.read(160)
+        print(read)
+        fromSim = struct.unpack('<BIIBBffffIIIBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB', read)
+        print(fromSim)
+
+        self.serial.ser.close()
+
+        Label(self.VVIR_mode, text= fromSim[2]).grid(row=1, column=3,  pady=2)
+        Label(self.VVIR_mode, text= fromSim[1]).grid(row=2, column=3,  pady=2)
+        Label(self.VVIR_mode, text= fromSim[5]).grid(row=3, column=3,  pady=2)
+        Label(self.VVIR_mode, text= fromSim[3]).grid(row=4, column=3,  pady=2)
+        Label(self.VVIR_mode, text= fromSim[9]).grid(row=5, column=3,  pady=2)
+        Label(self.VVIR_mode, text= fromSim[7]).grid(row=6, column=3,  pady=2)
+        Label(self.VVIR_mode, text= fromSim[12]).grid(row=7, column=3,  pady=2)
+        Label(self.VVIR_mode, text= fromSim[16]).grid(row=8, column=3,  pady=2)
+        Label(self.VVIR_mode, text= fromSim[13]).grid(row=9, column=3,  pady=2)
+        Label(self.VVIR_mode, text= fromSim[14]).grid(row=10, column=3,  pady=2)
+        Label(self.VVIR_mode, text= fromSim[15]).grid(row=11, column=3,  pady=2)
+        Label(self.VVIR_mode, text= "Current Mode number: " + str(fromSim[0])).grid(row=12, column=2,  pady=2)
+
+    
 
 # DOOR MODE PARAMETERS
     def set_mode_DOOR(self):
@@ -1262,7 +1507,7 @@ class pmParams:
         Label(self.DOOR_mode, text="Max Sensor Rate (ppm): ").grid(row=10, column=2, padx=85, pady=2)
         Label(self.DOOR_mode, text="Response Factor : ").grid(row=11, column=2, padx=85, pady=2)
         Label(self.DOOR_mode, text="Recovery Time (mins) : ").grid(row=12, column=2, padx=85, pady=2)
-        Button(self.DOOR_mode, text="Get Current Settings", padx=20, pady=10, command = None).grid(row=13, column=3, pady=2)
+        Button(self.DOOR_mode, text="Get Current Settings", padx=20, pady=10, command = self.echo_DOOR).grid(row=13, column=3, pady=2)
 
     def send_DOOR(self, lrl, url, va, vpw, aa, apw, av, threshold, rxn, max, response, recovery):
         mode = Mode(self.userName, 10)
@@ -1340,6 +1585,39 @@ class pmParams:
             print(f"EXCEPTION: {e}")
             self.message.destroy()
             self.message = Label(self.DOOR_mode,
-                                 text="Update Failed: \nPlease use floats for ventricular/atrial amplitude\n"
-                                      "Please use integers for all other values", font=("Calibri", 15), fg="red")
+                                 text="Update Failed: \nPlease use floats for ventricular amplitude/sensitivity\n"
+                                      "Please use integers for all other values\n"
+                                      "Make sure you have connected to the UART COM", font=("Calibri", 15), fg="red")
             self.message.grid(row=14, columnspan=2, pady=15)
+
+    def echo_DOOR(self):
+        self.serial.ser.open()
+        self.serial.ser.flushInput()
+        self.serial.ser.flushOutput()
+        packed = struct.pack('<BBBIIBBffffIIIBBBBB',34,45,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0)
+        self.serial.ser.write(packed)
+        unpacked = struct.unpack('<BBBIIBBffffIIIBBBBB', packed)
+        print(unpacked)
+
+        sleep(1)
+        print("In waiting: " + str(self.serial.ser.in_waiting))
+        read = self.serial.ser.read(160)
+        print(read)
+        fromSim = struct.unpack('<BIIBBffffIIIBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB', read)
+        print(fromSim)
+
+        self.serial.ser.close()
+
+        Label(self.DOOR_mode, text= fromSim[2]).grid(row=1, column=3,  pady=2)
+        Label(self.DOOR_mode, text= fromSim[1]).grid(row=2, column=3,  pady=2)
+        Label(self.DOOR_mode, text= fromSim[6]).grid(row=3, column=3,  pady=2)
+        Label(self.DOOR_mode, text= fromSim[4]).grid(row=4, column=3,  pady=2)
+        Label(self.DOOR_mode, text= fromSim[5]).grid(row=5, column=3,  pady=2)
+        Label(self.DOOR_mode, text= fromSim[3]).grid(row=6, column=3,  pady=2)
+        Label(self.DOOR_mode, text= fromSim[12]).grid(row=7, column=3,  pady=2)
+        Label(self.DOOR_mode, text= fromSim[11]).grid(row=8, column=3,  pady=2)
+        Label(self.DOOR_mode, text= fromSim[13]).grid(row=9, column=3,  pady=2)
+        Label(self.DOOR_mode, text= fromSim[16]).grid(row=10, column=3,  pady=2)
+        Label(self.DOOR_mode, text= fromSim[14]).grid(row=11, column=3,  pady=2)
+        Label(self.DOOR_mode, text= fromSim[15]).grid(row=12, column=3,  pady=2)
+        Label(self.DOOR_mode, text= "Current Mode number: " + str(fromSim[0])).grid(row=13, column=2,  pady=2)
