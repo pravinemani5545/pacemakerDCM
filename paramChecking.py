@@ -75,13 +75,13 @@ def check_ARP(lrlval, arpval):
     errormsg = ""
     error = False
 
-    if (not (arpval >= 150 and arpval <= 500 and (arpval % 10 == 0))):
+    if (not (arpval >= 10 and arpval <= 500 and (arpval % 10 == 0))):
         error = True
         errormsg = "        Please make sure the ARP value is between          \n         150-500ms, incremented by 10ms.        "
 
-    elif (60000//lrlval >= arpval):
+    elif (60000/lrlval <= arpval):
         error = True
-        errormsg = "        Please make sure the pacewidth (LRL value in ms)     \n         is less than the pulse period (ARP).        "
+        errormsg = "        Please make sure the LRL value in ms      \n         is greater than the ARP value.        "
 
     return error, errormsg
 
@@ -93,9 +93,9 @@ def check_VRP(lrlval, vrpval):
         error = True
         errormsg = "        Please make sure the VRP value is between          \n         150-500ms, incremented by 10 ms.        "
 
-    elif (60000//lrlval >= vrpval):
+    elif (60000/lrlval <= vrpval):
         error = True
-        errormsg = "        Please make sure the pacewidth (LRL value in ms)     \n         is less than the pulse period (VRP).        "
+        errormsg = "        Please make sure the LRL value in ms      \n         is greater than the VRP value.        "
 
     return error, errormsg
 
