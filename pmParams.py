@@ -2,6 +2,7 @@ from loginPage import *
 from pacemakerModes import *
 from paramChecking import *
 from serialcom import*
+from tkinter import *
 
 class pmParams:
     def __init__(self, parent, *args, **kwargs):
@@ -15,7 +16,7 @@ class pmParams:
 
         # displays current mode name
         self.verify = Label(self.pmParams, text="Current Pacemaker Settings")
-        self.verify.grid(row=0, column=2,)
+        self.verify.grid(row=0, column=2)
 
         # initialize pacemaker mode windows
         self.mode_frame = Frame(self.pmParams)
@@ -52,6 +53,10 @@ class pmParams:
         pm_modes.menu.add_command(label="DOOR", command=self.set_mode_DOOR)
 
         pm_modes.grid(row=0, column=0, pady=2)
+
+        Button(self.pmParams, text="Atrial ECG", command= None).grid(row=2,column=3)
+        Button(self.pmParams, text="Ventrical ECG", command= None).grid(row=3,column=3)
+        Button(self.pmParams, text="Atrial & Ventrical ECG", command= None).grid(row=4,column=3)
 
         self.pmParams.grid(row=1, column=0, sticky = W, pady = 5)
 
@@ -230,16 +235,16 @@ class pmParams:
                 mode.set_VA(float(va.get()))
                 mode.set_VPW(int(vpw.get()))
                 mode.write_params(self.serial)
-                mode.read_echo(self.serial)
+                echoFromSim = mode.read_echo(self.serial)
 
                 self.message.destroy()
                 self.message = Label(self.VOO_mode, text="Update Success!", font=("Calibri", 25), fg="green")
                 self.message.grid(row=6, columnspan=2, pady=15)
 
-                Label(self.VOO_mode, text="BLAH ").grid(row=1, column=3,  pady=2)
-                Label(self.VOO_mode, text="BLAH ").grid(row=2, column=3,  pady=2)
-                Label(self.VOO_mode, text="BLAH ").grid(row=3, column=3,  pady=2)
-                Label(self.VOO_mode, text="BLAH ").grid(row=4, column=3,  pady=2)
+                Label(self.VOO_mode, text= echoFromSim[2]).grid(row=1, column=3,  pady=2)
+                Label(self.VOO_mode, text= echoFromSim[1]).grid(row=2, column=3,  pady=2)
+                Label(self.VOO_mode, text= echoFromSim[5]).grid(row=3, column=3,  pady=2)
+                Label(self.VOO_mode, text= echoFromSim[3]).grid(row=4, column=3,  pady=2)
 
             else:
                 self.message.destroy()
@@ -343,19 +348,19 @@ class pmParams:
                 mode.set_AS(float(sense.get()))
                 mode.set_PVARP(int(pvarp.get()))
                 mode.write_params(self.serial)
-                mode.read_echo(self.serial)
+                echoFromSim = mode.read_echo(self.serial)
 
                 self.message.destroy()
                 self.message = Label(self.AAI_mode, text="Update Success!", font=("Calibri", 25), fg="green")
                 self.message.grid(row=9, columnspan=2, pady=15)
 
-                Label(self.AAI_mode, text="BLAH ").grid(row=1, column=3,  pady=2)
-                Label(self.AAI_mode, text="BLAH ").grid(row=2, column=3,  pady=2)
-                Label(self.AAI_mode, text="BLAH ").grid(row=3, column=3,  pady=2)
-                Label(self.AAI_mode, text="BLAH ").grid(row=4, column=3,  pady=2)
-                Label(self.AAI_mode, text="BLAH ").grid(row=5, column=3,  pady=2)
-                Label(self.AAI_mode, text="BLAH ").grid(row=6, column=3,  pady=2)
-                Label(self.AAI_mode, text="BLAH ").grid(row=7, column=3,  pady=2)
+                Label(self.AAI_mode, text= echoFromSim[2]).grid(row=1, column=3,  pady=2)
+                Label(self.AAI_mode, text= echoFromSim[1]).grid(row=2, column=3,  pady=2)
+                Label(self.AAI_mode, text= echoFromSim[6]).grid(row=3, column=3,  pady=2)
+                Label(self.AAI_mode, text= echoFromSim[4]).grid(row=4, column=3,  pady=2)
+                Label(self.AAI_mode, text= echoFromSim[10]).grid(row=5, column=3,  pady=2)
+                Label(self.AAI_mode, text= echoFromSim[8]).grid(row=6, column=3,  pady=2)
+                Label(self.AAI_mode, text= "").grid(row=7, column=3,  pady=2)
                 Button(self.AAI_mode, text="Get Current Settings", padx=20, pady=10, command = None).grid(row=8, column=3, pady=2)
                 
 
@@ -454,18 +459,19 @@ class pmParams:
                 mode.set_VRP(int(vrp.get()))
                 mode.set_VS(float(sense.get()))
                 mode.write_params(self.serial)
-                mode.read_echo(self.serial)
+                echoFromSim = mode.read_echo(self.serial)
 
                 self.message.destroy()
                 self.message = Label(self.VVI_mode, text="Update Success!", font=("Calibri", 25), fg="green")
                 self.message.grid(row=8, columnspan=2, pady=15)
 
-                Label(self.VVI_mode, text="BLAH ").grid(row=1, column=3,  pady=2)
-                Label(self.VVI_mode, text="BLAH ").grid(row=2, column=3,  pady=2)
-                Label(self.VVI_mode, text="BLAH ").grid(row=3, column=3,  pady=2)
-                Label(self.VVI_mode, text="BLAH ").grid(row=4, column=3,  pady=2)
-                Label(self.VVI_mode, text="BLAH ").grid(row=5, column=3,  pady=2)
-                Label(self.VVI_mode, text="BLAH ").grid(row=6, column=3,  pady=2)
+                Label(self.VVI_mode, text= echoFromSim[2]).grid(row=1, column=3,  pady=2)
+                Label(self.VVI_mode, text= echoFromSim[1]).grid(row=2, column=3,  pady=2)
+                Label(self.VVI_mode, text= echoFromSim[5]).grid(row=3, column=3,  pady=2)
+                Label(self.VVI_mode, text= echoFromSim[3]).grid(row=4, column=3,  pady=2)
+                Label(self.VVI_mode, text= echoFromSim[9]).grid(row=5, column=3,  pady=2)
+                Label(self.VVI_mode, text= echoFromSim[7]).grid(row=6, column=3,  pady=2)
+                Button(self.VVI_mode, text="Get Current Settings", padx=20, pady=10, command = None).grid(row=8, column=3, pady=2)
 
             else:
                 self.message.destroy()
@@ -570,19 +576,19 @@ class pmParams:
                 mode.set_APW(int(apw.get()))
                 mode.set_FIXED_AV_DELAY(int(av.get()))
                 mode.write_params(self.serial)
-                mode.read_echo(self.serial)
+                echoFromSim = mode.read_echo(self.serial)
 
                 self.message.destroy()
                 self.message = Label(self.DOO_mode, text="Update Success!", font=("Calibri", 25), fg="green")
                 self.message.grid(row=9, columnspan=2, pady=15)
-
-                Label(self.DOO_mode, text="BLAH ").grid(row=1, column=3,  pady=2)
-                Label(self.DOO_mode, text="BLAH ").grid(row=2, column=3,  pady=2)
-                Label(self.DOO_mode, text="BLAH ").grid(row=3, column=3,  pady=2)
-                Label(self.DOO_mode, text="BLAH ").grid(row=4, column=3,  pady=2)
-                Label(self.DOO_mode, text="BLAH ").grid(row=5, column=3,  pady=2)
-                Label(self.DOO_mode, text="BLAH ").grid(row=6, column=3,  pady=2)
-                Label(self.DOO_mode, text="BLAH ").grid(row=7, column=3,  pady=2)
+                
+                Label(self.DOO_mode, text= echoFromSim[2]).grid(row=1, column=3,  pady=2)
+                Label(self.DOO_mode, text= echoFromSim[1]).grid(row=2, column=3,  pady=2)
+                Label(self.DOO_mode, text= echoFromSim[6]).grid(row=3, column=3,  pady=2)
+                Label(self.DOO_mode, text= echoFromSim[4]).grid(row=4, column=3,  pady=2)
+                Label(self.DOO_mode, text= echoFromSim[5]).grid(row=5, column=3,  pady=2)
+                Label(self.DOO_mode, text= echoFromSim[3]).grid(row=6, column=3,  pady=2)
+                Label(self.DOO_mode, text= echoFromSim[11]).grid(row=7, column=3,  pady=2)
             else:
                 self.message.destroy()
                 self.message = Label(self.DOO_mode, text=f"Update Failed: \n {errormsg}", font=("Calibri", 15), fg="red")
@@ -633,7 +639,7 @@ class pmParams:
         Label(self.AOOR_mode, text="Max Sensor Rate (ppm): ").grid(row=5, column=0, pady=2)
         enter_max = Entry(self.AOOR_mode, textvariable=max).grid(row=5, column=1)
 
-        thresh_vals = ("V-Low", "Low", "Med-Low", "Med", "Med-High", "High", "V-High")
+        thresh_vals = ("V-Low (1)", "Low (2)", "Med-Low (3)", "Med (4)", "Med-High (5)", "High (6)", "V-High (7)")
         Label(self.AOOR_mode, text="Activity Threshold : ").grid(row=6, column=0, pady=2)
         enter_threshold = Spinbox(self.AOOR_mode, values=thresh_vals, state="readonly", textvariable=threshold).grid(row=6, column=1)
 
@@ -700,21 +706,21 @@ class pmParams:
                 mode.set_RESPONSE_FACTOR(int(response.get()))
                 mode.set_RECOVERY_TIME(int(recovery.get()))
                 mode.write_params(self.serial)
-                mode.read_echo(self.serial)
+                echoFromSim = mode.read_echo(self.serial)
 
                 self.message.destroy()
                 self.message = Label(self.AOOR_mode, text="Update Success!", font=("Calibri", 25), fg="green")
                 self.message.grid(row=11, columnspan=2, pady=15)
 
-                Label(self.AOOR_mode, text="BLAH ").grid(row=1, column=3,  pady=2)
-                Label(self.AOOR_mode, text="BLAH ").grid(row=2, column=3,  pady=2)
-                Label(self.AOOR_mode, text="BLAH ").grid(row=3, column=3,  pady=2)
-                Label(self.AOOR_mode, text="BLAH ").grid(row=4, column=3,  pady=2)
-                Label(self.AOOR_mode, text="BLAH ").grid(row=5, column=3,  pady=2)
-                Label(self.AOOR_mode, text="BLAH ").grid(row=6, column=3,  pady=2)
-                Label(self.AOOR_mode, text="BLAH ").grid(row=7, column=3,  pady=2)
-                Label(self.AOOR_mode, text="BLAH ").grid(row=8, column=3,  pady=2)
-                Label(self.AOOR_mode, text="BLAH ").grid(row=9, column=3,  pady=2)
+                Label(self.AOOR_mode, text= echoFromSim[2]).grid(row=1, column=3,  pady=2)
+                Label(self.AOOR_mode, text= echoFromSim[1]).grid(row=2, column=3,  pady=2)
+                Label(self.AOOR_mode, text= echoFromSim[6]).grid(row=3, column=3,  pady=2)
+                Label(self.AOOR_mode, text= echoFromSim[4]).grid(row=4, column=3,  pady=2)
+                Label(self.AOOR_mode, text= echoFromSim[16]).grid(row=5, column=3,  pady=2)
+                Label(self.AOOR_mode, text= echoFromSim[12]).grid(row=6, column=3,  pady=2)
+                Label(self.AOOR_mode, text= echoFromSim[13]).grid(row=7, column=3,  pady=2)
+                Label(self.AOOR_mode, text= echoFromSim[14]).grid(row=8, column=3,  pady=2)
+                Label(self.AOOR_mode, text= echoFromSim[15]).grid(row=9, column=3,  pady=2)
 
             else:
                 self.message.destroy()
@@ -765,7 +771,7 @@ class pmParams:
         Label(self.VOOR_mode, text="Max Sensor Rate (ppm): ").grid(row=5, column=0, pady=2)
         enter_max = Entry(self.VOOR_mode, textvariable=max).grid(row=5, column=1)
 
-        thresh_vals = ("V-Low", "Low", "Med-Low", "Med", "Med-High", "High", "V-High")
+        thresh_vals = ("V-Low (1)", "Low (2)", "Med-Low (3)", "Med (4)", "Med-High (5)", "High (6)", "V-High (7)")
         Label(self.VOOR_mode, text="Activity Threshold : ").grid(row=6, column=0,pady=2)
         enter_threshold = Spinbox(self.VOOR_mode, values=thresh_vals, state="readonly", textvariable=threshold).grid(
             row=6, column=1)
@@ -833,21 +839,22 @@ class pmParams:
                 mode.set_RESPONSE_FACTOR(int(response.get()))
                 mode.set_RECOVERY_TIME(int(recovery.get()))
                 mode.write_params(self.serial)
-                mode.read_echo(self.serial)
+                echoFromSim = mode.read_echo(self.serial)
 
                 self.message.destroy()
                 self.message = Label(self.VOOR_mode, text="Update Success!", font=("Calibri", 25), fg="green")
                 self.message.grid(row=11, columnspan=2, pady=15)
 
-                Label(self.VOOR_mode, text="BLAH ").grid(row=1, column=3,  pady=2)
-                Label(self.VOOR_mode, text="BLAH ").grid(row=2, column=3,  pady=2)
-                Label(self.VOOR_mode, text="BLAH ").grid(row=3, column=3,  pady=2)
-                Label(self.VOOR_mode, text="BLAH ").grid(row=4, column=3,  pady=2)
-                Label(self.VOOR_mode, text="BLAH ").grid(row=5, column=3,  pady=2)
-                Label(self.VOOR_mode, text="BLAH ").grid(row=6, column=3,  pady=2)
-                Label(self.VOOR_mode, text="BLAH ").grid(row=7, column=3,  pady=2)
-                Label(self.VOOR_mode, text="BLAH ").grid(row=8, column=3,  pady=2)
-                Label(self.VOOR_mode, text="BLAH ").grid(row=9, column=3,  pady=2)
+                Label(self.VOOR_mode, text= echoFromSim[2]).grid(row=1, column=3,  pady=2)
+                Label(self.VOOR_mode, text= echoFromSim[1]).grid(row=2, column=3,  pady=2)
+                Label(self.VOOR_mode, text= echoFromSim[5]).grid(row=3, column=3,  pady=2)
+                Label(self.VOOR_mode, text= echoFromSim[3]).grid(row=4, column=3,  pady=2)
+                Label(self.VOOR_mode, text= echoFromSim[16]).grid(row=5, column=3,  pady=2)
+                Label(self.VOOR_mode, text= echoFromSim[12]).grid(row=6, column=3,  pady=2)
+                Label(self.VOOR_mode, text= echoFromSim[13]).grid(row=7, column=3,  pady=2)
+                Label(self.VOOR_mode, text= echoFromSim[14]).grid(row=8, column=3,  pady=2)
+                Label(self.VOOR_mode, text= echoFromSim[15]).grid(row=9, column=3,  pady=2)
+                
             else:
                 self.message.destroy()
                 self.message = Label(self.VOOR_mode, text=f"Update Failed: \n {errormsg}", font=("Calibri", 15),
@@ -905,7 +912,7 @@ class pmParams:
         Label(self.AAIR_mode, text="Post VARP (ms): ").grid(row=6, column=0, pady=2)
         enter_pvarp = Entry(self.AAIR_mode, textvariable=pvarp).grid(row=6, column=1)
 
-        thresh_vals = ("V-Low", "Low", "Med-Low", "Med", "Med-High", "High", "V-High")
+        thresh_vals = ("V-Low (1)", "Low (2)", "Med-Low (3)", "Med (4)", "Med-High (5)", "High (6)", "V-High (7)")
         Label(self.AAIR_mode, text="Activity Threshold : ").grid(row=7, column=0, pady=2)
         enter_threshold = Spinbox(self.AAIR_mode, values=thresh_vals, state="readonly", textvariable=threshold).grid(
             row=7, column=1)
@@ -935,8 +942,8 @@ class pmParams:
         Label(self.AAIR_mode, text="Atrial Pulse Width (ms): ").grid(row=4, column=2, padx=85, pady=2)
         Label(self.AAIR_mode, text="ARP (ms): ").grid(row=5, column=2, padx=85, pady=2)
         Label(self.AAIR_mode, text="Post VARP (ms): ").grid(row=6, column=2, padx=85, pady=2)
-        Label(self.AAIR_mode, text="Max Sensor Rate (ppm): ").grid(row=7, column=2, padx=85, pady=2)
-        Label(self.AAIR_mode, text="Activity Threshold : ").grid(row=8, column=2, padx=85, pady=2)
+        Label(self.AAIR_mode, text="Activity Threshold : ").grid(row=7, column=2, padx=85, pady=2)
+        Label(self.AAIR_mode, text="Max Sensor Rate (ppm): ").grid(row=8, column=2, padx=85, pady=2)
         Label(self.AAIR_mode, text="Reaction Time (ms): ").grid(row=9, column=2, padx=85, pady=2)
         Label(self.AAIR_mode, text="Response Factor : ").grid(row=10, column=2, padx=85, pady=2)
         Label(self.AAIR_mode, text="Recovery Time (mins) : ").grid(row=11, column=2, padx=85, pady=2)
@@ -992,24 +999,25 @@ class pmParams:
                 mode.set_RECOVERY_TIME(int(recovery.get()))
                 mode.set_AS(float(sense.get()))
                 mode.write_params(self.serial)
-                mode.read_echo(self.serial)
+                echoFromSim = mode.read_echo(self.serial)
 
                 self.message.destroy()
                 self.message = Label(self.AAIR_mode, text="Update Success!", font=("Calibri", 25), fg="green")
                 self.message.grid(row=14, columnspan=2, pady=15)
 
-                Label(self.AAIR_mode, text="BLAH ").grid(row=1, column=3,  pady=2)
-                Label(self.AAIR_mode, text="BLAH ").grid(row=2, column=3,  pady=2)
-                Label(self.AAIR_mode, text="BLAH ").grid(row=3, column=3,  pady=2)
-                Label(self.AAIR_mode, text="BLAH ").grid(row=4, column=3,  pady=2)
-                Label(self.AAIR_mode, text="BLAH ").grid(row=5, column=3,  pady=2)
-                Label(self.AAIR_mode, text="BLAH ").grid(row=6, column=3,  pady=2)
-                Label(self.AAIR_mode, text="BLAH ").grid(row=7, column=3,  pady=2)
-                Label(self.AAIR_mode, text="BLAH ").grid(row=8, column=3,  pady=2)
-                Label(self.AAIR_mode, text="BLAH ").grid(row=9, column=3,  pady=2)
-                Label(self.AAIR_mode, text="BLAH ").grid(row=10, column=3,  pady=2)
-                Label(self.AAIR_mode, text="BLAH ").grid(row=11, column=3,  pady=2)
-                Label(self.AAIR_mode, text="BLAH ").grid(row=12, column=3,  pady=2)
+                Label(self.AAIR_mode, text= echoFromSim[2]).grid(row=1, column=3,  pady=2)
+                Label(self.AAIR_mode, text= echoFromSim[1]).grid(row=2, column=3,  pady=2)
+                Label(self.AAIR_mode, text= echoFromSim[6]).grid(row=3, column=3,  pady=2)
+                Label(self.AAIR_mode, text= echoFromSim[4]).grid(row=4, column=3,  pady=2)
+                Label(self.AAIR_mode, text= echoFromSim[10]).grid(row=5, column=3,  pady=2)
+                Label(self.AAIR_mode, text= "").grid(row=6, column=3,  pady=2)
+                Label(self.AAIR_mode, text= echoFromSim[12]).grid(row=7, column=3,  pady=2)
+                Label(self.AAIR_mode, text= echoFromSim[16]).grid(row=8, column=3,  pady=2)
+                Label(self.AAIR_mode, text= echoFromSim[13]).grid(row=9, column=3,  pady=2)
+                Label(self.AAIR_mode, text= echoFromSim[14]).grid(row=10, column=3,  pady=2)
+                Label(self.AAIR_mode, text= echoFromSim[15]).grid(row=11, column=3,  pady=2)
+                Label(self.AAIR_mode, text= echoFromSim[8]).grid(row=12, column=3,  pady=2)
+                
             else:
                 self.message.destroy()
                 self.message = Label(self.AAIR_mode, text=f"Update Failed: \n {errormsg}", font=("Calibri", 15),
@@ -1065,7 +1073,7 @@ class pmParams:
         Label(self.VVIR_mode, text="Ventricular Sensitivity (V): ").grid(row=6, column=0, padx=85, pady=2)
         enter_sense = Entry(self.VVIR_mode, textvariable=sense).grid(row=6, column=1)
 
-        thresh_vals = ("V-Low", "Low", "Med-Low", "Med", "Med-High", "High", "V-High")
+        thresh_vals = ("V-Low (1)", "Low (2)", "Med-Low (3)", "Med (4)", "Med-High (5)", "High (6)", "V-High (7)")
         Label(self.VVIR_mode, text="Activity Threshold : ").grid(row=7, column=0, pady=2)
         enter_threshold = Spinbox(self.VVIR_mode, values=thresh_vals, state="readonly",
                                   textvariable=threshold).grid(row=7, column=1)
@@ -1144,23 +1152,24 @@ class pmParams:
                 mode.set_RECOVERY_TIME(int(recovery.get()))
                 mode.set_VS(float(sense.get()))
                 mode.write_params(self.serial)
-                mode.read_echo(self.serial)
+                echoFromSim = mode.read_echo(self.serial)
 
                 self.message.destroy()
                 self.message = Label(self.VVIR_mode, text="Update Success!", font=("Calibri", 25), fg="green")
                 self.message.grid(row=13, columnspan=2, pady=15)
 
-                Label(self.VVIR_mode, text="BLAH ").grid(row=1, column=3,  pady=2)
-                Label(self.VVIR_mode, text="BLAH ").grid(row=2, column=3,  pady=2)
-                Label(self.VVIR_mode, text="BLAH ").grid(row=3, column=3,  pady=2)
-                Label(self.VVIR_mode, text="BLAH ").grid(row=4, column=3,  pady=2)
-                Label(self.VVIR_mode, text="BLAH ").grid(row=5, column=3,  pady=2)
-                Label(self.VVIR_mode, text="BLAH ").grid(row=6, column=3,  pady=2)
-                Label(self.VVIR_mode, text="BLAH ").grid(row=7, column=3,  pady=2)
-                Label(self.VVIR_mode, text="BLAH ").grid(row=8, column=3,  pady=2)
-                Label(self.VVIR_mode, text="BLAH ").grid(row=9, column=3,  pady=2)
-                Label(self.VVIR_mode, text="BLAH ").grid(row=10, column=3,  pady=2)
-                Label(self.VVIR_mode, text="BLAH ").grid(row=11, column=3,  pady=2)
+                Label(self.VVIR_mode, text= echoFromSim[2]).grid(row=1, column=3,  pady=2)
+                Label(self.VVIR_mode, text= echoFromSim[1]).grid(row=2, column=3,  pady=2)
+                Label(self.VVIR_mode, text= echoFromSim[5]).grid(row=3, column=3,  pady=2)
+                Label(self.VVIR_mode, text= echoFromSim[3]).grid(row=4, column=3,  pady=2)
+                Label(self.VVIR_mode, text= echoFromSim[9]).grid(row=5, column=3,  pady=2)
+                Label(self.VVIR_mode, text= echoFromSim[7]).grid(row=6, column=3,  pady=2)
+                Label(self.VVIR_mode, text= echoFromSim[12]).grid(row=7, column=3,  pady=2)
+                Label(self.VVIR_mode, text= echoFromSim[16]).grid(row=8, column=3,  pady=2)
+                Label(self.VVIR_mode, text= echoFromSim[13]).grid(row=9, column=3,  pady=2)
+                Label(self.VVIR_mode, text= echoFromSim[14]).grid(row=10, column=3,  pady=2)
+                Label(self.VVIR_mode, text= echoFromSim[15]).grid(row=11, column=3,  pady=2)
+               
 
             else:
                 self.message.destroy()
@@ -1219,7 +1228,7 @@ class pmParams:
         Label(self.DOOR_mode, text="Ventrical Pulse Width (ms): ").grid(row=6, column=0, pady=2, padx=50)
         enter_vpw = Entry(self.DOOR_mode, textvariable=vpw).grid(row=6, column=1)
 
-        thresh_vals = ("V-Low", "Low", "Med-Low", "Med", "Med-High", "High", "V-High")
+        thresh_vals = ("V-Low (1)", "Low (2)", "Med-Low (3)", "Med (4)", "Med-High (5)", "High (6)", "V-High (7)")
         Label(self.DOOR_mode, text="Activity Threshold : ").grid(row=7, column=0, pady=2)
         enter_threshold = Spinbox(self.DOOR_mode, values=thresh_vals, state="readonly", textvariable=threshold).grid(row=7, column=1)
 
@@ -1303,24 +1312,25 @@ class pmParams:
                 mode.set_RESPONSE_FACTOR(int(response.get()))
                 mode.set_RECOVERY_TIME(int(recovery.get()))
                 mode.write_params(self.serial)
-                mode.read_echo(self.serial)
+                echoFromSim = mode.read_echo(self.serial)
 
                 self.message.destroy()
                 self.message = Label(self.DOOR_mode, text="Update Success!", font=("Calibri", 25), fg="green")
                 self.message.grid(row=14, columnspan=2, pady=15)
 
-                Label(self.DOOR_mode, text="BLAH ").grid(row=1, column=3,  pady=2)
-                Label(self.DOOR_mode, text="BLAH ").grid(row=2, column=3,  pady=2)
-                Label(self.DOOR_mode, text="BLAH ").grid(row=3, column=3,  pady=2)
-                Label(self.DOOR_mode, text="BLAH ").grid(row=4, column=3,  pady=2)
-                Label(self.DOOR_mode, text="BLAH ").grid(row=5, column=3,  pady=2)
-                Label(self.DOOR_mode, text="BLAH ").grid(row=6, column=3,  pady=2)
-                Label(self.DOOR_mode, text="BLAH ").grid(row=7, column=3,  pady=2)
-                Label(self.DOOR_mode, text="BLAH ").grid(row=8, column=3,  pady=2)
-                Label(self.DOOR_mode, text="BLAH ").grid(row=9, column=3,  pady=2)
-                Label(self.DOOR_mode, text="BLAH ").grid(row=10, column=3,  pady=2)
-                Label(self.DOOR_mode, text="BLAH ").grid(row=11, column=3,  pady=2)
-                Label(self.DOOR_mode, text="BLAH ").grid(row=12, column=3,  pady=2)
+                Label(self.DOOR_mode, text= echoFromSim[2]).grid(row=1, column=3,  pady=2)
+                Label(self.DOOR_mode, text= echoFromSim[1]).grid(row=2, column=3,  pady=2)
+                Label(self.DOOR_mode, text= echoFromSim[6]).grid(row=3, column=3,  pady=2)
+                Label(self.DOOR_mode, text= echoFromSim[4]).grid(row=4, column=3,  pady=2)
+                Label(self.DOOR_mode, text= echoFromSim[5]).grid(row=5, column=3,  pady=2)
+                Label(self.DOOR_mode, text= echoFromSim[3]).grid(row=6, column=3,  pady=2)
+                Label(self.DOOR_mode, text= echoFromSim[12]).grid(row=7, column=3,  pady=2)
+                Label(self.DOOR_mode, text= echoFromSim[11]).grid(row=8, column=3,  pady=2)
+                Label(self.DOOR_mode, text= echoFromSim[13]).grid(row=9, column=3,  pady=2)
+                Label(self.DOOR_mode, text= echoFromSim[16]).grid(row=10, column=3,  pady=2)
+                Label(self.DOOR_mode, text= echoFromSim[14]).grid(row=11, column=3,  pady=2)
+                Label(self.DOOR_mode, text= echoFromSim[15]).grid(row=12, column=3,  pady=2)
+
             else:
                 self.message.destroy()
                 self.message = Label(self.DOOR_mode, text=f"Update Failed: \n {errormsg}", font=("Calibri", 15), fg="red")
