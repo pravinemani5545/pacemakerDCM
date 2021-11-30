@@ -183,7 +183,7 @@ class Mode():
     
     def read_echo(self, serial):
 
-        sleep(1)
+        sleep(1.3)
         print("In waiting: " + str(serial.ser.in_waiting))
         read = serial.ser.read(160)
         print(read)

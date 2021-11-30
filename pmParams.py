@@ -10,21 +10,23 @@ import numpy as np
 from itertools import count
 import pandas as pd
 import matplotlib.pyplot as plt
-from matplotlib.animation import FuncAnimation
+import matplotlib.animation as animation
 from time import sleep
+from eGramPage import *
 
 class pmParams:
     def __init__(self, parent, *args, **kwargs):
         self.pmParams = parent
         self.userName = args[0]
         self.serial = args[1]
+        self.DCM = args[2]
 
         # displays current mode name
         self.mode_name = Label(self.pmParams, text="                ")
         self.mode_name.grid(row=0, column=1)
 
         # displays current mode name
-        self.verify = Label(self.pmParams, text="Current Pacemaker Settings")
+        self.verify = Label(self.pmParams, text="Current Pacemaker Settings: ")
         self.verify.grid(row=0, column=2)
 
         # initialize pacemaker mode windows
@@ -46,7 +48,7 @@ class pmParams:
         self.set_mode_AOO()
 
         # set up menu to choose different pacemaker modes
-        pm_modes = Menubutton(self.pmParams, text="Choose Pacing Mode", relief = GROOVE)
+        pm_modes = Menubutton(self.pmParams, text="Choose Pacing Mode: ", relief = GROOVE)
         pm_modes.menu = Menu(pm_modes, tearoff=0)
         pm_modes["menu"] = pm_modes.menu
 
@@ -61,76 +63,17 @@ class pmParams:
         pm_modes.menu.add_command(label="VVIR (8)", command=self.set_mode_VVIR)
         pm_modes.menu.add_command(label="DOOR (10)", command=self.set_mode_DOOR)
 
-        pm_modes.grid(row=0, column=0, pady=2)
+        pm_modes.grid(row=0, column=0, pady=2, padx = 35)
 
-        Button(self.pmParams, text="Atrial ECG", command= None).grid(row=2,column=3)
-        Button(self.pmParams, text="Ventrical ECG", command= None).grid(row=3,column=3)
-        Button(self.pmParams, text="Atrial & Ventrical ECG", command= self.AVEcg).grid(row=4,column=3)
+        Button(self.pmParams, text="E-Gram", command= self.eGram).grid(row=2,column=3, ipadx = 20)
 
         self.pmParams.grid(row=1, column=0, sticky = W, pady = 5)
 
-    def AVEcg(self):
-
-        self.serial.ser.open()
-        self.serial.ser.read_all()
-        self.serial.ser.flushInput()
-        self.serial.ser.flushOutput()
-
-        print("ser: " + str(self.serial.ser.in_waiting))
-        print()
-        arr = []
-        arr2 = []
-
-
-        packed = struct.pack('<BBBIIBBffffIIIBBBBB',34,14,1,1,1,1,1,1.0,1.0,1.0,1.0,1,1,1,1,1,1,1,1)
-        self.serial.ser.write(packed)
-
-        print("opened")
-        count = 0
-        sleep(0.1)
-
-
-        while(count<=100):
-            
-            read = self.serial.ser.read(160)
-            fromSim = struct.unpack('ffffffffffffffffffffffffffffffffffffffff', read)
-            print(fromSim)
-            print("ser: " + str(self.serial.ser.in_waiting))
-            #avg = sum(fromSim[0:19])/20
-            #avg2 = sum(fromSim[20:39])/20
-
-            arr.extend(fromSim[0:19]) 
-            arr2.extend(fromSim[20:39])
-            
-            count+=1
-            print() 
-            sleep(0.02)
-
-
-        packed = struct.pack('<BBBIIBBffffIIIBBBBB',34,49,1,1,1,1,1,1.0,1.0,1.0,1.0,1,1,1,1,1,1,1,1)
-        self.serial.ser.write(packed)
-
-        plt.style.use('fivethirtyeight')
-
-        x_vals = np.arange(0, 1919)
-        y_vals = arr
-        y_vals2 = arr2
-
-
-        plt.plot(x_vals, y_vals, label='Ventrical Signal')
-        plt.plot(x_vals, y_vals2, label='Atrial Signal')
-
-
-        plt.legend(loc='upper left')
-        plt.tight_layout()
-        plt.show()
-
-        self.serial.ser.read_all()
-        self.serial.ser.flushInput()
-        self.serial.ser.flushOutput()
-        self.serial.ser.close()
+    def eGram(self):
+        self.eGramPg = Toplevel(self.pmParams)
+        self.eGramWindow = eGramPage(self.eGramPg, self.serial, self.DCM, self.userName)
+        self.DCM.withdraw()
         
-
     # AOO MODE PARAMETERS
     def set_mode_AOO(self):
         # set up AOO frame inside of pm_params frame
@@ -359,7 +302,6 @@ class pmParams:
         Label(self.VOO_mode, text= fromSim[5]).grid(row=3, column=3,  pady=2)
         Label(self.VOO_mode, text= fromSim[3]).grid(row=4, column=3,  pady=2)
         Label(self.VOO_mode, text= "Current Mode number: " + str(fromSim[0])).grid(row=5, column=2,  pady=2)
-        
 
     # AAI MODE PARAMETERS
     def set_mode_AAI(self):
@@ -599,7 +541,6 @@ class pmParams:
                 Label(self.VVI_mode, text= echoFromSim[3]).grid(row=4, column=3,  pady=2)
                 Label(self.VVI_mode, text= echoFromSim[9]).grid(row=5, column=3,  pady=2)
                 Label(self.VVI_mode, text= echoFromSim[7]).grid(row=6, column=3,  pady=2)
-                Button(self.VVI_mode, text="Get Current Settings", padx=20, pady=10, command = self.echo_VVI).grid(row=8, column=3, pady=2)
 
             else:
                 self.message.destroy()
@@ -639,7 +580,7 @@ class pmParams:
         Label(self.VVI_mode, text= fromSim[3]).grid(row=4, column=3,  pady=2)
         Label(self.VVI_mode, text= fromSim[9]).grid(row=5, column=3,  pady=2)
         Label(self.VVI_mode, text= fromSim[7]).grid(row=6, column=3,  pady=2)
-        Label(self.vvI_mode, text= "Current Mode number: " + str(fromSim[0])).grid(row=7, column=2,  pady=2)
+        Label(self.VVI_mode, text= "Current Mode number: " + str(fromSim[0])).grid(row=7, column=2,  pady=2)
 
     # DOO MODE PARAMETERS
     def set_mode_DOO(self):
@@ -826,7 +767,7 @@ class pmParams:
         Label(self.AOOR_mode, text="Activity Threshold : ").grid(row=6, column=0, pady=2)
         enter_threshold = Spinbox(self.AOOR_mode, values=thresh_vals, state="readonly", textvariable=threshold).grid(row=6, column=1)
 
-        Label(self.AOOR_mode, text="Reaction Time (ms): ").grid(row=7, column=0, pady=2)
+        Label(self.AOOR_mode, text="Reaction Time (s): ").grid(row=7, column=0, pady=2)
         enter_rxn = Entry(self.AOOR_mode, textvariable=rxn).grid(row=7, column=1)
 
         Label(self.AOOR_mode, text="Response Factor : ").grid(row=8, column=0, pady=2)
@@ -845,7 +786,7 @@ class pmParams:
         Label(self.AOOR_mode, text="Atrial Pulse Width (ms): ").grid(row=4, column=2, padx=85, pady=2)
         Label(self.AOOR_mode, text="Max Sensor Rate (ppm): ").grid(row=5, column=2, padx=85, pady=2)
         Label(self.AOOR_mode, text="Activity Threshold : ").grid(row=6, column=2, padx=85, pady=2)
-        Label(self.AOOR_mode, text="Reaction Time (ms): ").grid(row=7, column=2, padx=85, pady=2)
+        Label(self.AOOR_mode, text="Reaction Time (s): ").grid(row=7, column=2, padx=85, pady=2)
         Label(self.AOOR_mode, text="Response Factor : ").grid(row=8, column=2, padx=85, pady=2)
         Label(self.AOOR_mode, text="Recovery Time (mins) : ").grid(row=9, column=2, padx=85, pady=2)
         Button(self.AOOR_mode, text="Get Current Settings", padx=20, pady=10, command = self.echo_AOOR).grid(row=10, column=3, pady=2)
@@ -990,7 +931,7 @@ class pmParams:
         enter_threshold = Spinbox(self.VOOR_mode, values=thresh_vals, state="readonly", textvariable=threshold).grid(
             row=6, column=1)
 
-        Label(self.VOOR_mode, text="Reaction Time (ms): ").grid(row=7, column=0, pady=2)
+        Label(self.VOOR_mode, text="Reaction Time (s): ").grid(row=7, column=0, pady=2)
         enter_rxn = Entry(self.VOOR_mode, textvariable=rxn).grid(row=7, column=1)
 
         Label(self.VOOR_mode, text="Response Factor : ").grid(row=8, column=0, pady=2)
@@ -1009,7 +950,7 @@ class pmParams:
         Label(self.VOOR_mode, text="Ventricular Pulse Width (ms): ").grid(row=4, column=2, padx=85, pady=2)
         Label(self.VOOR_mode, text="Max Sensor Rate (ppm): ").grid(row=5, column=2, padx=85, pady=2)
         Label(self.VOOR_mode, text="Activity Threshold : ").grid(row=6, column=2, padx=85, pady=2)
-        Label(self.VOOR_mode, text="Reaction Time (ms): ").grid(row=7, column=2, padx=85, pady=2)
+        Label(self.VOOR_mode, text="Reaction Time (s): ").grid(row=7, column=2, padx=85, pady=2)
         Label(self.VOOR_mode, text="Response Factor : ").grid(row=8, column=2, padx=85, pady=2)
         Label(self.VOOR_mode, text="Recovery Time (mins) : ").grid(row=9, column=2, padx=85, pady=2)
         Button(self.VOOR_mode, text="Get Current Settings", padx=20, pady=10, command = self.echo_VOOR).grid(row=10, column=3, pady=2)
@@ -1164,7 +1105,7 @@ class pmParams:
         Label(self.AAIR_mode, text="Max Sensor Rate (ppm): ").grid(row=8, column=0, pady=2)
         enter_max = Entry(self.AAIR_mode, textvariable=max).grid(row=8, column=1)
 
-        Label(self.AAIR_mode, text="Reaction Time (ms): ").grid(row=9, column=0, pady=2)
+        Label(self.AAIR_mode, text="Reaction Time (s): ").grid(row=9, column=0, pady=2)
         enter_rxn = Entry(self.AAIR_mode, textvariable=rxn).grid(row=9, column=1)
 
         Label(self.AAIR_mode, text="Response Factor : ").grid(row=10, column=0, pady=2)
@@ -1188,7 +1129,7 @@ class pmParams:
         Label(self.AAIR_mode, text="Post VARP (ms): ").grid(row=6, column=2, padx=85, pady=2)
         Label(self.AAIR_mode, text="Activity Threshold : ").grid(row=7, column=2, padx=85, pady=2)
         Label(self.AAIR_mode, text="Max Sensor Rate (ppm): ").grid(row=8, column=2, padx=85, pady=2)
-        Label(self.AAIR_mode, text="Reaction Time (ms): ").grid(row=9, column=2, padx=85, pady=2)
+        Label(self.AAIR_mode, text="Reaction Time (s): ").grid(row=9, column=2, padx=85, pady=2)
         Label(self.AAIR_mode, text="Response Factor : ").grid(row=10, column=2, padx=85, pady=2)
         Label(self.AAIR_mode, text="Recovery Time (mins) : ").grid(row=11, column=2, padx=85, pady=2)
         Label(self.AAIR_mode, text="Atrial Sensitivity (V): ").grid(row=12, column=2, padx=85, pady=2)
@@ -1360,7 +1301,7 @@ class pmParams:
         Label(self.VVIR_mode, text="Max Sensor Rate (ppm): ").grid(row=8, column=0, pady=2)
         enter_max = Entry(self.VVIR_mode, textvariable=max).grid(row=8, column=1)
 
-        Label(self.VVIR_mode, text="Reaction Time (ms): ").grid(row=9, column=0, pady=2)
+        Label(self.VVIR_mode, text="Reaction Time (s): ").grid(row=9, column=0, pady=2)
         enter_rxn = Entry(self.VVIR_mode, textvariable=rxn).grid(row=9, column=1)
 
         Label(self.VVIR_mode, text="Response Factor : ").grid(row=10, column=0, pady=2)
@@ -1381,7 +1322,7 @@ class pmParams:
         Label(self.VVIR_mode, text="Ventricular Sensitivity (V): ").grid(row=6, column=2, padx=85, pady=2)
         Label(self.VVIR_mode, text="Activity Threshold :").grid(row=7, column=2, padx=85, pady=2)
         Label(self.VVIR_mode, text="Max Sensor Rate (ppm): ").grid(row=8, column=2, padx=85, pady=2)
-        Label(self.VVIR_mode, text="Reaction Time (ms): ").grid(row=9, column=2, padx=85, pady=2)
+        Label(self.VVIR_mode, text="Reaction Time (s): ").grid(row=9, column=2, padx=85, pady=2)
         Label(self.VVIR_mode, text="Response Factor : ").grid(row=10, column=2, padx=85, pady=2)
         Label(self.VVIR_mode, text="Recovery Time (mins) : ").grid(row=11, column=2, padx=85, pady=2)
         Button(self.VVIR_mode, text="Get Current Settings", padx=20, pady=10, command = self.echo_VVIR).grid(row=12, column=3, pady=2)
@@ -1548,7 +1489,7 @@ class pmParams:
         Label(self.DOOR_mode, text="Fixed AV Delay(ms): ").grid(row=8, column=0, pady=2, padx=50)
         enter_av = Entry(self.DOOR_mode, textvariable=av).grid(row=8, column=1)
 
-        Label(self.DOOR_mode, text="Reaction Time (ms): ").grid(row=9, column=0, pady=2)
+        Label(self.DOOR_mode, text="Reaction Time (s): ").grid(row=9, column=0, pady=2)
         enter_rxn = Entry(self.DOOR_mode, textvariable=rxn).grid(row=9, column=1)
 
         Label(self.DOOR_mode, text="Max Sensor Rate (ppm): ").grid(row=10, column=0, pady=2)
@@ -1571,7 +1512,7 @@ class pmParams:
         Label(self.DOOR_mode, text="Ventricular Pulse Width (ms): ").grid(row=6, column=2, padx=85, pady=2)
         Label(self.DOOR_mode, text="Activity Threshold :").grid(row=7, column=2, padx=85, pady=2)
         Label(self.DOOR_mode, text="Fixed AV Delay(ms): ").grid(row=8, column=2, padx=85, pady=2)
-        Label(self.DOOR_mode, text="Reaction Time (ms): ").grid(row=9, column=2, padx=85, pady=2)
+        Label(self.DOOR_mode, text="Reaction Time (s): ").grid(row=9, column=2, padx=85, pady=2)
         Label(self.DOOR_mode, text="Max Sensor Rate (ppm): ").grid(row=10, column=2, padx=85, pady=2)
         Label(self.DOOR_mode, text="Response Factor : ").grid(row=11, column=2, padx=85, pady=2)
         Label(self.DOOR_mode, text="Recovery Time (mins) : ").grid(row=12, column=2, padx=85, pady=2)

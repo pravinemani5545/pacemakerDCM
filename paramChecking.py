@@ -164,7 +164,7 @@ def check_RXN_TIME(rxn):
 
     if (rxn > 50 or rxn < 10 or rxn % 10 != 0):
         error = True
-        errormsg = "        Please make sure the reaction time         \n         is between 10-50ms, incremented by 10ms.        "
+        errormsg = "        Please make sure the reaction time         \n         is between 10-50s, incremented by 10s.        "
 
     return error, errormsg
 

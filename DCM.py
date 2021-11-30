@@ -14,7 +14,7 @@ class DCM():
         self.nav = nav(self.navFrm, self.DCM, args[0], self.ser)
 
         self.pmParamsFrm = Frame(self.DCM)
-        self.pmParams = pmParams(self.pmParamsFrm, args[0], self.ser)
+        self.pmParams = pmParams(self.pmParamsFrm, args[0], self.ser, self.DCM)
 
 
 def main():
