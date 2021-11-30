@@ -107,19 +107,19 @@ class Mode():
         return self.FIXED_AV_DELAY
 
     def set_ACT_THRESHOLD(self, value):
-        if value == "V-Low":
+        if value == "V-Low (1)":
             self.ACT_THRESHOLD = 1
-        if value == "Low":
+        if value == "Low (2)":
             self.ACT_THRESHOLD = 2
-        if value == "Med-Low":
+        if value == "Med-Low (3)":
             self.ACT_THRESHOLD = 3
-        if value == "Med":
+        if value == "Med (4)":
             self.ACT_THRESHOLD = 4
-        if value == "Med-High":
+        if value == "Med-High (5)":
             self.ACT_THRESHOLD = 5
-        if value == "High":
+        if value == "High (6)":
             self.ACT_THRESHOLD = 6
-        if value == "V-High":
+        if value == "V-High (7)":
             self.ACT_THRESHOLD = 7
 
     def get_ACT_THRESHOLD(self):
@@ -174,6 +174,7 @@ class Mode():
 
         serial.ser.open()
         serial.ser.flushInput()
+        serial.ser.read_all()
         serial.ser.flushOutput()
         self.packed = struct.pack('<BBBIIBBffffIIIBBBBB',34,81,self.MODE,self.URL,self.LRL,self.VPW,self.APW,self.VA,self.AA,self.VS,self.AS,self.VRP,self.ARP,self.FIXED_AV_DELAY,self.ACT_THRESHOLD,self.REACTION_TIME,self.RESPONSE_FACTOR,self.RECOVERY_TIME,self.MAX_SENSE_RATE)
         self.unpacked = struct.unpack('<BBBIIBBffffIIIBBBBB', self.packed)
@@ -189,6 +190,9 @@ class Mode():
         fromSim = struct.unpack('<BIIBBffffIIIBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB', read)
         print(fromSim)
 
+        serial.ser.flushInput()
+        serial.ser.read_all()
+        serial.ser.flushOutput()
         serial.ser.close()
 
         return fromSim

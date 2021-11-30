@@ -2,6 +2,16 @@ from loginPage import *
 from pacemakerModes import *
 from paramChecking import *
 from serialcom import*
+from tkinter import *
+import serial
+import struct
+import random
+import numpy as np
+from itertools import count
+import pandas as pd
+import matplotlib.pyplot as plt
+from matplotlib.animation import FuncAnimation
+from time import sleep
 
 class pmParams:
     def __init__(self, parent, *args, **kwargs):
@@ -15,7 +25,7 @@ class pmParams:
 
         # displays current mode name
         self.verify = Label(self.pmParams, text="Current Pacemaker Settings")
-        self.verify.grid(row=0, column=2,)
+        self.verify.grid(row=0, column=2)
 
         # initialize pacemaker mode windows
         self.mode_frame = Frame(self.pmParams)
@@ -40,20 +50,86 @@ class pmParams:
         pm_modes.menu = Menu(pm_modes, tearoff=0)
         pm_modes["menu"] = pm_modes.menu
 
-        pm_modes.menu.add_command(label="AOO", command=self.set_mode_AOO)
-        pm_modes.menu.add_command(label="VOO", command=self.set_mode_VOO)
-        pm_modes.menu.add_command(label="AAI", command=self.set_mode_AAI)
-        pm_modes.menu.add_command(label="VVI", command=self.set_mode_VVI)
-        pm_modes.menu.add_command(label="DOO", command=self.set_mode_DOO)
-        pm_modes.menu.add_command(label="AOOR", command=self.set_mode_AOOR)
-        pm_modes.menu.add_command(label="VOOR", command=self.set_mode_VOOR)
-        pm_modes.menu.add_command(label="AAIR", command=self.set_mode_AAIR)
-        pm_modes.menu.add_command(label="VVIR", command=self.set_mode_VVIR)
-        pm_modes.menu.add_command(label="DOOR", command=self.set_mode_DOOR)
+        pm_modes.menu.add_command(label="AOO (2)", command=self.set_mode_AOO)
+        pm_modes.menu.add_command(label="VOO (1)", command=self.set_mode_VOO)
+        pm_modes.menu.add_command(label="AAI (4)", command=self.set_mode_AAI)
+        pm_modes.menu.add_command(label="VVI (3)", command=self.set_mode_VVI)
+        pm_modes.menu.add_command(label="DOO (5)", command=self.set_mode_DOO)
+        pm_modes.menu.add_command(label="AOOR (7)", command=self.set_mode_AOOR)
+        pm_modes.menu.add_command(label="VOOR (6)", command=self.set_mode_VOOR)
+        pm_modes.menu.add_command(label="AAIR (9)", command=self.set_mode_AAIR)
+        pm_modes.menu.add_command(label="VVIR (8)", command=self.set_mode_VVIR)
+        pm_modes.menu.add_command(label="DOOR (10)", command=self.set_mode_DOOR)
 
         pm_modes.grid(row=0, column=0, pady=2)
 
+        Button(self.pmParams, text="Atrial ECG", command= None).grid(row=2,column=3)
+        Button(self.pmParams, text="Ventrical ECG", command= None).grid(row=3,column=3)
+        Button(self.pmParams, text="Atrial & Ventrical ECG", command= self.AVEcg).grid(row=4,column=3)
+
         self.pmParams.grid(row=1, column=0, sticky = W, pady = 5)
+
+    def AVEcg(self):
+
+        self.serial.ser.open()
+        self.serial.ser.read_all()
+        self.serial.ser.flushInput()
+        self.serial.ser.flushOutput()
+
+        print("ser: " + str(self.serial.ser.in_waiting))
+        print()
+        arr = []
+        arr2 = []
+
+
+        packed = struct.pack('<BBBIIBBffffIIIBBBBB',34,14,1,1,1,1,1,1.0,1.0,1.0,1.0,1,1,1,1,1,1,1,1)
+        self.serial.ser.write(packed)
+
+        print("opened")
+        count = 0
+        sleep(0.1)
+
+
+        while(count<=100):
+            
+            read = self.serial.ser.read(160)
+            fromSim = struct.unpack('ffffffffffffffffffffffffffffffffffffffff', read)
+            print(fromSim)
+            print("ser: " + str(self.serial.ser.in_waiting))
+            #avg = sum(fromSim[0:19])/20
+            #avg2 = sum(fromSim[20:39])/20
+
+            arr.extend(fromSim[0:19]) 
+            arr2.extend(fromSim[20:39])
+            
+            count+=1
+            print() 
+            sleep(0.02)
+
+
+        packed = struct.pack('<BBBIIBBffffIIIBBBBB',34,49,1,1,1,1,1,1.0,1.0,1.0,1.0,1,1,1,1,1,1,1,1)
+        self.serial.ser.write(packed)
+
+        plt.style.use('fivethirtyeight')
+
+        x_vals = np.arange(0, 1919)
+        y_vals = arr
+        y_vals2 = arr2
+
+
+        plt.plot(x_vals, y_vals, label='Ventrical Signal')
+        plt.plot(x_vals, y_vals2, label='Atrial Signal')
+
+
+        plt.legend(loc='upper left')
+        plt.tight_layout()
+        plt.show()
+
+        self.serial.ser.read_all()
+        self.serial.ser.flushInput()
+        self.serial.ser.flushOutput()
+        self.serial.ser.close()
+        
 
     # AOO MODE PARAMETERS
     def set_mode_AOO(self):
@@ -90,7 +166,7 @@ class pmParams:
         Label(self.AOO_mode, text="Upper Rate Limit (ppm): ").grid(row=2, column=2, padx=85, pady=2)
         Label(self.AOO_mode, text="Atrial Amplitude (V): ").grid(row=3, column=2, padx=85, pady=2)
         Label(self.AOO_mode, text="Atrial Pulse Width (ms): ").grid(row=4, column=2, padx=85, pady=2)
-        Button(self.AOO_mode, text="Get Current Settings", padx=20, pady=10, command = None).grid(row=5, column=3, pady=2)
+        Button(self.AOO_mode, text="Get Current Settings", padx=20, pady=10, command = self.echo_AOO).grid(row=5, column=3, pady=2)
 
     def send_AOO(self, lrl, url, aa, apw):
         mode = Mode(self.userName, 2)
@@ -138,33 +214,37 @@ class pmParams:
         except Exception as e:
             print(f"EXCEPTION: {e}")
             self.message.destroy()
-            self.message = Label(self.AOO_mode, text="Update Failed: \nPlease use floats for atrial amplitude\n"
-                                                "Please use integers for all other values", font=("Calibri", 15), fg="red")
+            self.message = Label(self.AOO_mode, 
+                                 text="Update Failed: \nPlease use floats for ventricular amplitude/sensitivity\n"
+                                      "Please use integers for all other values\n"
+                                      "Make sure you have connected to the UART COM", font=("Calibri", 15), fg="red")
             self.message.grid(row=6, columnspan=2, pady=15)
 
-    '''def echo_AOO(self):
+    def echo_AOO(self):
+        self.serial.ser.open()
+        self.serial.ser.flushInput()
+        self.serial.ser.flushOutput()
+        packed = struct.pack('<BBBIIBBffffIIIBBBBB',34,45,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0)
+        self.serial.ser.write(packed)
+        unpacked = struct.unpack('<BBBIIBBffffIIIBBBBB', packed)
+        print(unpacked)
 
-        serial.ser.open()
-        serial.ser.flushInput()
-        serial.ser.flushOutput()
-        self.packed = struct.pack('<BBBIIBBffffIIIBBBBB',34,81,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0)
-        self.unpacked = struct.unpack('<BBBIIBBffffIIIBBBBB', self.packed)
         sleep(1)
-        print("In waiting: " + str(serial.ser.in_waiting))
-        read = serial.ser.read(160)
+        print("In waiting: " + str(self.serial.ser.in_waiting))
+        read = self.serial.ser.read(160)
         print(read)
         fromSim = struct.unpack('<BIIBBffffIIIBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB', read)
         print(fromSim)
 
-        serial.ser.close()
+        self.serial.ser.close()
 
         Label(self.AOO_mode, text= fromSim[2]).grid(row=1, column=3,  pady=2)
         Label(self.AOO_mode, text= fromSim[1]).grid(row=2, column=3,  pady=2)
         Label(self.AOO_mode, text= fromSim[6]).grid(row=3, column=3,  pady=2)
-        Label(self.AOO_mode, text= fromSim[4]).grid(row=4, column=3,  pady=2)'''
+        Label(self.AOO_mode, text= fromSim[4]).grid(row=4, column=3,  pady=2)
+        Label(self.AOO_mode, text= "Current Mode number: " + str(fromSim[0])).grid(row=5, column=2,  pady=2)
 
-        
-
+    
 
     # VOO MODE PARAMETERS
     def set_mode_VOO(self):
@@ -202,7 +282,7 @@ class pmParams:
         Label(self.VOO_mode, text="Upper Rate Limit (ppm): ").grid(row=2, column=2, padx=85, pady=2)
         Label(self.VOO_mode, text="Ventrical Amplitude (V): ").grid(row=3, column=2, padx=85, pady=2)
         Label(self.VOO_mode, text="Ventrical Pulse Width (ms): ").grid(row=4, column=2, padx=85, pady=2)
-        Button(self.VOO_mode, text="Get Current Settings", padx=20, pady=10, command = None).grid(row=5, column=3, pady=2)
+        Button(self.VOO_mode, text="Get Current Settings", padx=20, pady=10, command = self.echo_VOO).grid(row=5, column=3, pady=2)
 
     def send_VOO(self, lrl, url, va, vpw):
         mode = Mode(self.userName, 1)
@@ -230,16 +310,16 @@ class pmParams:
                 mode.set_VA(float(va.get()))
                 mode.set_VPW(int(vpw.get()))
                 mode.write_params(self.serial)
-                mode.read_echo(self.serial)
+                echoFromSim = mode.read_echo(self.serial)
 
                 self.message.destroy()
                 self.message = Label(self.VOO_mode, text="Update Success!", font=("Calibri", 25), fg="green")
                 self.message.grid(row=6, columnspan=2, pady=15)
 
-                Label(self.VOO_mode, text="BLAH ").grid(row=1, column=3,  pady=2)
-                Label(self.VOO_mode, text="BLAH ").grid(row=2, column=3,  pady=2)
-                Label(self.VOO_mode, text="BLAH ").grid(row=3, column=3,  pady=2)
-                Label(self.VOO_mode, text="BLAH ").grid(row=4, column=3,  pady=2)
+                Label(self.VOO_mode, text= echoFromSim[2]).grid(row=1, column=3,  pady=2)
+                Label(self.VOO_mode, text= echoFromSim[1]).grid(row=2, column=3,  pady=2)
+                Label(self.VOO_mode, text= echoFromSim[5]).grid(row=3, column=3,  pady=2)
+                Label(self.VOO_mode, text= echoFromSim[3]).grid(row=4, column=3,  pady=2)
 
             else:
                 self.message.destroy()
@@ -251,9 +331,35 @@ class pmParams:
             print(f"EXCEPTION: {e}")
             self.message.destroy()
             self.message = Label(self.VOO_mode,
-                                 text="Update Failed: \nPlease use floats for ventricular amplitude\n"
-                                      "Please use integers for all other values", font=("Calibri", 15), fg="red")
+                                 text="Update Failed: \nPlease use floats for ventricular amplitude/sensitivity\n"
+                                      "Please use integers for all other values\n"
+                                      "Make sure you have connected to the UART COM", font=("Calibri", 15), fg="red")
             self.message.grid(row=6, columnspan=2, pady=15)
+
+    def echo_VOO(self):
+        self.serial.ser.open()
+        self.serial.ser.flushInput()
+        self.serial.ser.flushOutput()
+        packed = struct.pack('<BBBIIBBffffIIIBBBBB',34,45,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0)
+        self.serial.ser.write(packed)
+        unpacked = struct.unpack('<BBBIIBBffffIIIBBBBB', packed)
+        print(unpacked)
+
+        sleep(1)
+        print("In waiting: " + str(self.serial.ser.in_waiting))
+        read = self.serial.ser.read(160)
+        print(read)
+        fromSim = struct.unpack('<BIIBBffffIIIBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB', read)
+        print(fromSim)
+
+        self.serial.ser.close()
+
+        Label(self.VOO_mode, text= fromSim[2]).grid(row=1, column=3,  pady=2)
+        Label(self.VOO_mode, text= fromSim[1]).grid(row=2, column=3,  pady=2)
+        Label(self.VOO_mode, text= fromSim[5]).grid(row=3, column=3,  pady=2)
+        Label(self.VOO_mode, text= fromSim[3]).grid(row=4, column=3,  pady=2)
+        Label(self.VOO_mode, text= "Current Mode number: " + str(fromSim[0])).grid(row=5, column=2,  pady=2)
+        
 
     # AAI MODE PARAMETERS
     def set_mode_AAI(self):
@@ -295,7 +401,7 @@ class pmParams:
         Label(self.AAI_mode, text="Post VARP (ms): ").grid(row=7, column=0,pady=2)
         enter_pvarp = Entry(self.AAI_mode, textvariable=pvarp).grid(row=7, column=1)
 
-        Button(self.AAI_mode, text="Update", padx=20, pady=10, command=lambda:
+        Button(self.AAI_mode, text="Update", padx=20, pady=10, command=lambda: 
         self.send_AAI(lrl, url, aa, apw, arp, sense, pvarp)).grid(row=8, column=1, pady=20)
 
         Label(self.AAI_mode, text="Lower Rate Limit (ppm): ").grid(row=1, column=2, padx=85, pady=2)
@@ -305,7 +411,7 @@ class pmParams:
         Label(self.AAI_mode, text="ARP (ms): ").grid(row=5, column=2, padx=85, pady=2)
         Label(self.AAI_mode, text="Atrial Sensitivity (V): ").grid(row=6, column=2, padx=85, pady=2)
         Label(self.AAI_mode, text="Post VARP (ms): ").grid(row=7, column=2, padx=85, pady=2)
-        Button(self.AAI_mode, text="Get Current Settings", padx=20, pady=10, command = None).grid(row=8, column=3, pady=2)
+        Button(self.AAI_mode, text="Get Current Settings", padx=20, pady=10, command = self.echo_AAI).grid(row=8, column=3, pady=2)
         
 
     def send_AAI(self, lrl, url, aa, apw, arp, sense, pvarp):
@@ -343,22 +449,21 @@ class pmParams:
                 mode.set_AS(float(sense.get()))
                 mode.set_PVARP(int(pvarp.get()))
                 mode.write_params(self.serial)
-                mode.read_echo(self.serial)
+                echoFromSim = mode.read_echo(self.serial)
 
                 self.message.destroy()
                 self.message = Label(self.AAI_mode, text="Update Success!", font=("Calibri", 25), fg="green")
                 self.message.grid(row=9, columnspan=2, pady=15)
 
-                Label(self.AAI_mode, text="BLAH ").grid(row=1, column=3,  pady=2)
-                Label(self.AAI_mode, text="BLAH ").grid(row=2, column=3,  pady=2)
-                Label(self.AAI_mode, text="BLAH ").grid(row=3, column=3,  pady=2)
-                Label(self.AAI_mode, text="BLAH ").grid(row=4, column=3,  pady=2)
-                Label(self.AAI_mode, text="BLAH ").grid(row=5, column=3,  pady=2)
-                Label(self.AAI_mode, text="BLAH ").grid(row=6, column=3,  pady=2)
-                Label(self.AAI_mode, text="BLAH ").grid(row=7, column=3,  pady=2)
-                Button(self.AAI_mode, text="Get Current Settings", padx=20, pady=10, command = None).grid(row=8, column=3, pady=2)
+                Label(self.AAI_mode, text= echoFromSim[2]).grid(row=1, column=3,  pady=2)
+                Label(self.AAI_mode, text= echoFromSim[1]).grid(row=2, column=3,  pady=2)
+                Label(self.AAI_mode, text= echoFromSim[6]).grid(row=3, column=3,  pady=2)
+                Label(self.AAI_mode, text= echoFromSim[4]).grid(row=4, column=3,  pady=2)
+                Label(self.AAI_mode, text= echoFromSim[10]).grid(row=5, column=3,  pady=2)
+                Label(self.AAI_mode, text= echoFromSim[8]).grid(row=6, column=3,  pady=2)
+                Label(self.AAI_mode, text= "").grid(row=7, column=3,  pady=2)
+            
                 
-
             else:
                 self.message.destroy()
                 self.message = Label(self.AAI_mode, text=f"Update Failed: \n {errormsg}", font=("Calibri", 15),
@@ -369,9 +474,37 @@ class pmParams:
             print(f"EXCEPTION: {e}")
             self.message.destroy()
             self.message = Label(self.AAI_mode,
-                                 text="Update Failed: \nPlease use floats for atrial amplitude/sensitivity\n"
-                                      "Please use integers for all other values", font=("Calibri", 15), fg="red")
+                                 text="Update Failed: \nPlease use floats for ventricular amplitude/sensitivity\n"
+                                      "Please use integers for all other values\n"
+                                      "Make sure you have connected to the UART COM", font=("Calibri", 15), fg="red")
             self.message.grid(row=9, columnspan=2, pady=15)
+
+    def echo_AAI(self):
+        self.serial.ser.open()
+        self.serial.ser.flushInput()
+        self.serial.ser.flushOutput()
+        packed = struct.pack('<BBBIIBBffffIIIBBBBB',34,45,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0)
+        self.serial.ser.write(packed)
+        unpacked = struct.unpack('<BBBIIBBffffIIIBBBBB', packed)
+        print(unpacked)
+
+        sleep(1)
+        print("In waiting: " + str(self.serial.ser.in_waiting))
+        read = self.serial.ser.read(160)
+        print(read)
+        fromSim = struct.unpack('<BIIBBffffIIIBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB', read)
+        print(fromSim)
+
+        self.serial.ser.close()
+
+        Label(self.AAI_mode, text= fromSim[2]).grid(row=1, column=3,  pady=2)
+        Label(self.AAI_mode, text= fromSim[1]).grid(row=2, column=3,  pady=2)
+        Label(self.AAI_mode, text= fromSim[6]).grid(row=3, column=3,  pady=2)
+        Label(self.AAI_mode, text= fromSim[4]).grid(row=4, column=3,  pady=2)
+        Label(self.AAI_mode, text= fromSim[10]).grid(row=5, column=3,  pady=2)
+        Label(self.AAI_mode, text= fromSim[8]).grid(row=6, column=3,  pady=2)
+        Label(self.AAI_mode, text= "").grid(row=7, column=3,  pady=2)
+        Label(self.AAI_mode, text= "Current Mode number: " + str(fromSim[0])).grid(row=8, column=2,  pady=2)
 
     # VVI MODE PARAMETERS
     def set_mode_VVI(self):
@@ -419,7 +552,7 @@ class pmParams:
         Label(self.VVI_mode, text="Ventricular Pulse Width (ms): ").grid(row=4, column=2, padx=85, pady=2)
         Label(self.VVI_mode, text="VRP (ms): ").grid(row=5, column=2, padx=85, pady=2)
         Label(self.VVI_mode, text="Ventricular Sensitivity (V): ").grid(row=6, column=2, padx=85, pady=2)
-        Button(self.VVI_mode, text="Get Current Settings", padx=20, pady=10, command = None).grid(row=7, column=3, pady=2)
+        Button(self.VVI_mode, text="Get Current Settings", padx=20, pady=10, command = self.echo_VVI).grid(row=7, column=3, pady=2)
 
     def send_VVI(self, lrl, url, va, vpw, vrp, sense):
         mode = Mode(self.userName, 3)
@@ -454,18 +587,19 @@ class pmParams:
                 mode.set_VRP(int(vrp.get()))
                 mode.set_VS(float(sense.get()))
                 mode.write_params(self.serial)
-                mode.read_echo(self.serial)
+                echoFromSim = mode.read_echo(self.serial)
 
                 self.message.destroy()
                 self.message = Label(self.VVI_mode, text="Update Success!", font=("Calibri", 25), fg="green")
                 self.message.grid(row=8, columnspan=2, pady=15)
 
-                Label(self.VVI_mode, text="BLAH ").grid(row=1, column=3,  pady=2)
-                Label(self.VVI_mode, text="BLAH ").grid(row=2, column=3,  pady=2)
-                Label(self.VVI_mode, text="BLAH ").grid(row=3, column=3,  pady=2)
-                Label(self.VVI_mode, text="BLAH ").grid(row=4, column=3,  pady=2)
-                Label(self.VVI_mode, text="BLAH ").grid(row=5, column=3,  pady=2)
-                Label(self.VVI_mode, text="BLAH ").grid(row=6, column=3,  pady=2)
+                Label(self.VVI_mode, text= echoFromSim[2]).grid(row=1, column=3,  pady=2)
+                Label(self.VVI_mode, text= echoFromSim[1]).grid(row=2, column=3,  pady=2)
+                Label(self.VVI_mode, text= echoFromSim[5]).grid(row=3, column=3,  pady=2)
+                Label(self.VVI_mode, text= echoFromSim[3]).grid(row=4, column=3,  pady=2)
+                Label(self.VVI_mode, text= echoFromSim[9]).grid(row=5, column=3,  pady=2)
+                Label(self.VVI_mode, text= echoFromSim[7]).grid(row=6, column=3,  pady=2)
+                Button(self.VVI_mode, text="Get Current Settings", padx=20, pady=10, command = self.echo_VVI).grid(row=8, column=3, pady=2)
 
             else:
                 self.message.destroy()
@@ -477,8 +611,35 @@ class pmParams:
             self.message.destroy()
             self.message = Label(self.VVI_mode,
                                  text="Update Failed: \nPlease use floats for ventricular amplitude/sensitivity\n"
-                                      "Please use integers for all other values", font=("Calibri", 15), fg="red")
+                                      "Please use integers for all other values\n"
+                                      "Make sure you have connected to the UART COM", font=("Calibri", 15), fg="red")
             self.message.grid(row=8, columnspan=2, pady=15)
+
+    def echo_VVI(self):
+        self.serial.ser.open()
+        self.serial.ser.flushInput()
+        self.serial.ser.flushOutput()
+        packed = struct.pack('<BBBIIBBffffIIIBBBBB',34,45,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0)
+        self.serial.ser.write(packed)
+        unpacked = struct.unpack('<BBBIIBBffffIIIBBBBB', packed)
+        print(unpacked)
+
+        sleep(1)
+        print("In waiting: " + str(self.serial.ser.in_waiting))
+        read = self.serial.ser.read(160)
+        print(read)
+        fromSim = struct.unpack('<BIIBBffffIIIBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB', read)
+        print(fromSim)
+
+        self.serial.ser.close()
+
+        Label(self.VVI_mode, text= fromSim[2]).grid(row=1, column=3,  pady=2)
+        Label(self.VVI_mode, text= fromSim[1]).grid(row=2, column=3,  pady=2)
+        Label(self.VVI_mode, text= fromSim[5]).grid(row=3, column=3,  pady=2)
+        Label(self.VVI_mode, text= fromSim[3]).grid(row=4, column=3,  pady=2)
+        Label(self.VVI_mode, text= fromSim[9]).grid(row=5, column=3,  pady=2)
+        Label(self.VVI_mode, text= fromSim[7]).grid(row=6, column=3,  pady=2)
+        Label(self.vvI_mode, text= "Current Mode number: " + str(fromSim[0])).grid(row=7, column=2,  pady=2)
 
     # DOO MODE PARAMETERS
     def set_mode_DOO(self):
@@ -531,7 +692,7 @@ class pmParams:
         Label(self.DOO_mode, text="Ventricular Amplitude (V): ").grid(row=5, column=2, padx=85, pady=2)
         Label(self.DOO_mode, text="Ventricular Pulse Width (ms): ").grid(row=6, column=2, padx=85, pady=2)
         Label(self.DOO_mode, text="Fixed AV Delay(ms): ").grid(row=7, column=2, padx=85, pady=2)
-        Button(self.DOO_mode, text="Get Current Settings", padx=20, pady=10, command = None).grid(row=8, column=3, pady=2)
+        Button(self.DOO_mode, text="Get Current Settings", padx=20, pady=10, command = self.echo_DOO).grid(row=8, column=3, pady=2)
         
 
     # DOO PARAMETERS
@@ -570,19 +731,19 @@ class pmParams:
                 mode.set_APW(int(apw.get()))
                 mode.set_FIXED_AV_DELAY(int(av.get()))
                 mode.write_params(self.serial)
-                mode.read_echo(self.serial)
+                echoFromSim = mode.read_echo(self.serial)
 
                 self.message.destroy()
                 self.message = Label(self.DOO_mode, text="Update Success!", font=("Calibri", 25), fg="green")
                 self.message.grid(row=9, columnspan=2, pady=15)
-
-                Label(self.DOO_mode, text="BLAH ").grid(row=1, column=3,  pady=2)
-                Label(self.DOO_mode, text="BLAH ").grid(row=2, column=3,  pady=2)
-                Label(self.DOO_mode, text="BLAH ").grid(row=3, column=3,  pady=2)
-                Label(self.DOO_mode, text="BLAH ").grid(row=4, column=3,  pady=2)
-                Label(self.DOO_mode, text="BLAH ").grid(row=5, column=3,  pady=2)
-                Label(self.DOO_mode, text="BLAH ").grid(row=6, column=3,  pady=2)
-                Label(self.DOO_mode, text="BLAH ").grid(row=7, column=3,  pady=2)
+                
+                Label(self.DOO_mode, text= echoFromSim[2]).grid(row=1, column=3,  pady=2)
+                Label(self.DOO_mode, text= echoFromSim[1]).grid(row=2, column=3,  pady=2)
+                Label(self.DOO_mode, text= echoFromSim[6]).grid(row=3, column=3,  pady=2)
+                Label(self.DOO_mode, text= echoFromSim[4]).grid(row=4, column=3,  pady=2)
+                Label(self.DOO_mode, text= echoFromSim[5]).grid(row=5, column=3,  pady=2)
+                Label(self.DOO_mode, text= echoFromSim[3]).grid(row=6, column=3,  pady=2)
+                Label(self.DOO_mode, text= echoFromSim[11]).grid(row=7, column=3,  pady=2)
             else:
                 self.message.destroy()
                 self.message = Label(self.DOO_mode, text=f"Update Failed: \n {errormsg}", font=("Calibri", 15), fg="red")
@@ -592,9 +753,37 @@ class pmParams:
             print(f"EXCEPTION: {e}")
             self.message.destroy()
             self.message = Label(self.DOO_mode,
-                                 text="Update Failed: \nPlease use floats for ventricular/atrial amplitude\n"
-                                      "Please use integers for all other values", font=("Calibri", 15), fg="red")
+                                 text="Update Failed: \nPlease use floats for ventricular amplitude/sensitivity\n"
+                                      "Please use integers for all other values\n"
+                                      "Make sure you have connected to the UART COM", font=("Calibri", 15), fg="red")
             self.message.grid(row=9, columnspan=2, pady=15)
+    
+    def echo_DOO(self):
+        self.serial.ser.open()
+        self.serial.ser.flushInput()
+        self.serial.ser.flushOutput()
+        packed = struct.pack('<BBBIIBBffffIIIBBBBB',34,45,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0)
+        self.serial.ser.write(packed)
+        unpacked = struct.unpack('<BBBIIBBffffIIIBBBBB', packed)
+        print(unpacked)
+
+        sleep(1)
+        print("In waiting: " + str(self.serial.ser.in_waiting))
+        read = self.serial.ser.read(160)
+        print(read)
+        fromSim = struct.unpack('<BIIBBffffIIIBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB', read)
+        print(fromSim)
+
+        self.serial.ser.close()
+
+        Label(self.DOO_mode, text= fromSim[2]).grid(row=1, column=3,  pady=2)
+        Label(self.DOO_mode, text= fromSim[1]).grid(row=2, column=3,  pady=2)
+        Label(self.DOO_mode, text= fromSim[6]).grid(row=3, column=3,  pady=2)
+        Label(self.DOO_mode, text= fromSim[4]).grid(row=4, column=3,  pady=2)
+        Label(self.DOO_mode, text= fromSim[5]).grid(row=5, column=3,  pady=2)
+        Label(self.DOO_mode, text= fromSim[3]).grid(row=6, column=3,  pady=2)
+        Label(self.DOO_mode, text= fromSim[11]).grid(row=7, column=3,  pady=2)
+        Label(self.DOO_mode, text= "Current Mode number: " + str(fromSim[0])).grid(row=8, column=2,  pady=2)
 
     # AOOR MODE PARAMETERS
     def set_mode_AOOR(self):
@@ -633,7 +822,7 @@ class pmParams:
         Label(self.AOOR_mode, text="Max Sensor Rate (ppm): ").grid(row=5, column=0, pady=2)
         enter_max = Entry(self.AOOR_mode, textvariable=max).grid(row=5, column=1)
 
-        thresh_vals = ("V-Low", "Low", "Med-Low", "Med", "Med-High", "High", "V-High")
+        thresh_vals = ("V-Low (1)", "Low (2)", "Med-Low (3)", "Med (4)", "Med-High (5)", "High (6)", "V-High (7)")
         Label(self.AOOR_mode, text="Activity Threshold : ").grid(row=6, column=0, pady=2)
         enter_threshold = Spinbox(self.AOOR_mode, values=thresh_vals, state="readonly", textvariable=threshold).grid(row=6, column=1)
 
@@ -659,7 +848,7 @@ class pmParams:
         Label(self.AOOR_mode, text="Reaction Time (ms): ").grid(row=7, column=2, padx=85, pady=2)
         Label(self.AOOR_mode, text="Response Factor : ").grid(row=8, column=2, padx=85, pady=2)
         Label(self.AOOR_mode, text="Recovery Time (mins) : ").grid(row=9, column=2, padx=85, pady=2)
-        Button(self.AOOR_mode, text="Get Current Settings", padx=20, pady=10, command = None).grid(row=10, column=3, pady=2)
+        Button(self.AOOR_mode, text="Get Current Settings", padx=20, pady=10, command = self.echo_AOOR).grid(row=10, column=3, pady=2)
 
     def send_AOOR(self, lrl, url, aa, apw, max, threshold, rxn, response, recovery):
         mode = Mode(self.userName, 7)
@@ -700,21 +889,21 @@ class pmParams:
                 mode.set_RESPONSE_FACTOR(int(response.get()))
                 mode.set_RECOVERY_TIME(int(recovery.get()))
                 mode.write_params(self.serial)
-                mode.read_echo(self.serial)
+                echoFromSim = mode.read_echo(self.serial)
 
                 self.message.destroy()
                 self.message = Label(self.AOOR_mode, text="Update Success!", font=("Calibri", 25), fg="green")
                 self.message.grid(row=11, columnspan=2, pady=15)
 
-                Label(self.AOOR_mode, text="BLAH ").grid(row=1, column=3,  pady=2)
-                Label(self.AOOR_mode, text="BLAH ").grid(row=2, column=3,  pady=2)
-                Label(self.AOOR_mode, text="BLAH ").grid(row=3, column=3,  pady=2)
-                Label(self.AOOR_mode, text="BLAH ").grid(row=4, column=3,  pady=2)
-                Label(self.AOOR_mode, text="BLAH ").grid(row=5, column=3,  pady=2)
-                Label(self.AOOR_mode, text="BLAH ").grid(row=6, column=3,  pady=2)
-                Label(self.AOOR_mode, text="BLAH ").grid(row=7, column=3,  pady=2)
-                Label(self.AOOR_mode, text="BLAH ").grid(row=8, column=3,  pady=2)
-                Label(self.AOOR_mode, text="BLAH ").grid(row=9, column=3,  pady=2)
+                Label(self.AOOR_mode, text= echoFromSim[2]).grid(row=1, column=3,  pady=2)
+                Label(self.AOOR_mode, text= echoFromSim[1]).grid(row=2, column=3,  pady=2)
+                Label(self.AOOR_mode, text= echoFromSim[6]).grid(row=3, column=3,  pady=2)
+                Label(self.AOOR_mode, text= echoFromSim[4]).grid(row=4, column=3,  pady=2)
+                Label(self.AOOR_mode, text= echoFromSim[16]).grid(row=5, column=3,  pady=2)
+                Label(self.AOOR_mode, text= echoFromSim[12]).grid(row=6, column=3,  pady=2)
+                Label(self.AOOR_mode, text= echoFromSim[13]).grid(row=7, column=3,  pady=2)
+                Label(self.AOOR_mode, text= echoFromSim[14]).grid(row=8, column=3,  pady=2)
+                Label(self.AOOR_mode, text= echoFromSim[15]).grid(row=9, column=3,  pady=2)
 
             else:
                 self.message.destroy()
@@ -724,9 +913,40 @@ class pmParams:
         except Exception as e:
             print(f"EXCEPTION: {e}")
             self.message.destroy()
-            self.message = Label(self.AOOR_mode, text="Update Failed: \nPlease use floats for atrial amplitude\n"
-                                                "Please use integers for all other values", font=("Calibri", 15), fg="red")
+            self.message = Label(self.AOOR_mode, 
+                                 text="Update Failed: \nPlease use floats for ventricular amplitude/sensitivity\n"
+                                      "Please use integers for all other values\n"
+                                      "Make sure you have connected to the UART COM", font=("Calibri", 15), fg="red")
             self.message.grid(row=11, columnspan=2, pady=15)
+
+    def echo_AOOR(self):
+        self.serial.ser.open()
+        self.serial.ser.flushInput()
+        self.serial.ser.flushOutput()
+        packed = struct.pack('<BBBIIBBffffIIIBBBBB',34,45,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0)
+        self.serial.ser.write(packed)
+        unpacked = struct.unpack('<BBBIIBBffffIIIBBBBB', packed)
+        print(unpacked)
+
+        sleep(1)
+        print("In waiting: " + str(self.serial.ser.in_waiting))
+        read = self.serial.ser.read(160)
+        print(read)
+        fromSim = struct.unpack('<BIIBBffffIIIBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB', read)
+        print(fromSim)
+
+        self.serial.ser.close()
+
+        Label(self.AOOR_mode, text= fromSim[2]).grid(row=1, column=3,  pady=2)
+        Label(self.AOOR_mode, text= fromSim[1]).grid(row=2, column=3,  pady=2)
+        Label(self.AOOR_mode, text= fromSim[6]).grid(row=3, column=3,  pady=2)
+        Label(self.AOOR_mode, text= fromSim[4]).grid(row=4, column=3,  pady=2)
+        Label(self.AOOR_mode, text= fromSim[16]).grid(row=5, column=3,  pady=2)
+        Label(self.AOOR_mode, text= fromSim[12]).grid(row=6, column=3,  pady=2)
+        Label(self.AOOR_mode, text= fromSim[13]).grid(row=7, column=3,  pady=2)
+        Label(self.AOOR_mode, text= fromSim[14]).grid(row=8, column=3,  pady=2)
+        Label(self.AOOR_mode, text= fromSim[15]).grid(row=9, column=3,  pady=2)
+        Label(self.AOOR_mode, text= "Current Mode number: " + str(fromSim[0])).grid(row=10, column=2,  pady=2)
 
     # VOOR MODE PARAMETERS
     def set_mode_VOOR(self):
@@ -765,7 +985,7 @@ class pmParams:
         Label(self.VOOR_mode, text="Max Sensor Rate (ppm): ").grid(row=5, column=0, pady=2)
         enter_max = Entry(self.VOOR_mode, textvariable=max).grid(row=5, column=1)
 
-        thresh_vals = ("V-Low", "Low", "Med-Low", "Med", "Med-High", "High", "V-High")
+        thresh_vals = ("V-Low (1)", "Low (2)", "Med-Low (3)", "Med (4)", "Med-High (5)", "High (6)", "V-High (7)")
         Label(self.VOOR_mode, text="Activity Threshold : ").grid(row=6, column=0,pady=2)
         enter_threshold = Spinbox(self.VOOR_mode, values=thresh_vals, state="readonly", textvariable=threshold).grid(
             row=6, column=1)
@@ -792,7 +1012,7 @@ class pmParams:
         Label(self.VOOR_mode, text="Reaction Time (ms): ").grid(row=7, column=2, padx=85, pady=2)
         Label(self.VOOR_mode, text="Response Factor : ").grid(row=8, column=2, padx=85, pady=2)
         Label(self.VOOR_mode, text="Recovery Time (mins) : ").grid(row=9, column=2, padx=85, pady=2)
-        Button(self.VOOR_mode, text="Get Current Settings", padx=20, pady=10, command = None).grid(row=10, column=3, pady=2)
+        Button(self.VOOR_mode, text="Get Current Settings", padx=20, pady=10, command = self.echo_VOOR).grid(row=10, column=3, pady=2)
 
     def send_VOOR(self, lrl, url, va, vpw, max, threshold, rxn, response, recovery):
         mode = Mode(self.userName, 6)
@@ -833,21 +1053,22 @@ class pmParams:
                 mode.set_RESPONSE_FACTOR(int(response.get()))
                 mode.set_RECOVERY_TIME(int(recovery.get()))
                 mode.write_params(self.serial)
-                mode.read_echo(self.serial)
+                echoFromSim = mode.read_echo(self.serial)
 
                 self.message.destroy()
                 self.message = Label(self.VOOR_mode, text="Update Success!", font=("Calibri", 25), fg="green")
                 self.message.grid(row=11, columnspan=2, pady=15)
 
-                Label(self.VOOR_mode, text="BLAH ").grid(row=1, column=3,  pady=2)
-                Label(self.VOOR_mode, text="BLAH ").grid(row=2, column=3,  pady=2)
-                Label(self.VOOR_mode, text="BLAH ").grid(row=3, column=3,  pady=2)
-                Label(self.VOOR_mode, text="BLAH ").grid(row=4, column=3,  pady=2)
-                Label(self.VOOR_mode, text="BLAH ").grid(row=5, column=3,  pady=2)
-                Label(self.VOOR_mode, text="BLAH ").grid(row=6, column=3,  pady=2)
-                Label(self.VOOR_mode, text="BLAH ").grid(row=7, column=3,  pady=2)
-                Label(self.VOOR_mode, text="BLAH ").grid(row=8, column=3,  pady=2)
-                Label(self.VOOR_mode, text="BLAH ").grid(row=9, column=3,  pady=2)
+                Label(self.VOOR_mode, text= echoFromSim[2]).grid(row=1, column=3,  pady=2)
+                Label(self.VOOR_mode, text= echoFromSim[1]).grid(row=2, column=3,  pady=2)
+                Label(self.VOOR_mode, text= echoFromSim[5]).grid(row=3, column=3,  pady=2)
+                Label(self.VOOR_mode, text= echoFromSim[3]).grid(row=4, column=3,  pady=2)
+                Label(self.VOOR_mode, text= echoFromSim[16]).grid(row=5, column=3,  pady=2)
+                Label(self.VOOR_mode, text= echoFromSim[12]).grid(row=6, column=3,  pady=2)
+                Label(self.VOOR_mode, text= echoFromSim[13]).grid(row=7, column=3,  pady=2)
+                Label(self.VOOR_mode, text= echoFromSim[14]).grid(row=8, column=3,  pady=2)
+                Label(self.VOOR_mode, text= echoFromSim[15]).grid(row=9, column=3,  pady=2)
+                
             else:
                 self.message.destroy()
                 self.message = Label(self.VOOR_mode, text=f"Update Failed: \n {errormsg}", font=("Calibri", 15),
@@ -857,10 +1078,40 @@ class pmParams:
         except Exception as e:
             print(f"EXCEPTION: {e}")
             self.message.destroy()
-            self.message = Label(self.VOOR_mode, text="Update Failed: \nPlease use floats for ventricular amplitude\n"
-                                                      "Please use integers for all other values", font=("Calibri", 15),
-                                 fg="red")
+            self.message = Label(self.VOOR_mode, 
+                                 text="Update Failed: \nPlease use floats for ventricular amplitude/sensitivity\n"
+                                      "Please use integers for all other values\n"
+                                      "Make sure you have connected to the UART COM", font=("Calibri", 15), fg="red")
             self.message.grid(row=11, columnspan=2, pady=15)
+    
+    def echo_VOOR(self):
+        self.serial.ser.open()
+        self.serial.ser.flushInput()
+        self.serial.ser.flushOutput()
+        packed = struct.pack('<BBBIIBBffffIIIBBBBB',34,45,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0)
+        self.serial.ser.write(packed)
+        unpacked = struct.unpack('<BBBIIBBffffIIIBBBBB', packed)
+        print(unpacked)
+
+        sleep(1)
+        print("In waiting: " + str(self.serial.ser.in_waiting))
+        read = self.serial.ser.read(160)
+        print(read)
+        fromSim = struct.unpack('<BIIBBffffIIIBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB', read)
+        print(fromSim)
+
+        self.serial.ser.close()
+
+        Label(self.VOOR_mode, text= fromSim[2]).grid(row=1, column=3,  pady=2)
+        Label(self.VOOR_mode, text= fromSim[1]).grid(row=2, column=3,  pady=2)
+        Label(self.VOOR_mode, text= fromSim[5]).grid(row=3, column=3,  pady=2)
+        Label(self.VOOR_mode, text= fromSim[3]).grid(row=4, column=3,  pady=2)
+        Label(self.VOOR_mode, text= fromSim[16]).grid(row=5, column=3,  pady=2)
+        Label(self.VOOR_mode, text= fromSim[12]).grid(row=6, column=3,  pady=2)
+        Label(self.VOOR_mode, text= fromSim[13]).grid(row=7, column=3,  pady=2)
+        Label(self.VOOR_mode, text= fromSim[14]).grid(row=8, column=3,  pady=2)
+        Label(self.VOOR_mode, text= fromSim[15]).grid(row=9, column=3,  pady=2)
+        Label(self.VOOR_mode, text= "Current Mode number: " + str(fromSim[0])).grid(row=10, column=2,  pady=2)
 
     # AAIR MODE PARAMETERS
     def set_mode_AAIR(self):
@@ -905,7 +1156,7 @@ class pmParams:
         Label(self.AAIR_mode, text="Post VARP (ms): ").grid(row=6, column=0, pady=2)
         enter_pvarp = Entry(self.AAIR_mode, textvariable=pvarp).grid(row=6, column=1)
 
-        thresh_vals = ("V-Low", "Low", "Med-Low", "Med", "Med-High", "High", "V-High")
+        thresh_vals = ("V-Low (1)", "Low (2)", "Med-Low (3)", "Med (4)", "Med-High (5)", "High (6)", "V-High (7)")
         Label(self.AAIR_mode, text="Activity Threshold : ").grid(row=7, column=0, pady=2)
         enter_threshold = Spinbox(self.AAIR_mode, values=thresh_vals, state="readonly", textvariable=threshold).grid(
             row=7, column=1)
@@ -935,13 +1186,13 @@ class pmParams:
         Label(self.AAIR_mode, text="Atrial Pulse Width (ms): ").grid(row=4, column=2, padx=85, pady=2)
         Label(self.AAIR_mode, text="ARP (ms): ").grid(row=5, column=2, padx=85, pady=2)
         Label(self.AAIR_mode, text="Post VARP (ms): ").grid(row=6, column=2, padx=85, pady=2)
-        Label(self.AAIR_mode, text="Max Sensor Rate (ppm): ").grid(row=7, column=2, padx=85, pady=2)
-        Label(self.AAIR_mode, text="Activity Threshold : ").grid(row=8, column=2, padx=85, pady=2)
+        Label(self.AAIR_mode, text="Activity Threshold : ").grid(row=7, column=2, padx=85, pady=2)
+        Label(self.AAIR_mode, text="Max Sensor Rate (ppm): ").grid(row=8, column=2, padx=85, pady=2)
         Label(self.AAIR_mode, text="Reaction Time (ms): ").grid(row=9, column=2, padx=85, pady=2)
         Label(self.AAIR_mode, text="Response Factor : ").grid(row=10, column=2, padx=85, pady=2)
         Label(self.AAIR_mode, text="Recovery Time (mins) : ").grid(row=11, column=2, padx=85, pady=2)
         Label(self.AAIR_mode, text="Atrial Sensitivity (V): ").grid(row=12, column=2, padx=85, pady=2)
-        Button(self.AAIR_mode, text="Get Current Settings", padx=20, pady=10, command = None).grid(row=13, column=3, pady=2)
+        Button(self.AAIR_mode, text="Get Current Settings", padx=20, pady=10, command = self.echo_AAIR).grid(row=13, column=3, pady=2)
 
 
     def send_AAIR(self, lrl, url, aa, apw, max, threshold, rxn, response, recovery, arp, pvarp, sense):
@@ -992,24 +1243,25 @@ class pmParams:
                 mode.set_RECOVERY_TIME(int(recovery.get()))
                 mode.set_AS(float(sense.get()))
                 mode.write_params(self.serial)
-                mode.read_echo(self.serial)
+                echoFromSim = mode.read_echo(self.serial)
 
                 self.message.destroy()
                 self.message = Label(self.AAIR_mode, text="Update Success!", font=("Calibri", 25), fg="green")
                 self.message.grid(row=14, columnspan=2, pady=15)
 
-                Label(self.AAIR_mode, text="BLAH ").grid(row=1, column=3,  pady=2)
-                Label(self.AAIR_mode, text="BLAH ").grid(row=2, column=3,  pady=2)
-                Label(self.AAIR_mode, text="BLAH ").grid(row=3, column=3,  pady=2)
-                Label(self.AAIR_mode, text="BLAH ").grid(row=4, column=3,  pady=2)
-                Label(self.AAIR_mode, text="BLAH ").grid(row=5, column=3,  pady=2)
-                Label(self.AAIR_mode, text="BLAH ").grid(row=6, column=3,  pady=2)
-                Label(self.AAIR_mode, text="BLAH ").grid(row=7, column=3,  pady=2)
-                Label(self.AAIR_mode, text="BLAH ").grid(row=8, column=3,  pady=2)
-                Label(self.AAIR_mode, text="BLAH ").grid(row=9, column=3,  pady=2)
-                Label(self.AAIR_mode, text="BLAH ").grid(row=10, column=3,  pady=2)
-                Label(self.AAIR_mode, text="BLAH ").grid(row=11, column=3,  pady=2)
-                Label(self.AAIR_mode, text="BLAH ").grid(row=12, column=3,  pady=2)
+                Label(self.AAIR_mode, text= echoFromSim[2]).grid(row=1, column=3,  pady=2)
+                Label(self.AAIR_mode, text= echoFromSim[1]).grid(row=2, column=3,  pady=2)
+                Label(self.AAIR_mode, text= echoFromSim[6]).grid(row=3, column=3,  pady=2)
+                Label(self.AAIR_mode, text= echoFromSim[4]).grid(row=4, column=3,  pady=2)
+                Label(self.AAIR_mode, text= echoFromSim[10]).grid(row=5, column=3,  pady=2)
+                Label(self.AAIR_mode, text= "").grid(row=6, column=3,  pady=2)
+                Label(self.AAIR_mode, text= echoFromSim[12]).grid(row=7, column=3,  pady=2)
+                Label(self.AAIR_mode, text= echoFromSim[16]).grid(row=8, column=3,  pady=2)
+                Label(self.AAIR_mode, text= echoFromSim[13]).grid(row=9, column=3,  pady=2)
+                Label(self.AAIR_mode, text= echoFromSim[14]).grid(row=10, column=3,  pady=2)
+                Label(self.AAIR_mode, text= echoFromSim[15]).grid(row=11, column=3,  pady=2)
+                Label(self.AAIR_mode, text= echoFromSim[8]).grid(row=12, column=3,  pady=2)
+                
             else:
                 self.message.destroy()
                 self.message = Label(self.AAIR_mode, text=f"Update Failed: \n {errormsg}", font=("Calibri", 15),
@@ -1019,10 +1271,45 @@ class pmParams:
         except Exception as e:
             print(f"EXCEPTION: {e}")
             self.message.destroy()
-            self.message = Label(self.AAIR_mode, text="Update Failed: \nPlease use floats for atrial amplitude/sensitivity\n"
-                                                      "Please use integers for all other values", font=("Calibri", 15), fg="red")
+            self.message = Label(self.AAIR_mode, 
+                                 text="Update Failed: \nPlease use floats for ventricular amplitude/sensitivity\n"
+                                      "Please use integers for all other values\n"
+                                      "Make sure you have connected to the UART COM", font=("Calibri", 15), fg="red")
             self.message.grid(row=14, columnspan=2, pady=15)
 
+    def echo_AAIR(self):
+        self.serial.ser.open()
+        self.serial.ser.flushInput()
+        self.serial.ser.flushOutput()
+        packed = struct.pack('<BBBIIBBffffIIIBBBBB',34,45,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0)
+        self.serial.ser.write(packed)
+        unpacked = struct.unpack('<BBBIIBBffffIIIBBBBB', packed)
+        print(unpacked)
+
+        sleep(1)
+        print("In waiting: " + str(self.serial.ser.in_waiting))
+        read = self.serial.ser.read(160)
+        print(read)
+        fromSim = struct.unpack('<BIIBBffffIIIBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB', read)
+        print(fromSim)
+
+        self.serial.ser.close()
+
+        Label(self.AAIR_mode, text= fromSim[2]).grid(row=1, column=3,  pady=2)
+        Label(self.AAIR_mode, text= fromSim[1]).grid(row=2, column=3,  pady=2)
+        Label(self.AAIR_mode, text= fromSim[6]).grid(row=3, column=3,  pady=2)
+        Label(self.AAIR_mode, text= fromSim[4]).grid(row=4, column=3,  pady=2)
+        Label(self.AAIR_mode, text= fromSim[10]).grid(row=5, column=3,  pady=2)
+        Label(self.AAIR_mode, text= "").grid(row=6, column=3,  pady=2)
+        Label(self.AAIR_mode, text= fromSim[12]).grid(row=7, column=3,  pady=2)
+        Label(self.AAIR_mode, text= fromSim[16]).grid(row=8, column=3,  pady=2)
+        Label(self.AAIR_mode, text= fromSim[13]).grid(row=9, column=3,  pady=2)
+        Label(self.AAIR_mode, text= fromSim[14]).grid(row=10, column=3,  pady=2)
+        Label(self.AAIR_mode, text= fromSim[15]).grid(row=11, column=3,  pady=2)
+        Label(self.AAIR_mode, text= fromSim[8]).grid(row=12, column=3,  pady=2)
+        Label(self.AAIR_mode, text= "Current Mode number: " + str(fromSim[0])).grid(row=13, column=2,  pady=2)
+
+    
     # VVIR MODE PARAMETERS
     def set_mode_VVIR(self):
         # set up VVIR frame inside of pm_params frame
@@ -1065,7 +1352,7 @@ class pmParams:
         Label(self.VVIR_mode, text="Ventricular Sensitivity (V): ").grid(row=6, column=0, padx=85, pady=2)
         enter_sense = Entry(self.VVIR_mode, textvariable=sense).grid(row=6, column=1)
 
-        thresh_vals = ("V-Low", "Low", "Med-Low", "Med", "Med-High", "High", "V-High")
+        thresh_vals = ("V-Low (1)", "Low (2)", "Med-Low (3)", "Med (4)", "Med-High (5)", "High (6)", "V-High (7)")
         Label(self.VVIR_mode, text="Activity Threshold : ").grid(row=7, column=0, pady=2)
         enter_threshold = Spinbox(self.VVIR_mode, values=thresh_vals, state="readonly",
                                   textvariable=threshold).grid(row=7, column=1)
@@ -1097,7 +1384,7 @@ class pmParams:
         Label(self.VVIR_mode, text="Reaction Time (ms): ").grid(row=9, column=2, padx=85, pady=2)
         Label(self.VVIR_mode, text="Response Factor : ").grid(row=10, column=2, padx=85, pady=2)
         Label(self.VVIR_mode, text="Recovery Time (mins) : ").grid(row=11, column=2, padx=85, pady=2)
-        Button(self.VVIR_mode, text="Get Current Settings", padx=20, pady=10, command = None).grid(row=12, column=3, pady=2)
+        Button(self.VVIR_mode, text="Get Current Settings", padx=20, pady=10, command = self.echo_VVIR).grid(row=12, column=3, pady=2)
 
     def send_VVIR(self, lrl, url, va, vpw, max, threshold, rxn, response, recovery, vrp, sense):
         mode = Mode(self.userName, 8)
@@ -1144,23 +1431,24 @@ class pmParams:
                 mode.set_RECOVERY_TIME(int(recovery.get()))
                 mode.set_VS(float(sense.get()))
                 mode.write_params(self.serial)
-                mode.read_echo(self.serial)
+                echoFromSim = mode.read_echo(self.serial)
 
                 self.message.destroy()
                 self.message = Label(self.VVIR_mode, text="Update Success!", font=("Calibri", 25), fg="green")
                 self.message.grid(row=13, columnspan=2, pady=15)
 
-                Label(self.VVIR_mode, text="BLAH ").grid(row=1, column=3,  pady=2)
-                Label(self.VVIR_mode, text="BLAH ").grid(row=2, column=3,  pady=2)
-                Label(self.VVIR_mode, text="BLAH ").grid(row=3, column=3,  pady=2)
-                Label(self.VVIR_mode, text="BLAH ").grid(row=4, column=3,  pady=2)
-                Label(self.VVIR_mode, text="BLAH ").grid(row=5, column=3,  pady=2)
-                Label(self.VVIR_mode, text="BLAH ").grid(row=6, column=3,  pady=2)
-                Label(self.VVIR_mode, text="BLAH ").grid(row=7, column=3,  pady=2)
-                Label(self.VVIR_mode, text="BLAH ").grid(row=8, column=3,  pady=2)
-                Label(self.VVIR_mode, text="BLAH ").grid(row=9, column=3,  pady=2)
-                Label(self.VVIR_mode, text="BLAH ").grid(row=10, column=3,  pady=2)
-                Label(self.VVIR_mode, text="BLAH ").grid(row=11, column=3,  pady=2)
+                Label(self.VVIR_mode, text= echoFromSim[2]).grid(row=1, column=3,  pady=2)
+                Label(self.VVIR_mode, text= echoFromSim[1]).grid(row=2, column=3,  pady=2)
+                Label(self.VVIR_mode, text= echoFromSim[5]).grid(row=3, column=3,  pady=2)
+                Label(self.VVIR_mode, text= echoFromSim[3]).grid(row=4, column=3,  pady=2)
+                Label(self.VVIR_mode, text= echoFromSim[9]).grid(row=5, column=3,  pady=2)
+                Label(self.VVIR_mode, text= echoFromSim[7]).grid(row=6, column=3,  pady=2)
+                Label(self.VVIR_mode, text= echoFromSim[12]).grid(row=7, column=3,  pady=2)
+                Label(self.VVIR_mode, text= echoFromSim[16]).grid(row=8, column=3,  pady=2)
+                Label(self.VVIR_mode, text= echoFromSim[13]).grid(row=9, column=3,  pady=2)
+                Label(self.VVIR_mode, text= echoFromSim[14]).grid(row=10, column=3,  pady=2)
+                Label(self.VVIR_mode, text= echoFromSim[15]).grid(row=11, column=3,  pady=2)
+               
 
             else:
                 self.message.destroy()
@@ -1173,8 +1461,42 @@ class pmParams:
             self.message.destroy()
             self.message = Label(self.VVIR_mode,
                                  text="Update Failed: \nPlease use floats for ventricular amplitude/sensitivity\n"
-                                      "Please use integers for all other values", font=("Calibri", 15), fg="red")
+                                      "Please use integers for all other values\n"
+                                      "Make sure you have connected to the UART COM", font=("Calibri", 15), fg="red")
             self.message.grid(row=13, columnspan=2, pady=15)
+
+    def echo_VVIR(self):
+        self.serial.ser.open()
+        self.serial.ser.flushInput()
+        self.serial.ser.flushOutput()
+        packed = struct.pack('<BBBIIBBffffIIIBBBBB',34,45,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0)
+        self.serial.ser.write(packed)
+        unpacked = struct.unpack('<BBBIIBBffffIIIBBBBB', packed)
+        print(unpacked)
+
+        sleep(1)
+        print("In waiting: " + str(self.serial.ser.in_waiting))
+        read = self.serial.ser.read(160)
+        print(read)
+        fromSim = struct.unpack('<BIIBBffffIIIBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB', read)
+        print(fromSim)
+
+        self.serial.ser.close()
+
+        Label(self.VVIR_mode, text= fromSim[2]).grid(row=1, column=3,  pady=2)
+        Label(self.VVIR_mode, text= fromSim[1]).grid(row=2, column=3,  pady=2)
+        Label(self.VVIR_mode, text= fromSim[5]).grid(row=3, column=3,  pady=2)
+        Label(self.VVIR_mode, text= fromSim[3]).grid(row=4, column=3,  pady=2)
+        Label(self.VVIR_mode, text= fromSim[9]).grid(row=5, column=3,  pady=2)
+        Label(self.VVIR_mode, text= fromSim[7]).grid(row=6, column=3,  pady=2)
+        Label(self.VVIR_mode, text= fromSim[12]).grid(row=7, column=3,  pady=2)
+        Label(self.VVIR_mode, text= fromSim[16]).grid(row=8, column=3,  pady=2)
+        Label(self.VVIR_mode, text= fromSim[13]).grid(row=9, column=3,  pady=2)
+        Label(self.VVIR_mode, text= fromSim[14]).grid(row=10, column=3,  pady=2)
+        Label(self.VVIR_mode, text= fromSim[15]).grid(row=11, column=3,  pady=2)
+        Label(self.VVIR_mode, text= "Current Mode number: " + str(fromSim[0])).grid(row=12, column=2,  pady=2)
+
+    
 
 # DOOR MODE PARAMETERS
     def set_mode_DOOR(self):
@@ -1219,7 +1541,7 @@ class pmParams:
         Label(self.DOOR_mode, text="Ventrical Pulse Width (ms): ").grid(row=6, column=0, pady=2, padx=50)
         enter_vpw = Entry(self.DOOR_mode, textvariable=vpw).grid(row=6, column=1)
 
-        thresh_vals = ("V-Low", "Low", "Med-Low", "Med", "Med-High", "High", "V-High")
+        thresh_vals = ("V-Low (1)", "Low (2)", "Med-Low (3)", "Med (4)", "Med-High (5)", "High (6)", "V-High (7)")
         Label(self.DOOR_mode, text="Activity Threshold : ").grid(row=7, column=0, pady=2)
         enter_threshold = Spinbox(self.DOOR_mode, values=thresh_vals, state="readonly", textvariable=threshold).grid(row=7, column=1)
 
@@ -1253,7 +1575,7 @@ class pmParams:
         Label(self.DOOR_mode, text="Max Sensor Rate (ppm): ").grid(row=10, column=2, padx=85, pady=2)
         Label(self.DOOR_mode, text="Response Factor : ").grid(row=11, column=2, padx=85, pady=2)
         Label(self.DOOR_mode, text="Recovery Time (mins) : ").grid(row=12, column=2, padx=85, pady=2)
-        Button(self.DOOR_mode, text="Get Current Settings", padx=20, pady=10, command = None).grid(row=13, column=3, pady=2)
+        Button(self.DOOR_mode, text="Get Current Settings", padx=20, pady=10, command = self.echo_DOOR).grid(row=13, column=3, pady=2)
 
     def send_DOOR(self, lrl, url, va, vpw, aa, apw, av, threshold, rxn, max, response, recovery):
         mode = Mode(self.userName, 10)
@@ -1303,24 +1625,25 @@ class pmParams:
                 mode.set_RESPONSE_FACTOR(int(response.get()))
                 mode.set_RECOVERY_TIME(int(recovery.get()))
                 mode.write_params(self.serial)
-                mode.read_echo(self.serial)
+                echoFromSim = mode.read_echo(self.serial)
 
                 self.message.destroy()
                 self.message = Label(self.DOOR_mode, text="Update Success!", font=("Calibri", 25), fg="green")
                 self.message.grid(row=14, columnspan=2, pady=15)
 
-                Label(self.DOOR_mode, text="BLAH ").grid(row=1, column=3,  pady=2)
-                Label(self.DOOR_mode, text="BLAH ").grid(row=2, column=3,  pady=2)
-                Label(self.DOOR_mode, text="BLAH ").grid(row=3, column=3,  pady=2)
-                Label(self.DOOR_mode, text="BLAH ").grid(row=4, column=3,  pady=2)
-                Label(self.DOOR_mode, text="BLAH ").grid(row=5, column=3,  pady=2)
-                Label(self.DOOR_mode, text="BLAH ").grid(row=6, column=3,  pady=2)
-                Label(self.DOOR_mode, text="BLAH ").grid(row=7, column=3,  pady=2)
-                Label(self.DOOR_mode, text="BLAH ").grid(row=8, column=3,  pady=2)
-                Label(self.DOOR_mode, text="BLAH ").grid(row=9, column=3,  pady=2)
-                Label(self.DOOR_mode, text="BLAH ").grid(row=10, column=3,  pady=2)
-                Label(self.DOOR_mode, text="BLAH ").grid(row=11, column=3,  pady=2)
-                Label(self.DOOR_mode, text="BLAH ").grid(row=12, column=3,  pady=2)
+                Label(self.DOOR_mode, text= echoFromSim[2]).grid(row=1, column=3,  pady=2)
+                Label(self.DOOR_mode, text= echoFromSim[1]).grid(row=2, column=3,  pady=2)
+                Label(self.DOOR_mode, text= echoFromSim[6]).grid(row=3, column=3,  pady=2)
+                Label(self.DOOR_mode, text= echoFromSim[4]).grid(row=4, column=3,  pady=2)
+                Label(self.DOOR_mode, text= echoFromSim[5]).grid(row=5, column=3,  pady=2)
+                Label(self.DOOR_mode, text= echoFromSim[3]).grid(row=6, column=3,  pady=2)
+                Label(self.DOOR_mode, text= echoFromSim[12]).grid(row=7, column=3,  pady=2)
+                Label(self.DOOR_mode, text= echoFromSim[11]).grid(row=8, column=3,  pady=2)
+                Label(self.DOOR_mode, text= echoFromSim[13]).grid(row=9, column=3,  pady=2)
+                Label(self.DOOR_mode, text= echoFromSim[16]).grid(row=10, column=3,  pady=2)
+                Label(self.DOOR_mode, text= echoFromSim[14]).grid(row=11, column=3,  pady=2)
+                Label(self.DOOR_mode, text= echoFromSim[15]).grid(row=12, column=3,  pady=2)
+
             else:
                 self.message.destroy()
                 self.message = Label(self.DOOR_mode, text=f"Update Failed: \n {errormsg}", font=("Calibri", 15), fg="red")
@@ -1330,6 +1653,39 @@ class pmParams:
             print(f"EXCEPTION: {e}")
             self.message.destroy()
             self.message = Label(self.DOOR_mode,
-                                 text="Update Failed: \nPlease use floats for ventricular/atrial amplitude\n"
-                                      "Please use integers for all other values", font=("Calibri", 15), fg="red")
+                                 text="Update Failed: \nPlease use floats for ventricular amplitude/sensitivity\n"
+                                      "Please use integers for all other values\n"
+                                      "Make sure you have connected to the UART COM", font=("Calibri", 15), fg="red")
             self.message.grid(row=14, columnspan=2, pady=15)
+
+    def echo_DOOR(self):
+        self.serial.ser.open()
+        self.serial.ser.flushInput()
+        self.serial.ser.flushOutput()
+        packed = struct.pack('<BBBIIBBffffIIIBBBBB',34,45,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0)
+        self.serial.ser.write(packed)
+        unpacked = struct.unpack('<BBBIIBBffffIIIBBBBB', packed)
+        print(unpacked)
+
+        sleep(1)
+        print("In waiting: " + str(self.serial.ser.in_waiting))
+        read = self.serial.ser.read(160)
+        print(read)
+        fromSim = struct.unpack('<BIIBBffffIIIBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB', read)
+        print(fromSim)
+
+        self.serial.ser.close()
+
+        Label(self.DOOR_mode, text= fromSim[2]).grid(row=1, column=3,  pady=2)
+        Label(self.DOOR_mode, text= fromSim[1]).grid(row=2, column=3,  pady=2)
+        Label(self.DOOR_mode, text= fromSim[6]).grid(row=3, column=3,  pady=2)
+        Label(self.DOOR_mode, text= fromSim[4]).grid(row=4, column=3,  pady=2)
+        Label(self.DOOR_mode, text= fromSim[5]).grid(row=5, column=3,  pady=2)
+        Label(self.DOOR_mode, text= fromSim[3]).grid(row=6, column=3,  pady=2)
+        Label(self.DOOR_mode, text= fromSim[12]).grid(row=7, column=3,  pady=2)
+        Label(self.DOOR_mode, text= fromSim[11]).grid(row=8, column=3,  pady=2)
+        Label(self.DOOR_mode, text= fromSim[13]).grid(row=9, column=3,  pady=2)
+        Label(self.DOOR_mode, text= fromSim[16]).grid(row=10, column=3,  pady=2)
+        Label(self.DOOR_mode, text= fromSim[14]).grid(row=11, column=3,  pady=2)
+        Label(self.DOOR_mode, text= fromSim[15]).grid(row=12, column=3,  pady=2)
+        Label(self.DOOR_mode, text= "Current Mode number: " + str(fromSim[0])).grid(row=13, column=2,  pady=2)
