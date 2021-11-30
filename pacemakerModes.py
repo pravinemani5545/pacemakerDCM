@@ -174,6 +174,7 @@ class Mode():
 
         serial.ser.open()
         serial.ser.flushInput()
+        serial.ser.read_all()
         serial.ser.flushOutput()
         self.packed = struct.pack('<BBBIIBBffffIIIBBBBB',34,81,self.MODE,self.URL,self.LRL,self.VPW,self.APW,self.VA,self.AA,self.VS,self.AS,self.VRP,self.ARP,self.FIXED_AV_DELAY,self.ACT_THRESHOLD,self.REACTION_TIME,self.RESPONSE_FACTOR,self.RECOVERY_TIME,self.MAX_SENSE_RATE)
         self.unpacked = struct.unpack('<BBBIIBBffffIIIBBBBB', self.packed)
@@ -189,6 +190,9 @@ class Mode():
         fromSim = struct.unpack('<BIIBBffffIIIBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB', read)
         print(fromSim)
 
+        serial.ser.flushInput()
+        serial.ser.read_all()
+        serial.ser.flushOutput()
         serial.ser.close()
 
         return fromSim

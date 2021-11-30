@@ -3,6 +3,15 @@ from pacemakerModes import *
 from paramChecking import *
 from serialcom import*
 from tkinter import *
+import serial
+import struct
+import random
+import numpy as np
+from itertools import count
+import pandas as pd
+import matplotlib.pyplot as plt
+from matplotlib.animation import FuncAnimation
+from time import sleep
 
 class pmParams:
     def __init__(self, parent, *args, **kwargs):
@@ -56,12 +65,71 @@ class pmParams:
 
         Button(self.pmParams, text="Atrial ECG", command= None).grid(row=2,column=3)
         Button(self.pmParams, text="Ventrical ECG", command= None).grid(row=3,column=3)
-        Button(self.pmParams, text="Atrial & Ventrical ECG", command= None).grid(row=4,column=3)
+        Button(self.pmParams, text="Atrial & Ventrical ECG", command= self.AVEcg).grid(row=4,column=3)
 
         self.pmParams.grid(row=1, column=0, sticky = W, pady = 5)
-    
-    def openAtrialEcg(self):
 
+    def AVEcg(self):
+
+        self.serial.ser.open()
+        self.serial.ser.read_all()
+        self.serial.ser.flushInput()
+        self.serial.ser.flushOutput()
+
+        print("ser: " + str(self.serial.ser.in_waiting))
+        print()
+        arr = []
+        arr2 = []
+
+
+        packed = struct.pack('<BBBIIBBffffIIIBBBBB',34,14,1,1,1,1,1,1.0,1.0,1.0,1.0,1,1,1,1,1,1,1,1)
+        self.serial.ser.write(packed)
+
+        print("opened")
+        count = 0
+        sleep(0.1)
+
+
+        while(count<=100):
+            
+            read = self.serial.ser.read(160)
+            fromSim = struct.unpack('ffffffffffffffffffffffffffffffffffffffff', read)
+            print(fromSim)
+            print("ser: " + str(self.serial.ser.in_waiting))
+            #avg = sum(fromSim[0:19])/20
+            #avg2 = sum(fromSim[20:39])/20
+
+            arr.extend(fromSim[0:19]) 
+            arr2.extend(fromSim[20:39])
+            
+            count+=1
+            print() 
+            sleep(0.02)
+
+
+        packed = struct.pack('<BBBIIBBffffIIIBBBBB',34,49,1,1,1,1,1,1.0,1.0,1.0,1.0,1,1,1,1,1,1,1,1)
+        self.serial.ser.write(packed)
+
+        plt.style.use('fivethirtyeight')
+
+        x_vals = np.arange(0, 1919)
+        y_vals = arr
+        y_vals2 = arr2
+
+
+        plt.plot(x_vals, y_vals, label='Ventrical Signal')
+        plt.plot(x_vals, y_vals2, label='Atrial Signal')
+
+
+        plt.legend(loc='upper left')
+        plt.tight_layout()
+        plt.show()
+
+        self.serial.ser.read_all()
+        self.serial.ser.flushInput()
+        self.serial.ser.flushOutput()
+        self.serial.ser.close()
+        
 
     # AOO MODE PARAMETERS
     def set_mode_AOO(self):
