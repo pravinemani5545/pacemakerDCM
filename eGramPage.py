@@ -48,32 +48,29 @@ class eGramPage:
         plt.xlabel('Samples (Every 20 ms)')
         plt.ylabel('Voltage (V)')
 
-        ser = serial.Serial()
-        ser.baudrate = 115200
-        ser.port = 'COM7'
-        ser.open()
+        self.serial.ser.open()
         sleep(1)
 
-        ser.flushInput()
-        ser.flushOutput()
-        ser.read_all()
-        print("ser: " + str(ser.in_waiting))
+        self.serial.ser.flushInput()
+        self.serial.ser.flushOutput()
+        self.serial.ser.read_all()
+        print("ser: " + str(self.serial.ser.in_waiting))
 
-        print("connected to: " + ser.portstr)
+        print("connected to: " + self.serial.ser.portstr)
         print()
 
-        print("ser: " + str(ser.in_waiting))
+        print("ser: " + str(self.serial.ser.in_waiting))
         packed = struct.pack('<BBBIIBBffffIIIBBBBB',34,14,1,1,1,1,1,1.0,1.0,1.0,1.0,1,1,1,1,1,1,1,1)
-        ser.write(packed)
-        print("ser: " + str(ser.in_waiting))
+        self.serial.ser.write(packed)
+        print("ser: " + str(self.serial.ser.in_waiting))
         print("opened")
         sleep(0.05)
 
         # This function is called periodically from FuncAnimation
         def animate(i, ys):
 
-            print("ser: " + str(ser.in_waiting))
-            read = ser.read(160)
+            print("ser: " + str(self.serial.ser.in_waiting))
+            read = self.serial.ser.read(160)
             fromSim = struct.unpack('ffffffffffffffffffffffffffffffffffffffff', read)
             #print(fromSim)
             print()
@@ -101,12 +98,12 @@ class eGramPage:
         plt.tight_layout()
         plt.show()
 
-        ser.read_all()
-        ser.flushInput()
-        ser.flushOutput()
+        self.serial.ser.read_all()
+        self.serial.ser.flushInput()
+        self.serial.ser.flushOutput()
         packed = struct.pack('<BBBIIBBffffIIIBBBBB',34,49,1,1,1,1,1,1.0,1.0,1.0,1.0,1,1,1,1,1,1,1,1)
-        ser.write(packed)
-        ser.close()
+        self.serial.ser.write(packed)
+        self.serial.ser.close()
 
 
 
@@ -132,32 +129,29 @@ class eGramPage:
         plt.xlabel('Samples (Every 20 ms)')
         plt.ylabel('Voltage (V)')
 
-        ser = serial.Serial()
-        ser.baudrate = 115200
-        ser.port = 'COM7'
-        ser.open()
+        self.serial.ser.open()
         sleep(1)
 
-        ser.flushInput()
-        ser.flushOutput()
-        ser.read_all()
-        print("ser: " + str(ser.in_waiting))
+        self.serial.ser.flushInput()
+        self.serial.ser.flushOutput()
+        self.serial.ser.read_all()
+        print("ser: " + str(self.serial.ser.in_waiting))
 
-        print("connected to: " + ser.portstr)
+        print("connected to: " + self.serial.ser.portstr)
         print()
 
-        print("ser: " + str(ser.in_waiting))
+        print("ser: " + str(self.serial.ser.in_waiting))
         packed = struct.pack('<BBBIIBBffffIIIBBBBB',34,14,1,1,1,1,1,1.0,1.0,1.0,1.0,1,1,1,1,1,1,1,1)
-        ser.write(packed)
-        print("ser: " + str(ser.in_waiting))
+        self.serial.ser.write(packed)
+        print("ser: " + str(self.serial.ser.in_waiting))
         print("opened")
         sleep(0.05)
 
         # This function is called periodically from FuncAnimation
         def animate(i, ys):
 
-            print("ser: " + str(ser.in_waiting))
-            read = ser.read(160)
+            print("ser: " + str(self.serial.ser.in_waiting))
+            read = self.serial.ser.read(160)
             fromSim = struct.unpack('ffffffffffffffffffffffffffffffffffffffff', read)
             #print(fromSim)
             print()
@@ -185,12 +179,12 @@ class eGramPage:
         plt.tight_layout()
         plt.show()
 
-        ser.read_all()
-        ser.flushInput()
-        ser.flushOutput()
+        self.serial.ser.read_all()
+        self.serial.ser.flushInput()
+        self.serial.ser.flushOutput()
         packed = struct.pack('<BBBIIBBffffIIIBBBBB',34,49,1,1,1,1,1,1.0,1.0,1.0,1.0,1,1,1,1,1,1,1,1)
-        ser.write(packed)
-        ser.close()
+        self.serial.ser.write(packed)
+        self.serial.ser.close()
 
     
 
@@ -220,32 +214,29 @@ class eGramPage:
         plt.xlabel('Samples (Every 20 ms)')
         plt.ylabel('Analog Voltage')
 
-        ser = serial.Serial()
-        ser.baudrate = 115200
-        ser.port = 'COM7'
-        ser.open()
+        self.serial.ser.open()
         sleep(1)
 
-        ser.flushInput()
-        ser.flushOutput()
-        ser.read_all()
-        print("ser: " + str(ser.in_waiting))
+        self.serial.ser.flushInput()
+        self.serial.ser.flushOutput()
+        self.serial.ser.read_all()
+        print("ser: " + str(self.serial.ser.in_waiting))
 
-        print("connected to: " + ser.portstr)
+        print("connected to: " + self.serial.ser.portstr)
         print()
 
-        print("ser: " + str(ser.in_waiting))
+        print("ser: " + str(self.serial.ser.in_waiting))
         packed = struct.pack('<BBBIIBBffffIIIBBBBB',34,14,1,1,1,1,1,1.0,1.0,1.0,1.0,1,1,1,1,1,1,1,1)
-        ser.write(packed)
-        print("ser: " + str(ser.in_waiting))
+        self.serial.ser.write(packed)
+        print("ser: " + str(self.serial.ser.in_waiting))
         print("opened")
         sleep(0.05)
 
         # This function is called periodically from FuncAnimation
         def animate(i, ys, ys2):
 
-            print("ser: " + str(ser.in_waiting))
-            read = ser.read(160)
+            print("ser: " + str(self.serial.ser.in_waiting))
+            read = self.serial.ser.read(160)
             fromSim = struct.unpack('ffffffffffffffffffffffffffffffffffffffff', read)
             #print(fromSim)
             print()
@@ -278,12 +269,12 @@ class eGramPage:
         plt.tight_layout()
         plt.show()
 
-        ser.read_all()
-        ser.flushInput()
-        ser.flushOutput()
+        self.serial.ser.read_all()
+        self.serial.ser.flushInput()
+        self.serial.ser.flushOutput()
         packed = struct.pack('<BBBIIBBffffIIIBBBBB',34,49,1,1,1,1,1,1.0,1.0,1.0,1.0,1,1,1,1,1,1,1,1)
-        ser.write(packed)
-        ser.close()
+        self.serial.ser.write(packed)
+        self.serial.ser.close()
     
     
     def backToPm(self):
