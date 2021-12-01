@@ -109,7 +109,7 @@ class pmParams:
         Label(self.AOO_mode, text="Upper Rate Limit (ppm): ").grid(row=2, column=2, padx=85, pady=2)
         Label(self.AOO_mode, text="Atrial Amplitude (V): ").grid(row=3, column=2, padx=85, pady=2)
         Label(self.AOO_mode, text="Atrial Pulse Width (ms): ").grid(row=4, column=2, padx=85, pady=2)
-        Button(self.AOO_mode, text="Get Current Settings", padx=20, pady=10, command = self.echo_AOO).grid(row=5, column=3, pady=2)
+        Button(self.AOO_mode, text="Get Current Settings", padx=20, pady=10, command = self.retrieve_AOOR).grid(row=5, column=3, pady=2)
 
     def send_AOO(self, lrl, url, aa, apw):
         mode = Mode(self.userName, 2)
@@ -139,14 +139,18 @@ class pmParams:
                 mode.write_params(self.serial)
                 echoFromSim = mode.read_echo(self.serial)
 
-                self.message.destroy()
-                self.message = Label(self.AOO_mode, text="Update Success!", font=("Calibri", 25), fg="green")
-                self.message.grid(row=6, columnspan=2, pady=15)
+                if (mode.verify_write(echoFromSim)):
+                    errormsg = "Data retrieved from pacemaker doesn't match data sent from DCM"
 
-                Label(self.AOO_mode, text= echoFromSim[2]).grid(row=1, column=3,  pady=2)
-                Label(self.AOO_mode, text= echoFromSim[1]).grid(row=2, column=3,  pady=2)
-                Label(self.AOO_mode, text= echoFromSim[6]).grid(row=3, column=3,  pady=2)
-                Label(self.AOO_mode, text= echoFromSim[4]).grid(row=4, column=3,  pady=2)
+                else:
+                    self.message.destroy()
+                    self.message = Label(self.AOO_mode, text="Update Success!", font=("Calibri", 25), fg="green")
+                    self.message.grid(row=6, columnspan=2, pady=15)
+
+                    Label(self.AOO_mode, text= echoFromSim[2]).grid(row=1, column=3,  pady=2)
+                    Label(self.AOO_mode, text= echoFromSim[1]).grid(row=2, column=3,  pady=2)
+                    Label(self.AOO_mode, text= round(echoFromSim[6], 2)).grid(row=3, column=3,  pady=2)
+                    Label(self.AOO_mode, text= echoFromSim[4]).grid(row=4, column=3,  pady=2)
 
                 
             else:
@@ -163,7 +167,7 @@ class pmParams:
                                       "Make sure you have connected to the UART COM", font=("Calibri", 15), fg="red")
             self.message.grid(row=6, columnspan=2, pady=15)
 
-    def echo_AOO(self):
+    def retrieve_AOO(self):
         self.serial.ser.open()
         self.serial.ser.flushInput()
         self.serial.ser.flushOutput()
@@ -186,8 +190,6 @@ class pmParams:
         Label(self.AOO_mode, text= fromSim[6]).grid(row=3, column=3,  pady=2)
         Label(self.AOO_mode, text= fromSim[4]).grid(row=4, column=3,  pady=2)
         Label(self.AOO_mode, text= "Current Mode number: " + str(fromSim[0])).grid(row=5, column=2,  pady=2)
-
-    
 
     # VOO MODE PARAMETERS
     def set_mode_VOO(self):
@@ -225,7 +227,7 @@ class pmParams:
         Label(self.VOO_mode, text="Upper Rate Limit (ppm): ").grid(row=2, column=2, padx=85, pady=2)
         Label(self.VOO_mode, text="Ventrical Amplitude (V): ").grid(row=3, column=2, padx=85, pady=2)
         Label(self.VOO_mode, text="Ventrical Pulse Width (ms): ").grid(row=4, column=2, padx=85, pady=2)
-        Button(self.VOO_mode, text="Get Current Settings", padx=20, pady=10, command = self.echo_VOO).grid(row=5, column=3, pady=2)
+        Button(self.VOO_mode, text="Get Current Settings", padx=20, pady=10, command = self.retrieve_VOO).grid(row=5, column=3, pady=2)
 
     def send_VOO(self, lrl, url, va, vpw):
         mode = Mode(self.userName, 1)
@@ -255,14 +257,18 @@ class pmParams:
                 mode.write_params(self.serial)
                 echoFromSim = mode.read_echo(self.serial)
 
-                self.message.destroy()
-                self.message = Label(self.VOO_mode, text="Update Success!", font=("Calibri", 25), fg="green")
-                self.message.grid(row=6, columnspan=2, pady=15)
+                if (mode.verify_write(echoFromSim)):
+                    errormsg = "Data retrieved from pacemaker doesn't match data sent from DCM"
 
-                Label(self.VOO_mode, text= echoFromSim[2]).grid(row=1, column=3,  pady=2)
-                Label(self.VOO_mode, text= echoFromSim[1]).grid(row=2, column=3,  pady=2)
-                Label(self.VOO_mode, text= echoFromSim[5]).grid(row=3, column=3,  pady=2)
-                Label(self.VOO_mode, text= echoFromSim[3]).grid(row=4, column=3,  pady=2)
+                else:
+                    self.message.destroy()
+                    self.message = Label(self.VOO_mode, text="Update Success!", font=("Calibri", 25), fg="green")
+                    self.message.grid(row=6, columnspan=2, pady=15)
+
+                    Label(self.VOO_mode, text= echoFromSim[2]).grid(row=1, column=3,  pady=2)
+                    Label(self.VOO_mode, text= echoFromSim[1]).grid(row=2, column=3,  pady=2)
+                    Label(self.VOO_mode, text= round(echoFromSim[5], 2)).grid(row=3, column=3,  pady=2)
+                    Label(self.VOO_mode, text= echoFromSim[3]).grid(row=4, column=3,  pady=2)
 
             else:
                 self.message.destroy()
@@ -279,7 +285,7 @@ class pmParams:
                                       "Make sure you have connected to the UART COM", font=("Calibri", 15), fg="red")
             self.message.grid(row=6, columnspan=2, pady=15)
 
-    def echo_VOO(self):
+    def retrieve_VOO(self):
         self.serial.ser.open()
         self.serial.ser.flushInput()
         self.serial.ser.flushOutput()
@@ -353,7 +359,7 @@ class pmParams:
         Label(self.AAI_mode, text="ARP (ms): ").grid(row=5, column=2, padx=85, pady=2)
         Label(self.AAI_mode, text="Atrial Sensitivity (V): ").grid(row=6, column=2, padx=85, pady=2)
         Label(self.AAI_mode, text="Post VARP (ms): ").grid(row=7, column=2, padx=85, pady=2)
-        Button(self.AAI_mode, text="Get Current Settings", padx=20, pady=10, command = self.echo_AAI).grid(row=8, column=3, pady=2)
+        Button(self.AAI_mode, text="Get Current Settings", padx=20, pady=10, command = self.retrieve_AAI).grid(row=8, column=3, pady=2)
         
 
     def send_AAI(self, lrl, url, aa, apw, arp, sense, pvarp):
@@ -393,19 +399,22 @@ class pmParams:
                 mode.write_params(self.serial)
                 echoFromSim = mode.read_echo(self.serial)
 
-                self.message.destroy()
-                self.message = Label(self.AAI_mode, text="Update Success!", font=("Calibri", 25), fg="green")
-                self.message.grid(row=9, columnspan=2, pady=15)
+                if (mode.verify_write(echoFromSim)):
+                    errormsg = "Data retrieved from pacemaker doesn't match data sent from DCM"
 
-                Label(self.AAI_mode, text= echoFromSim[2]).grid(row=1, column=3,  pady=2)
-                Label(self.AAI_mode, text= echoFromSim[1]).grid(row=2, column=3,  pady=2)
-                Label(self.AAI_mode, text= echoFromSim[6]).grid(row=3, column=3,  pady=2)
-                Label(self.AAI_mode, text= echoFromSim[4]).grid(row=4, column=3,  pady=2)
-                Label(self.AAI_mode, text= echoFromSim[10]).grid(row=5, column=3,  pady=2)
-                Label(self.AAI_mode, text= echoFromSim[8]).grid(row=6, column=3,  pady=2)
-                Label(self.AAI_mode, text= "").grid(row=7, column=3,  pady=2)
-            
-                
+                else:
+                    self.message.destroy()
+                    self.message = Label(self.AAI_mode, text="Update Success!", font=("Calibri", 25), fg="green")
+                    self.message.grid(row=9, columnspan=2, pady=15)
+
+                    Label(self.AAI_mode, text= echoFromSim[2]).grid(row=1, column=3,  pady=2)
+                    Label(self.AAI_mode, text= echoFromSim[1]).grid(row=2, column=3,  pady=2)
+                    Label(self.AAI_mode, text= round(echoFromSim[6], 2)).grid(row=3, column=3,  pady=2)
+                    Label(self.AAI_mode, text= echoFromSim[4]).grid(row=4, column=3,  pady=2)
+                    Label(self.AAI_mode, text= echoFromSim[10]).grid(row=5, column=3,  pady=2)
+                    Label(self.AAI_mode, text= round(echoFromSim[8], 2)).grid(row=6, column=3,  pady=2)
+                    Label(self.AAI_mode, text= "").grid(row=7, column=3,  pady=2)
+
             else:
                 self.message.destroy()
                 self.message = Label(self.AAI_mode, text=f"Update Failed: \n {errormsg}", font=("Calibri", 15),
@@ -421,7 +430,7 @@ class pmParams:
                                       "Make sure you have connected to the UART COM", font=("Calibri", 15), fg="red")
             self.message.grid(row=9, columnspan=2, pady=15)
 
-    def echo_AAI(self):
+    def retrieve_AAI(self):
         self.serial.ser.open()
         self.serial.ser.flushInput()
         self.serial.ser.flushOutput()
@@ -494,7 +503,7 @@ class pmParams:
         Label(self.VVI_mode, text="Ventricular Pulse Width (ms): ").grid(row=4, column=2, padx=85, pady=2)
         Label(self.VVI_mode, text="VRP (ms): ").grid(row=5, column=2, padx=85, pady=2)
         Label(self.VVI_mode, text="Ventricular Sensitivity (V): ").grid(row=6, column=2, padx=85, pady=2)
-        Button(self.VVI_mode, text="Get Current Settings", padx=20, pady=10, command = self.echo_VVI).grid(row=7, column=3, pady=2)
+        Button(self.VVI_mode, text="Get Current Settings", padx=20, pady=10, command = self.retrieve_VVI).grid(row=7, column=3, pady=2)
 
     def send_VVI(self, lrl, url, va, vpw, vrp, sense):
         mode = Mode(self.userName, 3)
@@ -531,16 +540,20 @@ class pmParams:
                 mode.write_params(self.serial)
                 echoFromSim = mode.read_echo(self.serial)
 
-                self.message.destroy()
-                self.message = Label(self.VVI_mode, text="Update Success!", font=("Calibri", 25), fg="green")
-                self.message.grid(row=8, columnspan=2, pady=15)
+                if (mode.verify_write(echoFromSim)):
+                    errormsg = "Data retrieved from pacemaker doesn't match data sent from DCM"
 
-                Label(self.VVI_mode, text= echoFromSim[2]).grid(row=1, column=3,  pady=2)
-                Label(self.VVI_mode, text= echoFromSim[1]).grid(row=2, column=3,  pady=2)
-                Label(self.VVI_mode, text= echoFromSim[5]).grid(row=3, column=3,  pady=2)
-                Label(self.VVI_mode, text= echoFromSim[3]).grid(row=4, column=3,  pady=2)
-                Label(self.VVI_mode, text= echoFromSim[9]).grid(row=5, column=3,  pady=2)
-                Label(self.VVI_mode, text= echoFromSim[7]).grid(row=6, column=3,  pady=2)
+                else:
+                    self.message.destroy()
+                    self.message = Label(self.VVI_mode, text="Update Success!", font=("Calibri", 25), fg="green")
+                    self.message.grid(row=8, columnspan=2, pady=15)
+
+                    Label(self.VVI_mode, text= echoFromSim[2]).grid(row=1, column=3,  pady=2)
+                    Label(self.VVI_mode, text= echoFromSim[1]).grid(row=2, column=3,  pady=2)
+                    Label(self.VVI_mode, text= round(echoFromSim[5], 2)).grid(row=3, column=3,  pady=2)
+                    Label(self.VVI_mode, text= echoFromSim[3]).grid(row=4, column=3,  pady=2)
+                    Label(self.VVI_mode, text= echoFromSim[9]).grid(row=5, column=3,  pady=2)
+                    Label(self.VVI_mode, text= echoFromSim[7]).grid(row=6, column=3,  pady=2)
 
             else:
                 self.message.destroy()
@@ -556,7 +569,7 @@ class pmParams:
                                       "Make sure you have connected to the UART COM", font=("Calibri", 15), fg="red")
             self.message.grid(row=8, columnspan=2, pady=15)
 
-    def echo_VVI(self):
+    def retrieve_VVI(self):
         self.serial.ser.open()
         self.serial.ser.flushInput()
         self.serial.ser.flushOutput()
@@ -633,8 +646,7 @@ class pmParams:
         Label(self.DOO_mode, text="Ventricular Amplitude (V): ").grid(row=5, column=2, padx=85, pady=2)
         Label(self.DOO_mode, text="Ventricular Pulse Width (ms): ").grid(row=6, column=2, padx=85, pady=2)
         Label(self.DOO_mode, text="Fixed AV Delay(ms): ").grid(row=7, column=2, padx=85, pady=2)
-        Button(self.DOO_mode, text="Get Current Settings", padx=20, pady=10, command = self.echo_DOO).grid(row=8, column=3, pady=2)
-        
+        Button(self.DOO_mode, text="Get Current Settings", padx=20, pady=10, command = self.retrieve_DOO).grid(row=8, column=3, pady=2)
 
     # DOO PARAMETERS
     def send_DOO(self, lrl, url, va, vpw, aa, apw, av):
@@ -674,17 +686,21 @@ class pmParams:
                 mode.write_params(self.serial)
                 echoFromSim = mode.read_echo(self.serial)
 
-                self.message.destroy()
-                self.message = Label(self.DOO_mode, text="Update Success!", font=("Calibri", 25), fg="green")
-                self.message.grid(row=9, columnspan=2, pady=15)
-                
-                Label(self.DOO_mode, text= echoFromSim[2]).grid(row=1, column=3,  pady=2)
-                Label(self.DOO_mode, text= echoFromSim[1]).grid(row=2, column=3,  pady=2)
-                Label(self.DOO_mode, text= echoFromSim[6]).grid(row=3, column=3,  pady=2)
-                Label(self.DOO_mode, text= echoFromSim[4]).grid(row=4, column=3,  pady=2)
-                Label(self.DOO_mode, text= echoFromSim[5]).grid(row=5, column=3,  pady=2)
-                Label(self.DOO_mode, text= echoFromSim[3]).grid(row=6, column=3,  pady=2)
-                Label(self.DOO_mode, text= echoFromSim[11]).grid(row=7, column=3,  pady=2)
+                if (mode.verify_write(echoFromSim)):
+                    errormsg = "Data retrieved from pacemaker doesn't match data sent from DCM"
+
+                else:
+                    self.message.destroy()
+                    self.message = Label(self.DOO_mode, text="Update Success!", font=("Calibri", 25), fg="green")
+                    self.message.grid(row=9, columnspan=2, pady=15)
+
+                    Label(self.DOO_mode, text= echoFromSim[2]).grid(row=1, column=3,  pady=2)
+                    Label(self.DOO_mode, text= echoFromSim[1]).grid(row=2, column=3,  pady=2)
+                    Label(self.DOO_mode, text= round(echoFromSim[6], 2)).grid(row=3, column=3,  pady=2)
+                    Label(self.DOO_mode, text= echoFromSim[4]).grid(row=4, column=3,  pady=2)
+                    Label(self.DOO_mode, text= round(echoFromSim[5], 2)).grid(row=5, column=3,  pady=2)
+                    Label(self.DOO_mode, text= echoFromSim[3]).grid(row=6, column=3,  pady=2)
+                    Label(self.DOO_mode, text= echoFromSim[11]).grid(row=7, column=3,  pady=2)
             else:
                 self.message.destroy()
                 self.message = Label(self.DOO_mode, text=f"Update Failed: \n {errormsg}", font=("Calibri", 15), fg="red")
@@ -699,7 +715,7 @@ class pmParams:
                                       "Make sure you have connected to the UART COM", font=("Calibri", 15), fg="red")
             self.message.grid(row=9, columnspan=2, pady=15)
     
-    def echo_DOO(self):
+    def retrieve_DOO(self):
         self.serial.ser.open()
         self.serial.ser.flushInput()
         self.serial.ser.flushOutput()
@@ -789,7 +805,7 @@ class pmParams:
         Label(self.AOOR_mode, text="Reaction Time (s): ").grid(row=7, column=2, padx=85, pady=2)
         Label(self.AOOR_mode, text="Response Factor : ").grid(row=8, column=2, padx=85, pady=2)
         Label(self.AOOR_mode, text="Recovery Time (mins) : ").grid(row=9, column=2, padx=85, pady=2)
-        Button(self.AOOR_mode, text="Get Current Settings", padx=20, pady=10, command = self.echo_AOOR).grid(row=10, column=3, pady=2)
+        Button(self.AOOR_mode, text="Get Current Settings", padx=20, pady=10, command = self.retrieve_AOOR).grid(row=10, column=3, pady=2)
 
     def send_AOOR(self, lrl, url, aa, apw, max, threshold, rxn, response, recovery):
         mode = Mode(self.userName, 7)
@@ -831,20 +847,24 @@ class pmParams:
                 mode.set_RECOVERY_TIME(int(recovery.get()))
                 mode.write_params(self.serial)
                 echoFromSim = mode.read_echo(self.serial)
-
-                self.message.destroy()
-                self.message = Label(self.AOOR_mode, text="Update Success!", font=("Calibri", 25), fg="green")
-                self.message.grid(row=11, columnspan=2, pady=15)
-
-                Label(self.AOOR_mode, text= echoFromSim[2]).grid(row=1, column=3,  pady=2)
-                Label(self.AOOR_mode, text= echoFromSim[1]).grid(row=2, column=3,  pady=2)
-                Label(self.AOOR_mode, text= echoFromSim[6]).grid(row=3, column=3,  pady=2)
-                Label(self.AOOR_mode, text= echoFromSim[4]).grid(row=4, column=3,  pady=2)
-                Label(self.AOOR_mode, text= echoFromSim[16]).grid(row=5, column=3,  pady=2)
-                Label(self.AOOR_mode, text= echoFromSim[12]).grid(row=6, column=3,  pady=2)
-                Label(self.AOOR_mode, text= echoFromSim[13]).grid(row=7, column=3,  pady=2)
-                Label(self.AOOR_mode, text= echoFromSim[14]).grid(row=8, column=3,  pady=2)
-                Label(self.AOOR_mode, text= echoFromSim[15]).grid(row=9, column=3,  pady=2)
+                    
+                if (mode.verify_write(echoFromSim)):
+                    errormsg = "Data retrieved from pacemaker doesn't match data sent from DCM"
+                
+                else:
+                    self.message.destroy()
+                    self.message = Label(self.AOOR_mode, text="Update Success!", font=("Calibri", 25), fg="green")
+                    self.message.grid(row=11, columnspan=2, pady=15)
+    
+                    Label(self.AOOR_mode, text= echoFromSim[2]).grid(row=1, column=3,  pady=2)
+                    Label(self.AOOR_mode, text= echoFromSim[1]).grid(row=2, column=3,  pady=2)
+                    Label(self.AOOR_mode, text= round(echoFromSim[6], 2)).grid(row=3, column=3,  pady=2)
+                    Label(self.AOOR_mode, text= echoFromSim[4]).grid(row=4, column=3,  pady=2)
+                    Label(self.AOOR_mode, text= echoFromSim[16]).grid(row=5, column=3,  pady=2)
+                    Label(self.AOOR_mode, text= echoFromSim[12]).grid(row=6, column=3,  pady=2)
+                    Label(self.AOOR_mode, text= echoFromSim[13]).grid(row=7, column=3,  pady=2)
+                    Label(self.AOOR_mode, text= echoFromSim[14]).grid(row=8, column=3,  pady=2)
+                    Label(self.AOOR_mode, text= echoFromSim[15]).grid(row=9, column=3,  pady=2)
 
             else:
                 self.message.destroy()
@@ -860,7 +880,7 @@ class pmParams:
                                       "Make sure you have connected to the UART COM", font=("Calibri", 15), fg="red")
             self.message.grid(row=11, columnspan=2, pady=15)
 
-    def echo_AOOR(self):
+    def retrieve_AOOR(self):
         self.serial.ser.open()
         self.serial.ser.flushInput()
         self.serial.ser.flushOutput()
@@ -953,7 +973,7 @@ class pmParams:
         Label(self.VOOR_mode, text="Reaction Time (s): ").grid(row=7, column=2, padx=85, pady=2)
         Label(self.VOOR_mode, text="Response Factor : ").grid(row=8, column=2, padx=85, pady=2)
         Label(self.VOOR_mode, text="Recovery Time (mins) : ").grid(row=9, column=2, padx=85, pady=2)
-        Button(self.VOOR_mode, text="Get Current Settings", padx=20, pady=10, command = self.echo_VOOR).grid(row=10, column=3, pady=2)
+        Button(self.VOOR_mode, text="Get Current Settings", padx=20, pady=10, command = self.retrieve_VOOR).grid(row=10, column=3, pady=2)
 
     def send_VOOR(self, lrl, url, va, vpw, max, threshold, rxn, response, recovery):
         mode = Mode(self.userName, 6)
@@ -996,19 +1016,23 @@ class pmParams:
                 mode.write_params(self.serial)
                 echoFromSim = mode.read_echo(self.serial)
 
-                self.message.destroy()
-                self.message = Label(self.VOOR_mode, text="Update Success!", font=("Calibri", 25), fg="green")
-                self.message.grid(row=11, columnspan=2, pady=15)
+                if (mode.verify_write(echoFromSim)):
+                    errormsg = "Data retrieved from pacemaker doesn't match data sent from DCM"
 
-                Label(self.VOOR_mode, text= echoFromSim[2]).grid(row=1, column=3,  pady=2)
-                Label(self.VOOR_mode, text= echoFromSim[1]).grid(row=2, column=3,  pady=2)
-                Label(self.VOOR_mode, text= echoFromSim[5]).grid(row=3, column=3,  pady=2)
-                Label(self.VOOR_mode, text= echoFromSim[3]).grid(row=4, column=3,  pady=2)
-                Label(self.VOOR_mode, text= echoFromSim[16]).grid(row=5, column=3,  pady=2)
-                Label(self.VOOR_mode, text= echoFromSim[12]).grid(row=6, column=3,  pady=2)
-                Label(self.VOOR_mode, text= echoFromSim[13]).grid(row=7, column=3,  pady=2)
-                Label(self.VOOR_mode, text= echoFromSim[14]).grid(row=8, column=3,  pady=2)
-                Label(self.VOOR_mode, text= echoFromSim[15]).grid(row=9, column=3,  pady=2)
+                else:
+                    self.message.destroy()
+                    self.message = Label(self.VOOR_mode, text="Update Success!", font=("Calibri", 25), fg="green")
+                    self.message.grid(row=11, columnspan=2, pady=15)
+
+                    Label(self.VOOR_mode, text= echoFromSim[2]).grid(row=1, column=3,  pady=2)
+                    Label(self.VOOR_mode, text= echoFromSim[1]).grid(row=2, column=3,  pady=2)
+                    Label(self.VOOR_mode, text= round(echoFromSim[5], 2)).grid(row=3, column=3,  pady=2)
+                    Label(self.VOOR_mode, text= echoFromSim[3]).grid(row=4, column=3,  pady=2)
+                    Label(self.VOOR_mode, text= echoFromSim[16]).grid(row=5, column=3,  pady=2)
+                    Label(self.VOOR_mode, text= echoFromSim[12]).grid(row=6, column=3,  pady=2)
+                    Label(self.VOOR_mode, text= echoFromSim[13]).grid(row=7, column=3,  pady=2)
+                    Label(self.VOOR_mode, text= echoFromSim[14]).grid(row=8, column=3,  pady=2)
+                    Label(self.VOOR_mode, text= echoFromSim[15]).grid(row=9, column=3,  pady=2)
                 
             else:
                 self.message.destroy()
@@ -1025,7 +1049,7 @@ class pmParams:
                                       "Make sure you have connected to the UART COM", font=("Calibri", 15), fg="red")
             self.message.grid(row=11, columnspan=2, pady=15)
     
-    def echo_VOOR(self):
+    def retrieve_VOOR(self):
         self.serial.ser.open()
         self.serial.ser.flushInput()
         self.serial.ser.flushOutput()
@@ -1133,7 +1157,7 @@ class pmParams:
         Label(self.AAIR_mode, text="Response Factor : ").grid(row=10, column=2, padx=85, pady=2)
         Label(self.AAIR_mode, text="Recovery Time (mins) : ").grid(row=11, column=2, padx=85, pady=2)
         Label(self.AAIR_mode, text="Atrial Sensitivity (V): ").grid(row=12, column=2, padx=85, pady=2)
-        Button(self.AAIR_mode, text="Get Current Settings", padx=20, pady=10, command = self.echo_AAIR).grid(row=13, column=3, pady=2)
+        Button(self.AAIR_mode, text="Get Current Settings", padx=20, pady=10, command = self.retrieve_AAIR).grid(row=13, column=3, pady=2)
 
 
     def send_AAIR(self, lrl, url, aa, apw, max, threshold, rxn, response, recovery, arp, pvarp, sense):
@@ -1186,22 +1210,26 @@ class pmParams:
                 mode.write_params(self.serial)
                 echoFromSim = mode.read_echo(self.serial)
 
-                self.message.destroy()
-                self.message = Label(self.AAIR_mode, text="Update Success!", font=("Calibri", 25), fg="green")
-                self.message.grid(row=14, columnspan=2, pady=15)
+                if (mode.verify_write(echoFromSim)):
+                    errormsg = "Data retrieved from pacemaker doesn't match data sent from DCM"
 
-                Label(self.AAIR_mode, text= echoFromSim[2]).grid(row=1, column=3,  pady=2)
-                Label(self.AAIR_mode, text= echoFromSim[1]).grid(row=2, column=3,  pady=2)
-                Label(self.AAIR_mode, text= echoFromSim[6]).grid(row=3, column=3,  pady=2)
-                Label(self.AAIR_mode, text= echoFromSim[4]).grid(row=4, column=3,  pady=2)
-                Label(self.AAIR_mode, text= echoFromSim[10]).grid(row=5, column=3,  pady=2)
-                Label(self.AAIR_mode, text= "").grid(row=6, column=3,  pady=2)
-                Label(self.AAIR_mode, text= echoFromSim[12]).grid(row=7, column=3,  pady=2)
-                Label(self.AAIR_mode, text= echoFromSim[16]).grid(row=8, column=3,  pady=2)
-                Label(self.AAIR_mode, text= echoFromSim[13]).grid(row=9, column=3,  pady=2)
-                Label(self.AAIR_mode, text= echoFromSim[14]).grid(row=10, column=3,  pady=2)
-                Label(self.AAIR_mode, text= echoFromSim[15]).grid(row=11, column=3,  pady=2)
-                Label(self.AAIR_mode, text= echoFromSim[8]).grid(row=12, column=3,  pady=2)
+                else:
+                    self.message.destroy()
+                    self.message = Label(self.AAIR_mode, text="Update Success!", font=("Calibri", 25), fg="green")
+                    self.message.grid(row=14, columnspan=2, pady=15)
+
+                    Label(self.AAIR_mode, text= echoFromSim[2]).grid(row=1, column=3,  pady=2)
+                    Label(self.AAIR_mode, text= echoFromSim[1]).grid(row=2, column=3,  pady=2)
+                    Label(self.AAIR_mode, text= round(echoFromSim[6], 2)).grid(row=3, column=3,  pady=2)
+                    Label(self.AAIR_mode, text= echoFromSim[4]).grid(row=4, column=3,  pady=2)
+                    Label(self.AAIR_mode, text= echoFromSim[10]).grid(row=5, column=3,  pady=2)
+                    Label(self.AAIR_mode, text= "").grid(row=6, column=3,  pady=2)
+                    Label(self.AAIR_mode, text= echoFromSim[12]).grid(row=7, column=3,  pady=2)
+                    Label(self.AAIR_mode, text= echoFromSim[16]).grid(row=8, column=3,  pady=2)
+                    Label(self.AAIR_mode, text= echoFromSim[13]).grid(row=9, column=3,  pady=2)
+                    Label(self.AAIR_mode, text= echoFromSim[14]).grid(row=10, column=3,  pady=2)
+                    Label(self.AAIR_mode, text= echoFromSim[15]).grid(row=11, column=3,  pady=2)
+                    Label(self.AAIR_mode, text= round(echoFromSim[8], 2)).grid(row=12, column=3,  pady=2)
                 
             else:
                 self.message.destroy()
@@ -1218,7 +1246,7 @@ class pmParams:
                                       "Make sure you have connected to the UART COM", font=("Calibri", 15), fg="red")
             self.message.grid(row=14, columnspan=2, pady=15)
 
-    def echo_AAIR(self):
+    def retrieve_AAIR(self):
         self.serial.ser.open()
         self.serial.ser.flushInput()
         self.serial.ser.flushOutput()
@@ -1325,7 +1353,7 @@ class pmParams:
         Label(self.VVIR_mode, text="Reaction Time (s): ").grid(row=9, column=2, padx=85, pady=2)
         Label(self.VVIR_mode, text="Response Factor : ").grid(row=10, column=2, padx=85, pady=2)
         Label(self.VVIR_mode, text="Recovery Time (mins) : ").grid(row=11, column=2, padx=85, pady=2)
-        Button(self.VVIR_mode, text="Get Current Settings", padx=20, pady=10, command = self.echo_VVIR).grid(row=12, column=3, pady=2)
+        Button(self.VVIR_mode, text="Get Current Settings", padx=20, pady=10, command = self.retrieve_VVIR).grid(row=12, column=3, pady=2)
 
     def send_VVIR(self, lrl, url, va, vpw, max, threshold, rxn, response, recovery, vrp, sense):
         mode = Mode(self.userName, 8)
@@ -1374,22 +1402,25 @@ class pmParams:
                 mode.write_params(self.serial)
                 echoFromSim = mode.read_echo(self.serial)
 
-                self.message.destroy()
-                self.message = Label(self.VVIR_mode, text="Update Success!", font=("Calibri", 25), fg="green")
-                self.message.grid(row=13, columnspan=2, pady=15)
+                if (mode.verify_write(echoFromSim)):
+                    errormsg = "Data retrieved from pacemaker doesn't match data sent from DCM"
 
-                Label(self.VVIR_mode, text= echoFromSim[2]).grid(row=1, column=3,  pady=2)
-                Label(self.VVIR_mode, text= echoFromSim[1]).grid(row=2, column=3,  pady=2)
-                Label(self.VVIR_mode, text= echoFromSim[5]).grid(row=3, column=3,  pady=2)
-                Label(self.VVIR_mode, text= echoFromSim[3]).grid(row=4, column=3,  pady=2)
-                Label(self.VVIR_mode, text= echoFromSim[9]).grid(row=5, column=3,  pady=2)
-                Label(self.VVIR_mode, text= echoFromSim[7]).grid(row=6, column=3,  pady=2)
-                Label(self.VVIR_mode, text= echoFromSim[12]).grid(row=7, column=3,  pady=2)
-                Label(self.VVIR_mode, text= echoFromSim[16]).grid(row=8, column=3,  pady=2)
-                Label(self.VVIR_mode, text= echoFromSim[13]).grid(row=9, column=3,  pady=2)
-                Label(self.VVIR_mode, text= echoFromSim[14]).grid(row=10, column=3,  pady=2)
-                Label(self.VVIR_mode, text= echoFromSim[15]).grid(row=11, column=3,  pady=2)
-               
+                else:
+                    self.message.destroy()
+                    self.message = Label(self.VVIR_mode, text="Update Success!", font=("Calibri", 25), fg="green")
+                    self.message.grid(row=13, columnspan=2, pady=15)
+
+                    Label(self.VVIR_mode, text= echoFromSim[2]).grid(row=1, column=3,  pady=2)
+                    Label(self.VVIR_mode, text= echoFromSim[1]).grid(row=2, column=3,  pady=2)
+                    Label(self.VVIR_mode, text= round(echoFromSim[5], 2)).grid(row=3, column=3,  pady=2)
+                    Label(self.VVIR_mode, text= echoFromSim[3]).grid(row=4, column=3,  pady=2)
+                    Label(self.VVIR_mode, text= echoFromSim[9]).grid(row=5, column=3,  pady=2)
+                    Label(self.VVIR_mode, text= echoFromSim[7]).grid(row=6, column=3,  pady=2)
+                    Label(self.VVIR_mode, text= echoFromSim[12]).grid(row=7, column=3,  pady=2)
+                    Label(self.VVIR_mode, text= echoFromSim[16]).grid(row=8, column=3,  pady=2)
+                    Label(self.VVIR_mode, text= echoFromSim[13]).grid(row=9, column=3,  pady=2)
+                    Label(self.VVIR_mode, text= echoFromSim[14]).grid(row=10, column=3,  pady=2)
+                    Label(self.VVIR_mode, text= echoFromSim[15]).grid(row=11, column=3,  pady=2)
 
             else:
                 self.message.destroy()
@@ -1406,7 +1437,7 @@ class pmParams:
                                       "Make sure you have connected to the UART COM", font=("Calibri", 15), fg="red")
             self.message.grid(row=13, columnspan=2, pady=15)
 
-    def echo_VVIR(self):
+    def retrieve_VVIR(self):
         self.serial.ser.open()
         self.serial.ser.flushInput()
         self.serial.ser.flushOutput()
@@ -1436,8 +1467,6 @@ class pmParams:
         Label(self.VVIR_mode, text= fromSim[14]).grid(row=10, column=3,  pady=2)
         Label(self.VVIR_mode, text= fromSim[15]).grid(row=11, column=3,  pady=2)
         Label(self.VVIR_mode, text= "Current Mode number: " + str(fromSim[0])).grid(row=12, column=2,  pady=2)
-
-    
 
 # DOOR MODE PARAMETERS
     def set_mode_DOOR(self):
@@ -1516,7 +1545,7 @@ class pmParams:
         Label(self.DOOR_mode, text="Max Sensor Rate (ppm): ").grid(row=10, column=2, padx=85, pady=2)
         Label(self.DOOR_mode, text="Response Factor : ").grid(row=11, column=2, padx=85, pady=2)
         Label(self.DOOR_mode, text="Recovery Time (mins) : ").grid(row=12, column=2, padx=85, pady=2)
-        Button(self.DOOR_mode, text="Get Current Settings", padx=20, pady=10, command = self.echo_DOOR).grid(row=13, column=3, pady=2)
+        Button(self.DOOR_mode, text="Get Current Settings", padx=20, pady=10, command = self.retrieve_DOOR).grid(row=13, column=3, pady=2)
 
     def send_DOOR(self, lrl, url, va, vpw, aa, apw, av, threshold, rxn, max, response, recovery):
         mode = Mode(self.userName, 10)
@@ -1568,22 +1597,26 @@ class pmParams:
                 mode.write_params(self.serial)
                 echoFromSim = mode.read_echo(self.serial)
 
-                self.message.destroy()
-                self.message = Label(self.DOOR_mode, text="Update Success!", font=("Calibri", 25), fg="green")
-                self.message.grid(row=14, columnspan=2, pady=15)
+                if (mode.verify_write(echoFromSim)):
+                    errormsg = "Data retrieved from pacemaker doesn't match data sent from DCM"
 
-                Label(self.DOOR_mode, text= echoFromSim[2]).grid(row=1, column=3,  pady=2)
-                Label(self.DOOR_mode, text= echoFromSim[1]).grid(row=2, column=3,  pady=2)
-                Label(self.DOOR_mode, text= echoFromSim[6]).grid(row=3, column=3,  pady=2)
-                Label(self.DOOR_mode, text= echoFromSim[4]).grid(row=4, column=3,  pady=2)
-                Label(self.DOOR_mode, text= echoFromSim[5]).grid(row=5, column=3,  pady=2)
-                Label(self.DOOR_mode, text= echoFromSim[3]).grid(row=6, column=3,  pady=2)
-                Label(self.DOOR_mode, text= echoFromSim[12]).grid(row=7, column=3,  pady=2)
-                Label(self.DOOR_mode, text= echoFromSim[11]).grid(row=8, column=3,  pady=2)
-                Label(self.DOOR_mode, text= echoFromSim[13]).grid(row=9, column=3,  pady=2)
-                Label(self.DOOR_mode, text= echoFromSim[16]).grid(row=10, column=3,  pady=2)
-                Label(self.DOOR_mode, text= echoFromSim[14]).grid(row=11, column=3,  pady=2)
-                Label(self.DOOR_mode, text= echoFromSim[15]).grid(row=12, column=3,  pady=2)
+                else:
+                    self.message.destroy()
+                    self.message = Label(self.DOOR_mode, text="Update Success!", font=("Calibri", 25), fg="green")
+                    self.message.grid(row=14, columnspan=2, pady=15)
+
+                    Label(self.DOOR_mode, text= echoFromSim[2]).grid(row=1, column=3,  pady=2)
+                    Label(self.DOOR_mode, text= echoFromSim[1]).grid(row=2, column=3,  pady=2)
+                    Label(self.DOOR_mode, text= round(echoFromSim[6], 2)).grid(row=3, column=3,  pady=2)
+                    Label(self.DOOR_mode, text= echoFromSim[4]).grid(row=4, column=3,  pady=2)
+                    Label(self.DOOR_mode, text= round(echoFromSim[5], 2)).grid(row=5, column=3,  pady=2)
+                    Label(self.DOOR_mode, text= echoFromSim[3]).grid(row=6, column=3,  pady=2)
+                    Label(self.DOOR_mode, text= echoFromSim[12]).grid(row=7, column=3,  pady=2)
+                    Label(self.DOOR_mode, text= echoFromSim[11]).grid(row=8, column=3,  pady=2)
+                    Label(self.DOOR_mode, text= echoFromSim[13]).grid(row=9, column=3,  pady=2)
+                    Label(self.DOOR_mode, text= echoFromSim[16]).grid(row=10, column=3,  pady=2)
+                    Label(self.DOOR_mode, text= echoFromSim[14]).grid(row=11, column=3,  pady=2)
+                    Label(self.DOOR_mode, text= echoFromSim[15]).grid(row=12, column=3,  pady=2)
 
             else:
                 self.message.destroy()
@@ -1599,7 +1632,7 @@ class pmParams:
                                       "Make sure you have connected to the UART COM", font=("Calibri", 15), fg="red")
             self.message.grid(row=14, columnspan=2, pady=15)
 
-    def echo_DOOR(self):
+    def retrieve_DOOR(self):
         self.serial.ser.open()
         self.serial.ser.flushInput()
         self.serial.ser.flushOutput()

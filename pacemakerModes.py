@@ -3,7 +3,6 @@ import serial
 import struct
 from time import sleep
 
-
 class Mode():
     def __init__(self, user, mode):
         self.LRL = 0                # lower rate limit
@@ -172,14 +171,13 @@ class Mode():
         file.write("\n")
         file.close()
 
+        # open serial port for writing data to pacemaker
         serial.ser.open()
-        serial.ser.flushInput()
-        serial.ser.read_all()
-        serial.ser.flushOutput()
+        serial.ser.flushInput() # flush input buffer
+        serial.ser.read_all()   # read data from pacemaker
+        serial.ser.flushOutput()    # flush output buffer
         self.packed = struct.pack('<BBBIIBBffffIIIBBBBB',34,81,self.MODE,self.URL,self.LRL,self.VPW,self.APW,self.VA,self.AA,self.VS,self.AS,self.VRP,self.ARP,self.FIXED_AV_DELAY,self.ACT_THRESHOLD,self.REACTION_TIME,self.RESPONSE_FACTOR,self.RECOVERY_TIME,self.MAX_SENSE_RATE)
-        self.unpacked = struct.unpack('<BBBIIBBffffIIIBBBBB', self.packed)
-        print(self.unpacked)
-        serial.ser.write(self.packed)
+        serial.ser.write(self.packed)   # send packed data
     
     def read_echo(self, serial):
 
@@ -187,7 +185,7 @@ class Mode():
         print("In waiting: " + str(serial.ser.in_waiting))
         read = serial.ser.read(160)
         print(read)
-        fromSim = struct.unpack('<BIIBBffffIIIBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB', read)
+        fromSim = struct.unpack('<BIIBBffffIIIBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB', read) # unpack data from PM
         print(fromSim)
 
         serial.ser.flushInput()
@@ -197,10 +195,24 @@ class Mode():
 
         return fromSim
 
+    def verify_write(self, echo):
+
+        if (self.MODE != echo[0]):
+            return False
+        else:
+            i = 0 # used to index through echo
+            for param in self.paramList:
+                if (round(param, 2) != round(echo[i], 2)):
+                    return False
+                else:
+                    i = i + 1
+
+        return True
+
     def updateParamList(self):
-        self.paramList = [self.LRL, self.URL, self.AA, self.APW, self.ARP, self.AS, self.PVARP,
-                          self.VA, self.VPW, self.VRP, self.VS,  self.MAX_SENSE_RATE, self.FIXED_AV_DELAY,
-                          self.ACT_THRESHOLD, self.REACTION_TIME, self.RESPONSE_FACTOR, self.RECOVERY_TIME, self.MODE]
+        self.paramList = [self.URL,self.LRL,self.VPW,self.APW,self.VA,self.AA,self.VS,self.AS,self.VRP,
+                          self.ARP,self.FIXED_AV_DELAY,self.ACT_THRESHOLD,self.REACTION_TIME,self.RESPONSE_FACTOR,
+                          self.RECOVERY_TIME,self.MAX_SENSE_RATE]
 
     def chooseDataFile(self, mode):
         if (mode == 1):

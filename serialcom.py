@@ -4,7 +4,7 @@ from serial.tools.list_ports import comports
 class serialcom():
 
     def __init__(self):
-        self.ser = serial.Serial()
-        self.ser.baudrate = 115200
-        self.ports = list(comports())
-        print(self.ports)
+        ser = serial.Serial()
+        ser.baudrate = 115200
+        ports = list(comports())
+        print(ports)
